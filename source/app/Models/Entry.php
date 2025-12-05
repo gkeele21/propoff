@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Entry extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'event_id',
+        'user_id',
+        'group_id',
+        'total_score',
+        'possible_points',
+        'percentage',
+        'is_complete',
+        'submitted_at',
+        'submitted_by_captain_id',
+        'submitted_by_captain_at',
+    ];
+
+    protected $casts = [
+        'is_complete' => 'boolean',
+        'submitted_at' => 'datetime',
+        'submitted_by_captain_at' => 'datetime',
+        'percentage' => 'float',
+    ];
+
+    /**
+     * Get the event that owns the entry.
+     */
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
+
+    /**
+     * Get the user who made the entry.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the group this entry belongs to.
+     */
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
+
+    /**
+     * Get the user answers for this entry.
+     */
+    public function userAnswers()
+    {
+        return $this->hasMany(UserAnswer::class);
+    }
+
+    /**
+     * Get the captain who submitted on behalf of the user.
+     */
+    public function submittedByCaptain()
+    {
+        return $this->belongsTo(User::class, 'submitted_by_captain_id');
+    }
+
+    /**
+     * Check if this entry was submitted by a captain.
+     */
+    public function wasSubmittedByCaptain(): bool
+    {
+        return !is_null($this->submitted_by_captain_id);
+    }
+}
