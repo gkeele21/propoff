@@ -32,7 +32,6 @@ class GuestController extends Controller
                 'event' => [
                     'id' => $invitation->event->id,
                     'name' => $invitation->event->name,
-                    'category' => $invitation->event->category,
                     'event_date' => $invitation->event->event_date,
                     'status' => $invitation->event->status,
                 ],

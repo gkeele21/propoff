@@ -151,6 +151,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Event Questions
     Route::get('/events/{event}/event-questions', [AdminEventQuestionController::class, 'index'])->name('events.event-questions.index');
     Route::get('/events/{event}/event-questions/create', [AdminEventQuestionController::class, 'create'])->name('events.event-questions.create');
+    Route::get('/events/{event}/event-questions/search-templates', [AdminEventQuestionController::class, 'searchTemplates'])->name('events.event-questions.searchTemplates');
     Route::post('/events/{event}/event-questions', [AdminEventQuestionController::class, 'store'])->name('events.event-questions.store');
     Route::post('/events/{event}/event-questions/template/{template}', [AdminEventQuestionController::class, 'createFromTemplate'])->name('events.event-questions.createFromTemplate');
     Route::post('/events/{event}/event-questions/bulk-create-from-templates', [AdminEventQuestionController::class, 'bulkCreateFromTemplates'])->name('events.event-questions.bulkCreateFromTemplates');

@@ -9,6 +9,14 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Disable Vite for tests to avoid manifest errors
+        $this->withoutVite();
+    }
+
     /**
      * Create an admin user.
      */

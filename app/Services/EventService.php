@@ -99,12 +99,11 @@ class EventService
     }
 
     /**
-     * Search events by name or category.
+     * Search events by name or description.
      */
     public function searchEvents(string $query, int $perPage = 15)
     {
         return Event::where('name', 'like', "%{$query}%")
-            ->orWhere('category', 'like', "%{$query}%")
             ->orWhere('description', 'like', "%{$query}%")
             ->with('creator')
             ->withCount(['questions', 'entries'])

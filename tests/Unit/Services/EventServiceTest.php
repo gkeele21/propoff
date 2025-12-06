@@ -311,21 +311,18 @@ class EventServiceTest extends TestCase
     }
 
     /** @test */
-    public function it_searches_events_by_category()
+    public function it_searches_events_by_name_partial_match()
     {
         Event::factory()->create([
-            'name' => 'Event 1',
-            'category' => 'Football',
+            'name' => 'Football Championship 2024',
         ]);
 
         Event::factory()->create([
-            'name' => 'Event 2',
-            'category' => 'Basketball',
+            'name' => 'Basketball Finals',
         ]);
 
         Event::factory()->create([
-            'name' => 'Event 3',
-            'category' => 'Football',
+            'name' => 'College Football Bowl',
         ]);
 
         $results = $this->eventService->searchEvents('Football', 50);

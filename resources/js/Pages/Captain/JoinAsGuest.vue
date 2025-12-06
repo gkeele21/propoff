@@ -22,7 +22,6 @@
                     <!-- Event Info -->
                     <div class="bg-propoff-blue/10 border border-propoff-blue/30 rounded-lg p-4">
                         <h3 class="text-lg font-semibold text-propoff-blue">{{ event.name }}</h3>
-                        <p class="text-sm text-propoff-blue mt-1">{{ event.category }}</p>
                         <p class="text-xs text-propoff-blue mt-2">
                             Event Date: {{ formatDate(event.event_date) }}
                         </p>

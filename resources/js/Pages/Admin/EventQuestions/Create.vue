@@ -31,83 +31,112 @@
                         <div>
                             <h3 class="font-semibold text-propoff-blue">{{ event.name }}</h3>
                             <p class="text-sm text-propoff-blue mt-1">
-                                Category: {{ event.category }} | Current Questions: {{ currentQuestions.length }} | Event Date: {{ formatDate(event?.event_date) }}
+                                Current Questions: {{ currentQuestions.length }} | Event Date: {{ formatDate(event?.event_date) }}
                             </p>
                         </div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- LEFT: Available Templates -->
+                    <!-- LEFT: Template Search -->
                     <div class="lg:col-span-2">
                         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                             <div class="border-b border-gray-200 p-6">
                                 <h3 class="text-lg font-semibold text-gray-900 mb-4">
                                     <DocumentPlusIcon class="w-5 h-5 inline mr-2" />
-                                    Available Templates ({{ availableTemplates.length }})
+                                    Find Template Questions
                                 </h3>
 
-                                <div v-if="availableTemplates.length === 0" class="text-center py-8 text-gray-500">
-                                    No templates available for the {{ event.category }} category.
+                                <!-- Category Search Input -->
+                                <div class="mb-6">
+                                    <label for="category-search" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Search by Category
+                                    </label>
+                                    <div class="flex gap-2">
+                                        <input
+                                            id="category-search"
+                                            type="text"
+                                            v-model="categorySearch"
+                                            @keyup.enter="findTemplatesByCategory"
+                                            class="flex-1 border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                            placeholder="Enter category (e.g., football, nfl, sports)"
+                                        />
+                                        <button
+                                            @click="findTemplatesByCategory"
+                                            :disabled="!categorySearch.trim() || isSearching"
+                                            class="px-4 py-2 bg-propoff-blue text-white rounded-md hover:bg-propoff-blue/80 disabled:bg-propoff-blue/50 disabled:cursor-not-allowed"
+                                        >
+                                            {{ isSearching ? 'Searching...' : 'Find' }}
+                                        </button>
+                                    </div>
                                 </div>
 
-                                <div v-else class="space-y-3">
-                                    <!-- Select All / Deselect All -->
-                                    <div class="flex gap-2 pb-4 border-b">
-                                        <button @click="selectAllTemplates"
-                                                class="px-3 py-1 text-sm bg-propoff-blue text-white rounded hover:bg-propoff-blue/80">
-                                            Select All
-                                        </button>
-                                        <button @click="deselectAllTemplates"
-                                                class="px-3 py-1 text-sm bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
-                                            Deselect All
-                                        </button>
-                                        <button @click="bulkCreateSelected"
-                                                :disabled="selectedTemplateIds.length === 0"
-                                                class="ml-auto px-4 py-1 text-sm bg-propoff-green text-white rounded hover:bg-propoff-dark-green disabled:bg-propoff-green/50">
-                                            Add {{ selectedTemplateIds.length }} Selected
-                                        </button>
+                                <!-- Search Results -->
+                                <div v-if="searchPerformed">
+                                    <div v-if="filteredTemplates.length === 0" class="text-center py-8 text-gray-500">
+                                        No templates found for category "{{ lastSearchTerm }}".
                                     </div>
 
-                                    <!-- Template List -->
-                                    <div class="space-y-2">
-                                        <div v-for="template in availableTemplates" :key="template.id"
-                                             class="flex items-start gap-3 p-3 border border-gray-200 rounded hover:bg-gray-50">
+                                    <div v-else class="space-y-3">
+                                        <p class="text-sm text-gray-700 mb-3">
+                                            Found {{ filteredTemplates.length }} template{{ filteredTemplates.length !== 1 ? 's' : '' }} for "{{ lastSearchTerm }}"
+                                        </p>
 
-                                            <!-- Checkbox -->
-                                            <input
-                                                type="checkbox"
-                                                :value="template.id"
-                                                v-model="selectedTemplateIds"
-                                                class="mt-1"
-                                            />
-
-                                            <!-- Template Info -->
-                                            <div class="flex-1">
-                                                <div class="flex items-center gap-2 mb-1">
-                                                    <h4 class="font-semibold text-gray-900">{{ template.title }}</h4>
-                                                    <span :class="['px-2 py-0.5 text-xs rounded', typeClass(template.question_type)]">
-                                                        {{ formatType(template.question_type) }}
-                                                    </span>
-                                                </div>
-                                                <p class="text-sm text-gray-600 mb-2">{{ template.question_text }}</p>
-
-                                                <!-- Variables Badge -->
-                                                <div v-if="template.variables?.length" class="text-xs">
-                                                    <span class="bg-propoff-orange/10 text-propoff-orange px-2 py-1 rounded">
-                                                        {{ template.variables.length }} variable{{ template.variables.length !== 1 ? 's' : '' }}:
-                                                        {{ template.variables.join(', ') }}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            <!-- Single Add Button -->
-                                            <button @click="addSingleTemplate(template)"
-                                                    class="px-3 py-1 text-sm bg-propoff-blue/10 text-propoff-blue rounded hover:bg-propoff-blue/20">
-                                                +
+                                        <!-- Select All / Deselect All -->
+                                        <div class="flex gap-2 pb-4 border-b">
+                                            <button @click="selectAllTemplates"
+                                                    class="px-3 py-1 text-sm bg-propoff-blue text-white rounded hover:bg-propoff-blue/80">
+                                                Select All
+                                            </button>
+                                            <button @click="deselectAllTemplates"
+                                                    class="px-3 py-1 text-sm bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                                                Deselect All
+                                            </button>
+                                            <button @click="bulkCreateSelected"
+                                                    :disabled="selectedTemplates.length === 0"
+                                                    class="ml-auto px-4 py-1 text-sm bg-propoff-green text-white rounded hover:bg-propoff-dark-green disabled:bg-propoff-green/50">
+                                                Import {{ selectedTemplates.length }} Selected
                                             </button>
                                         </div>
+
+                                        <!-- Template List -->
+                                        <div class="space-y-2 max-h-[500px] overflow-y-auto">
+                                            <div v-for="template in filteredTemplates" :key="template.id"
+                                                 class="flex items-start gap-3 p-3 border border-gray-200 rounded hover:bg-gray-50">
+
+                                                <!-- Checkbox -->
+                                                <input
+                                                    type="checkbox"
+                                                    :checked="isTemplateSelected(template.id)"
+                                                    @change="toggleTemplateSelection(template)"
+                                                    class="mt-1"
+                                                />
+
+                                                <!-- Template Info -->
+                                                <div class="flex-1">
+                                                    <div class="flex items-center gap-2 mb-1">
+                                                        <h4 class="font-semibold text-gray-900">{{ template.title }}</h4>
+                                                        <span :class="['px-2 py-0.5 text-xs rounded', typeClass(template.question_type)]">
+                                                            {{ formatType(template.question_type) }}
+                                                        </span>
+                                                    </div>
+                                                    <p class="text-sm text-gray-600 mb-2">{{ template.question_text }}</p>
+
+                                                    <!-- Variables Badge -->
+                                                    <div v-if="template.variables?.length" class="text-xs">
+                                                        <span class="bg-propoff-orange/10 text-propoff-orange px-2 py-1 rounded">
+                                                            {{ template.variables.length }} variable{{ template.variables.length !== 1 ? 's' : '' }}:
+                                                            {{ template.variables.join(', ') }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
+                                </div>
+
+                                <div v-else class="text-center py-8 text-gray-500">
+                                    <p>Enter a category and click "Find" to search for template questions.</p>
                                 </div>
                             </div>
                         </div>
@@ -124,7 +153,7 @@
 
                                 <div v-if="currentQuestions.length === 0" class="text-center py-8 text-gray-500">
                                     <p>No questions added yet.</p>
-                                    <p class="text-sm mt-2">Select templates from the left or create a custom question below.</p>
+                                    <p class="text-sm mt-2">Search templates or create a custom question below.</p>
                                 </div>
 
                                 <div v-else class="space-y-2 max-h-96 overflow-y-auto">
@@ -328,142 +357,79 @@
                     </form>
                 </div>
 
-                <!-- Variable Input Modal -->
-                <div v-if="showVariableModal && currentTemplate" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                <!-- Consolidated Variable Input Modal -->
+                <div v-if="showConsolidatedVariableModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
                     <!-- Backdrop -->
-                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showVariableModal = false"></div>
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeConsolidatedVariableModal"></div>
 
                     <!-- Modal -->
                     <div class="flex min-h-full items-center justify-center p-4">
-                        <div class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full">
+                        <div class="relative bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
                             <!-- Header -->
                             <div class="border-b border-gray-200 px-6 py-4">
                                 <div class="flex items-center justify-between">
                                     <h3 class="text-lg font-semibold text-gray-900">
-                                        Set Variable Values
+                                        Fill in Variables for {{ selectedTemplates.length }} Question{{ selectedTemplates.length !== 1 ? 's' : '' }}
                                     </h3>
-                                    <button @click="showVariableModal = false" class="text-gray-400 hover:text-gray-500">
+                                    <button @click="closeConsolidatedVariableModal" class="text-gray-400 hover:text-gray-500">
                                         <XMarkIcon class="w-6 h-6" />
                                     </button>
                                 </div>
                                 <p class="mt-1 text-sm text-gray-500">
-                                    Template: <span class="font-medium">{{ currentTemplate.title }}</span>
-                                </p>
-                            </div>
-
-                            <!-- Body -->
-                            <div class="px-6 py-4">
-                                <!-- Preview with placeholders -->
-                                <div class="bg-propoff-blue/10 border border-propoff-blue/30 rounded-lg p-4 mb-6">
-                                    <h4 class="text-sm font-semibold text-propoff-blue mb-2">Preview</h4>
-                                    <p class="text-sm text-gray-700">{{ getPreviewText() }}</p>
-                                </div>
-
-                                <!-- Variable inputs -->
-                                <div class="space-y-4">
-                                    <div v-for="variable in currentTemplate.variables" :key="variable">
-                                        <label :for="'var-' + variable" class="block text-sm font-medium text-gray-700 mb-2">
-                                            {{ variable }}
-                                            <span class="text-xs text-gray-500 ml-1">(will replace {{ variable }})</span>
-                                        </label>
-                                        <input
-                                            :id="'var-' + variable"
-                                            type="text"
-                                            v-model="variableValues[variable]"
-                                            class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
-                                            :placeholder="`Enter value for ${variable}`"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Footer -->
-                            <div class="border-t border-gray-200 px-6 py-4 flex items-center justify-end gap-3">
-                                <button
-                                    @click="showVariableModal = false"
-                                    type="button"
-                                    class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    @click="submitTemplateWithVariables"
-                                    type="button"
-                                    class="px-4 py-2 bg-propoff-blue border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-propoff-blue/80"
-                                >
-                                    Add Question
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bulk Variable Input Modal -->
-                <div v-if="showBulkVariableModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                    <!-- Backdrop -->
-                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showBulkVariableModal = false"></div>
-
-                    <!-- Modal -->
-                    <div class="flex min-h-full items-center justify-center p-4">
-                        <div class="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-                            <!-- Header -->
-                            <div class="border-b border-gray-200 px-6 py-4">
-                                <div class="flex items-center justify-between">
-                                    <h3 class="text-lg font-semibold text-gray-900">
-                                        Set Variables for {{ selectedTemplateIds.length }} Templates
-                                    </h3>
-                                    <button @click="showBulkVariableModal = false" class="text-gray-400 hover:text-gray-500">
-                                        <XMarkIcon class="w-6 h-6" />
-                                    </button>
-                                </div>
-                                <p class="mt-1 text-sm text-gray-500">
-                                    Enter variable values for each template that requires them
+                                    The following variables were found across your selected templates.
+                                    Fill them out once, and they'll be applied to all questions.
                                 </p>
                             </div>
 
                             <!-- Body - Scrollable -->
-                            <div class="px-6 py-4 max-h-[60vh] overflow-y-auto">
-                                <div class="space-y-6">
-                                    <div v-for="template in bulkTemplates.filter(t => t.variables && t.variables.length > 0)" :key="template.id" class="border border-gray-200 rounded-lg p-4">
-                                        <h4 class="font-semibold text-gray-900 mb-2">{{ template.title }}</h4>
-                                        <p class="text-sm text-gray-600 mb-4">{{ template.question_text }}</p>
+                            <div class="flex-1 overflow-y-auto px-6 py-4">
+                                <div class="space-y-4">
+                                    <div
+                                        v-for="variable in distinctVariables"
+                                        :key="variable"
+                                        class="variable-input-group"
+                                    >
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            {{ variable }}
+                                        </label>
 
-                                        <div class="space-y-3">
-                                            <div v-for="variable in template.variables" :key="`${template.id}-${variable}`">
-                                                <label :for="`bulk-var-${template.id}-${variable}`" class="block text-sm font-medium text-gray-700 mb-1">
-                                                    {{ variable }}
-                                                    <span class="text-xs text-gray-500 ml-1">(replace {{ variable }})</span>
-                                                </label>
-                                                <input
-                                                    :id="`bulk-var-${template.id}-${variable}`"
-                                                    type="text"
-                                                    v-model="bulkVariableValues[template.id][variable]"
-                                                    class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
-                                                    :placeholder="`Enter value for ${variable}`"
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
+                                        <!-- Show which templates use this variable -->
+                                        <p class="text-xs text-gray-500 mb-2">
+                                            Used in {{ getTemplateCountForVariable(variable) }} question(s)
+                                        </p>
+
+                                        <input
+                                            type="text"
+                                            v-model="consolidatedVariables[variable]"
+                                            :placeholder="`Enter value for ${variable}`"
+                                            class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                        />
                                     </div>
+                                </div>
+
+                                <!-- Preview Section -->
+                                <div v-if="previewQuestion" class="mt-6 p-4 bg-gray-50 rounded border border-gray-200">
+                                    <h4 class="text-sm font-semibold text-gray-700 mb-2">Preview (first question):</h4>
+                                    <p class="text-gray-900">{{ previewQuestionText }}</p>
                                 </div>
                             </div>
 
                             <!-- Footer -->
                             <div class="border-t border-gray-200 px-6 py-4 flex items-center justify-end gap-3">
                                 <button
-                                    @click="showBulkVariableModal = false"
+                                    @click="closeConsolidatedVariableModal"
                                     type="button"
                                     class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
                                 >
                                     Cancel
                                 </button>
                                 <button
-                                    @click="submitBulkTemplatesWithVariables"
+                                    @click="submitConsolidatedImport"
                                     type="button"
-                                    class="px-4 py-2 bg-propoff-blue border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-propoff-blue/80"
+                                    :disabled="!allVariablesFilled"
+                                    class="px-4 py-2 bg-propoff-blue border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-propoff-blue/80 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    Add {{ selectedTemplateIds.length }} Questions
+                                    Import {{ selectedTemplates.length }} Question{{ selectedTemplates.length !== 1 ? 's' : '' }}
                                 </button>
                             </div>
                         </div>
@@ -475,12 +441,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
+import { Head } from '@inertiajs/vue3';
 import { router, useForm } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import {
-    ArrowLeftIcon,
     InformationCircleIcon,
     DocumentPlusIcon,
     ListBulletIcon,
@@ -489,23 +454,30 @@ import {
     XMarkIcon,
 } from '@heroicons/vue/24/outline';
 import PageHeader from '@/Components/PageHeader.vue';
+import axios from 'axios';
 
 const props = defineProps({
     event: Object,
-    availableTemplates: Array,
     currentQuestions: Array,
     nextOrder: Number,
 });
 
-// State
-const selectedTemplateIds = ref([]);
+// Category Search State
+const categorySearch = ref('');
+const lastSearchTerm = ref('');
+const searchPerformed = ref(false);
+const filteredTemplates = ref([]);
+const isSearching = ref(false);
+
+// Template Selection State
+const selectedTemplates = ref([]);
+
+// Consolidated Variable Modal State
+const showConsolidatedVariableModal = ref(false);
+const consolidatedVariables = ref({});
+
+// Manual Form State
 const showManualForm = ref(false);
-const showVariableModal = ref(false);
-const currentTemplate = ref(null);
-const variableValues = ref({});
-const showBulkVariableModal = ref(false);
-const bulkTemplates = ref([]);
-const bulkVariableValues = ref({});
 
 // Form for manual creation
 const questionTypes = [
@@ -526,114 +498,205 @@ const form = useForm({
     ],
 });
 
+// Computed: Get all distinct variables across selected templates
+const distinctVariables = computed(() => {
+    const variableSet = new Set();
+
+    selectedTemplates.value.forEach(template => {
+        if (template.variables && Array.isArray(template.variables)) {
+            template.variables.forEach(v => variableSet.add(v));
+        }
+    });
+
+    return Array.from(variableSet).sort();
+});
+
+// Computed: Check if all variables are filled
+const allVariablesFilled = computed(() => {
+    return distinctVariables.value.every(variable => {
+        return consolidatedVariables.value[variable] &&
+               consolidatedVariables.value[variable].trim() !== '';
+    });
+});
+
+// Computed: Preview question with variables replaced
+const previewQuestion = computed(() => {
+    return selectedTemplates.value.find(t => t.variables && t.variables.length > 0) || null;
+});
+
+const previewQuestionText = computed(() => {
+    if (!previewQuestion.value) return '';
+
+    let text = previewQuestion.value.question_text;
+
+    Object.keys(consolidatedVariables.value).forEach(variable => {
+        const value = consolidatedVariables.value[variable];
+        if (value) {
+            text = text.replace(new RegExp(`\\{${variable}\\}`, 'g'), value);
+        }
+    });
+
+    return text;
+});
+
 // Methods
+
+// Search for templates by category
+const findTemplatesByCategory = async () => {
+    if (!categorySearch.value.trim()) {
+        return;
+    }
+
+    isSearching.value = true;
+
+    try {
+        const response = await axios.get(
+            route('admin.events.event-questions.searchTemplates', props.event.id),
+            {
+                params: { category: categorySearch.value.trim() }
+            }
+        );
+
+        filteredTemplates.value = response.data.templates;
+        lastSearchTerm.value = response.data.search_term;
+        searchPerformed.value = true;
+    } catch (error) {
+        console.error('Error searching templates:', error);
+        alert('Error searching for templates. Please try again.');
+    } finally {
+        isSearching.value = false;
+    }
+};
+
+// Toggle template selection
+const toggleTemplateSelection = (template) => {
+    const index = selectedTemplates.value.findIndex(t => t.id === template.id);
+    if (index > -1) {
+        selectedTemplates.value.splice(index, 1);
+    } else {
+        selectedTemplates.value.push(template);
+    }
+};
+
+// Check if template is selected
+const isTemplateSelected = (templateId) => {
+    return selectedTemplates.value.some(t => t.id === templateId);
+};
+
+// Select all templates
 const selectAllTemplates = () => {
-    selectedTemplateIds.value = props.availableTemplates.map(t => t.id);
+    selectedTemplates.value = [...filteredTemplates.value];
 };
 
+// Deselect all templates
 const deselectAllTemplates = () => {
-    selectedTemplateIds.value = [];
+    selectedTemplates.value = [];
 };
 
+// Bulk create selected templates
 const bulkCreateSelected = () => {
-    if (selectedTemplateIds.value.length === 0) return;
+    if (selectedTemplates.value.length === 0) {
+        return;
+    }
 
     // Check if any selected templates have variables
-    const selectedTemplates = props.availableTemplates.filter(t => selectedTemplateIds.value.includes(t.id));
-    const templatesWithVariables = selectedTemplates.filter(t => t.variables && t.variables.length > 0);
-
-    if (templatesWithVariables.length > 0) {
-        // Show bulk variable modal
-        showBulkVariableModal.value = true;
-        bulkTemplates.value = selectedTemplates;
-        // Initialize variable values for each template
-        bulkVariableValues.value = {};
-        templatesWithVariables.forEach(template => {
-            bulkVariableValues.value[template.id] = {};
-            template.variables.forEach(variable => {
-                bulkVariableValues.value[template.id][variable] = '';
-            });
-        });
-    } else {
-        // No variables, add directly
-        router.post(
-            route('admin.events.event-questions.bulkCreateFromTemplates', props.event.id),
-            {
-                templates: selectedTemplateIds.value,
-                starting_order: props.nextOrder,
-            },
-            {
-                onSuccess: () => {
-                    selectedTemplateIds.value = [];
-                }
-            }
-        );
-    }
-};
-
-const addSingleTemplate = (template) => {
-    // Check if template has variables
-    if (template.variables && template.variables.length > 0) {
-        // Show modal to collect variable values
-        currentTemplate.value = template;
-        // Initialize variable values
-        variableValues.value = {};
-        template.variables.forEach(variable => {
-            variableValues.value[variable] = '';
-        });
-        showVariableModal.value = true;
-    } else {
-        // No variables, add directly
-        router.post(
-            route('admin.events.event-questions.createFromTemplate', [props.event.id, template.id]),
-            {
-                variable_values: {},
-                order: props.nextOrder,
-                points: template.default_points,
-            }
-        );
-    }
-};
-
-const submitTemplateWithVariables = () => {
-    if (!currentTemplate.value) return;
-
-    router.post(
-        route('admin.events.event-questions.createFromTemplate', [props.event.id, currentTemplate.value.id]),
-        {
-            variable_values: variableValues.value,
-            order: props.nextOrder,
-            points: currentTemplate.value.default_points,
-        },
-        {
-            onSuccess: () => {
-                showVariableModal.value = false;
-                currentTemplate.value = null;
-                variableValues.value = {};
-            }
-        }
+    const hasVariables = selectedTemplates.value.some(t =>
+        t.variables && t.variables.length > 0
     );
+
+    if (hasVariables) {
+        openConsolidatedVariableModal();
+    } else {
+        // No variables, import directly
+        submitBulkImport();
+    }
 };
 
-const submitBulkTemplatesWithVariables = () => {
+// Open consolidated variable modal
+const openConsolidatedVariableModal = () => {
+    // Initialize consolidated variables
+    consolidatedVariables.value = {};
+    distinctVariables.value.forEach(variable => {
+        consolidatedVariables.value[variable] = '';
+    });
+
+    showConsolidatedVariableModal.value = true;
+};
+
+// Close consolidated variable modal
+const closeConsolidatedVariableModal = () => {
+    showConsolidatedVariableModal.value = false;
+    consolidatedVariables.value = {};
+};
+
+// Helper: Count how many templates use a variable
+const getTemplateCountForVariable = (variable) => {
+    return selectedTemplates.value.filter(template => {
+        return template.variables && template.variables.includes(variable);
+    }).length;
+};
+
+// Submit bulk import with consolidated variables
+const submitConsolidatedImport = () => {
+    const payload = {
+        templates: selectedTemplates.value.map(template => ({
+            template_id: template.id,
+            variable_values: template.variables
+                ? template.variables.reduce((acc, variable) => {
+                    acc[variable] = consolidatedVariables.value[variable] || '';
+                    return acc;
+                }, {})
+                : {}
+        }))
+    };
+
     router.post(
         route('admin.events.event-questions.bulkCreateFromTemplates', props.event.id),
-        {
-            templates: selectedTemplateIds.value,
-            variable_values: bulkVariableValues.value,
-            starting_order: props.nextOrder,
-        },
+        payload,
         {
             onSuccess: () => {
-                showBulkVariableModal.value = false;
-                selectedTemplateIds.value = [];
-                bulkTemplates.value = [];
-                bulkVariableValues.value = {};
+                closeConsolidatedVariableModal();
+                selectedTemplates.value = [];
+                categorySearch.value = '';
+                searchPerformed.value = false;
+                filteredTemplates.value = [];
+            },
+            onError: (errors) => {
+                console.error('Error importing templates:', errors);
+                alert('Error importing templates. Please try again.');
             }
         }
     );
 };
 
+// Submit bulk import without variables
+const submitBulkImport = () => {
+    const payload = {
+        templates: selectedTemplates.value.map(template => ({
+            template_id: template.id,
+            variable_values: {}
+        }))
+    };
+
+    router.post(
+        route('admin.events.event-questions.bulkCreateFromTemplates', props.event.id),
+        payload,
+        {
+            onSuccess: () => {
+                selectedTemplates.value = [];
+                categorySearch.value = '';
+                searchPerformed.value = false;
+                filteredTemplates.value = [];
+            },
+            onError: (errors) => {
+                console.error('Error importing templates:', errors);
+                alert('Error importing templates. Please try again.');
+            }
+        }
+    );
+};
+
+// Delete question
 const deleteQuestion = (questionId) => {
     if (confirm('Delete this question?')) {
         router.delete(
@@ -647,6 +710,7 @@ const deleteQuestion = (questionId) => {
     }
 };
 
+// Format type
 const formatType = (type) => {
     if (!type) return 'Unknown';
     return type.split('_')
@@ -654,6 +718,7 @@ const formatType = (type) => {
         .join(' ');
 };
 
+// Format date
 const formatDate = (date) => {
     if (!date) return 'No date';
     return new Date(date).toLocaleDateString('en-US', {
@@ -663,6 +728,7 @@ const formatDate = (date) => {
     });
 };
 
+// Type class
 const typeClass = (type) => {
     if (!type) return 'bg-gray-100 text-gray-800';
     const classes = {
@@ -674,16 +740,19 @@ const typeClass = (type) => {
     return classes[type] || 'bg-gray-100 text-gray-800';
 };
 
+// Add option
 const addOption = () => {
     form.options.push({ label: '', points: 0 });
 };
 
+// Remove option
 const removeOption = (index) => {
     if (form.options.length > 2) {
         form.options.splice(index, 1);
     }
 };
 
+// Submit manual question
 const submitManual = () => {
     form.post(route('admin.events.event-questions.store', props.event.id), {
         onSuccess: () => {
@@ -691,21 +760,5 @@ const submitManual = () => {
             form.reset();
         }
     });
-};
-
-const getPreviewText = () => {
-    if (!currentTemplate.value) return '';
-
-    let text = currentTemplate.value.question_text;
-
-    // Replace variables with their current values (or placeholder if empty)
-    if (currentTemplate.value.variables) {
-        currentTemplate.value.variables.forEach(variable => {
-            const value = variableValues.value[variable] || `{${variable}}`;
-            text = text.replace(new RegExp(`\\{${variable}\\}`, 'g'), value);
-        });
-    }
-
-    return text;
 };
 </script>

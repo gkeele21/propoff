@@ -94,47 +94,19 @@ class EventTest extends TestCase
     }
 
     /** @test */
-    public function available_templates_returns_templates_matching_event_category()
+    public function it_does_not_have_category_field()
     {
-        $event = Event::factory()->create(['category' => 'sports']);
+        $user = User::factory()->admin()->create();
+        $event = Event::factory()->create(['created_by' => $user->id]);
 
-        $sportsTemplate1 = QuestionTemplate::factory()->create([
-            'category' => 'sports',
-            'display_order' => 1,
-        ]);
-        $sportsTemplate2 = QuestionTemplate::factory()->create([
-            'category' => 'sports',
-            'display_order' => 2,
-        ]);
-        $entertainmentTemplate = QuestionTemplate::factory()->create([
-            'category' => 'entertainment',
-        ]);
-
-        $templates = $event->availableTemplates();
-
-        $this->assertEquals(2, $templates->count());
-        $this->assertTrue($templates->contains($sportsTemplate1));
-        $this->assertTrue($templates->contains($sportsTemplate2));
-        $this->assertFalse($templates->contains($entertainmentTemplate));
+        $this->assertArrayNotHasKey('category', $event->toArray());
     }
 
     /** @test */
-    public function available_templates_are_ordered_by_display_order()
+    public function it_does_not_have_available_templates_method()
     {
-        $event = Event::factory()->create(['category' => 'sports']);
+        $event = Event::factory()->create();
 
-        $template2 = QuestionTemplate::factory()->create([
-            'category' => 'sports',
-            'display_order' => 2,
-        ]);
-        $template1 = QuestionTemplate::factory()->create([
-            'category' => 'sports',
-            'display_order' => 1,
-        ]);
-
-        $templates = $event->availableTemplates();
-
-        $this->assertEquals(1, $templates->first()->display_order);
-        $this->assertEquals(2, $templates->last()->display_order);
+        $this->assertFalse(method_exists($event, 'availableTemplates'));
     }
 }

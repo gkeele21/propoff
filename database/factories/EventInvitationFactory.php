@@ -24,7 +24,7 @@ class EventInvitationFactory extends Factory
             'group_id' => Group::factory(),
             'token' => Str::random(32),
             'max_uses' => fake()->numberBetween(10, 100),
-            'uses' => 0,
+            'times_used' => 0,
             'expires_at' => fake()->dateTimeBetween('now', '+1 month'),
         ];
     }
@@ -45,7 +45,7 @@ class EventInvitationFactory extends Factory
     public function maxedOut(): static
     {
         return $this->state(fn (array $attributes) => [
-            'uses' => $attributes['max_uses'],
+            'times_used' => $attributes['max_uses'],
         ]);
     }
 }

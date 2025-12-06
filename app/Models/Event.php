@@ -14,7 +14,6 @@ class Event extends Model
     protected $fillable = [
         'name',
         'description',
-        'category',
         'event_date',
         'status',
         'lock_date',
@@ -96,16 +95,5 @@ class Event extends Model
     public function captainInvitations()
     {
         return $this->hasMany(CaptainInvitation::class);
-    }
-
-    /**
-     * Get all available question templates for this event's category.
-     * Returns templates that match this event's category.
-     */
-    public function availableTemplates()
-    {
-        return QuestionTemplate::where('category', $this->category)
-            ->orderBy('display_order')
-            ->get();
     }
 }

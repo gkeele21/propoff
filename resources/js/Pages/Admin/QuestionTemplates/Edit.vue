@@ -36,15 +36,28 @@
 
                         <!-- Category -->
                         <div>
-                            <label for="category" class="block text-sm font-medium text-gray-700">Category (Optional)</label>
+                            <label for="category" class="block text-sm font-medium text-gray-700">Categories (Optional)</label>
                             <input
                                 type="text"
                                 id="category"
                                 v-model="form.category"
-                                placeholder="e.g., Sports, Entertainment, etc."
+                                placeholder="e.g., football,nfl,sports"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
                             />
                             <div v-if="form.errors.category" class="text-propoff-red text-sm mt-1">{{ form.errors.category }}</div>
+                            <p class="mt-1 text-sm text-gray-500">
+                                Enter one or more categories separated by commas (e.g., "football,nfl,sports")
+                            </p>
+                            <!-- Category tags preview -->
+                            <div v-if="categoryTags.length > 0" class="mt-2 flex gap-2 flex-wrap">
+                                <span
+                                    v-for="tag in categoryTags"
+                                    :key="tag"
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                >
+                                    {{ tag }}
+                                </span>
+                            </div>
                         </div>
 
                         <!-- Base Points -->
@@ -219,6 +232,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import PageHeader from '@/Components/PageHeader.vue';
 
 const props = defineProps({
@@ -268,6 +282,15 @@ const removeOption = (index) => {
         form.default_options.splice(index, 1);
     }
 };
+
+// Computed property for category tags preview
+const categoryTags = computed(() => {
+    if (!form.category) return [];
+    return form.category
+        .split(',')
+        .map(c => c.trim())
+        .filter(c => c.length > 0);
+});
 
 const submit = () => {
     form.put(route('admin.question-templates.update', props.template.id));

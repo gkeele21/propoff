@@ -9,7 +9,6 @@ import PageHeader from '@/Components/PageHeader.vue';
 
 const form = useForm({
     name: '',
-    category: '',
     description: '',
     event_date: '',
     lock_date: '',
@@ -55,23 +54,6 @@ const submit = () => {
                             <InputError :message="form.errors.name" class="mt-2" />
                             <p class="mt-1 text-sm text-gray-500">
                                 Give your event a descriptive name
-                            </p>
-                        </div>
-
-                        <!-- Category -->
-                        <div>
-                            <InputLabel for="category" value="Category" />
-                            <TextInput
-                                id="category"
-                                v-model="form.category"
-                                type="text"
-                                class="mt-1 block w-full"
-                                placeholder="e.g., NFL, NCAA, NBA"
-                                required
-                            />
-                            <InputError :message="form.errors.category" class="mt-2" />
-                            <p class="mt-1 text-sm text-gray-500">
-                                What type of event is this? (e.g., NFL, NCAA, NBA)
                             </p>
                         </div>
 

@@ -31,9 +31,6 @@ class EventQuestionController extends Controller
      */
     public function create(Event $event)
     {
-        // Get available templates for this event's category
-        $availableTemplates = $event->availableTemplates();
-
         // Get current questions
         $currentQuestions = $event->eventQuestions()->orderBy('display_order')->get();
 
@@ -42,9 +39,44 @@ class EventQuestionController extends Controller
 
         return Inertia::render('Admin/EventQuestions/Create', [
             'event' => $event,
-            'availableTemplates' => $availableTemplates,
             'currentQuestions' => $currentQuestions,
             'nextOrder' => $nextOrder,
+        ]);
+    }
+
+    /**
+     * Search for templates by category.
+     */
+    public function searchTemplates(Request $request, Event $event)
+    {
+        $this->authorize('create', EventQuestion::class);
+
+        $validated = $request->validate([
+            'category' => 'required|string|max:100',
+        ]);
+
+        $searchCategory = trim($validated['category']);
+
+        // Find templates where category contains the search term
+        $templates = QuestionTemplate::where('category', 'LIKE', "%{$searchCategory}%")
+            ->orderBy('display_order')
+            ->get();
+
+        // Get IDs of templates already imported to this event
+        $importedTemplateIds = EventQuestion::where('event_id', $event->id)
+            ->whereNotNull('template_id')
+            ->pluck('template_id')
+            ->toArray();
+
+        // Filter out already imported templates
+        $filteredTemplates = $templates->filter(function($template) use ($importedTemplateIds) {
+            return !in_array($template->id, $importedTemplateIds);
+        })->values();
+
+        return response()->json([
+            'templates' => $filteredTemplates,
+            'total' => $filteredTemplates->count(),
+            'search_term' => $searchCategory,
         ]);
     }
 
@@ -325,70 +357,61 @@ class EventQuestionController extends Controller
     }
 
     /**
-     * Create multiple questions from templates at once.
+     * Create multiple questions from templates at once with consolidated variables.
      */
     public function bulkCreateFromTemplates(Request $request, Event $event)
     {
         $validated = $request->validate([
-            'templates' => 'required|array|min:1',
-            'templates.*' => 'integer|exists:question_templates,id',
-            'variable_values' => 'nullable|array',
-            'starting_order' => 'required|integer|min:1',
+            'templates' => 'required|array',
+            'templates.*.template_id' => 'required|exists:question_templates,id',
+            'templates.*.variable_values' => 'nullable|array',
         ]);
 
-        $startingOrder = $validated['starting_order'];
-        $templateIds = $validated['templates'];
-        $variableValues = $validated['variable_values'] ?? [];
+        $nextOrder = $event->eventQuestions()->max('display_order') + 1;
 
-        foreach ($templateIds as $index => $templateId) {
-            $template = QuestionTemplate::find($templateId);
+        foreach ($validated['templates'] as $templateData) {
+            $template = QuestionTemplate::findOrFail($templateData['template_id']);
+            $variableValues = $templateData['variable_values'] ?? [];
 
-            if (!$template) {
-                continue;  // Skip if template not found
-            }
+            // Substitute variables in question text
+            $questionText = $this->substituteVariables(
+                $template->question_text,
+                $variableValues
+            );
 
-            // Get variables for this specific template if provided
-            $vars = $variableValues[$templateId] ?? [];
-
-            // Substitute variables
-            $questionText = $this->substituteVariables($template->question_text, $vars);
-
+            // Substitute variables in options
             $options = null;
-            if ($template->question_type === 'multiple_choice' && $template->default_options) {
-                $options = array_map(function ($option) use ($vars) {
-                    // Handle both string and array formats
-                    if (is_string($option)) {
-                        return [
-                            'label' => $this->substituteVariables($option, $vars),
-                            'points' => 0,
-                        ];
+            if ($template->default_options) {
+                $options = collect($template->default_options)->map(function ($option) use ($variableValues) {
+                    if (is_array($option) && isset($option['label'])) {
+                        $option['label'] = $this->substituteVariables($option['label'], $variableValues);
+                        return $option;
+                    } else {
+                        return $this->substituteVariables($option, $variableValues);
                     }
-                    return [
-                        'label' => $this->substituteVariables($option['label'] ?? '', $vars),
-                        'points' => $option['points'] ?? 0,
-                    ];
-                }, $template->default_options);
+                })->toArray();
             }
 
-            // Create question
-            $eventQuestion = $event->eventQuestions()->create([
+            // Create event question
+            $eventQuestion = EventQuestion::create([
+                'event_id' => $event->id,
                 'template_id' => $template->id,
                 'question_text' => $questionText,
                 'question_type' => $template->question_type,
                 'options' => $options,
                 'points' => $template->default_points,
-                'display_order' => $startingOrder + $index,
+                'display_order' => $nextOrder++,
             ]);
 
-            // Create group questions for all groups
+            // Create group questions for all groups in this event
             foreach ($event->groups as $group) {
                 \App\Models\GroupQuestion::create([
                     'group_id' => $group->id,
                     'event_question_id' => $eventQuestion->id,
-                    'question_text' => $eventQuestion->question_text,
-                    'question_type' => $eventQuestion->question_type,
-                    'options' => $eventQuestion->options,
-                    'points' => $eventQuestion->points,
+                    'question_text' => $questionText,
+                    'question_type' => $template->question_type,
+                    'options' => $options,
+                    'points' => $template->default_points,
                     'display_order' => $eventQuestion->display_order,
                     'is_active' => true,
                     'is_custom' => false,
@@ -397,7 +420,7 @@ class EventQuestionController extends Controller
         }
 
         return redirect()->route('admin.events.event-questions.index', $event)
-            ->with('success', count($templateIds) . ' questions created from templates!');
+            ->with('success', 'Questions imported successfully.');
     }
 
     /**
