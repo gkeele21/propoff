@@ -13,7 +13,6 @@ const props = defineProps({
 
 const form = useForm({
     name: props.event.name,
-    category: props.event.category,
     description: props.event.description,
     event_date: props.event.event_date?.substring(0, 16) || '', // Format for datetime-local
     lock_date: props.event.lock_date?.substring(0, 16) || '',
@@ -60,20 +59,6 @@ const submit = () => {
                                 required
                             />
                             <InputError :message="form.errors.name" class="mt-2" />
-                        </div>
-
-                        <!-- Category -->
-                        <div>
-                            <InputLabel for="category" value="Category" />
-                            <TextInput
-                                id="category"
-                                v-model="form.category"
-                                type="text"
-                                class="mt-1 block w-full"
-                                placeholder="e.g., Trivia Night, Sports Challenge"
-                                required
-                            />
-                            <InputError :message="form.errors.category" class="mt-2" />
                         </div>
 
                         <!-- Description -->

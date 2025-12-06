@@ -138,7 +138,6 @@ class DashboardController extends Controller
                 return [
                     'id' => $event->id,
                     'name' => $event->name,
-                    'category' => $event->category,
                     'event_date' => $event->event_date,
                     'lock_date' => $event->lock_date,
                     'status' => $event->status,

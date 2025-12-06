@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Bert\PropOff\source\phpunit.xml" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="8.051639">
+    <testsuite name="Feature" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="8.051639">
+      <testsuite name="Tests\Feature\GroupManagementTest" file="C:\Bert\PropOff\source\tests\Feature\GroupManagementTest.php" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="8.051639">
+        <testcase name="user_can_view_create_group_form" file="C:\Bert\PropOff\source\tests\Feature\GroupManagementTest.php" line="42" class="Tests\Feature\GroupManagementTest" classname="Tests.Feature.GroupManagementTest" assertions="1" time="8.051639">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\GroupManagementTest::user_can_view_create_group_form&#13;
+Expected response status code [200] but received 500.
+Failed asserting that 500 is identical to 200.
+&#13;
+C:\Bert\PropOff\source\vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:148
+C:\Bert\PropOff\source\tests\Feature\GroupManagementTest.php:49</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -31,7 +31,7 @@ class EventController extends Controller
         if ($request->has('search') && $request->search) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', "%{$request->search}%")
-                  ->orWhere('category', 'like', "%{$request->search}%");
+                  ->orWhere('description', 'like', "%{$request->search}%");
             });
         }
 

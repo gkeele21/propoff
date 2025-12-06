@@ -3,7 +3,11 @@
     "allow": [
       "Bash(tree:*)",
       "Bash(dir:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(php artisan make:migration:*)",
+      "Bash(php artisan test:*)",
+      "Bash(php artisan make:test:*)",
+      "Bash(php artisan:*)"
     ],
     "deny": [],
     "ask": []

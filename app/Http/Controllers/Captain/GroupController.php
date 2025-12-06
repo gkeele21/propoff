@@ -50,7 +50,6 @@ class GroupController extends Controller
                 'event' => [
                     'id' => $event->id,
                     'name' => $event->name,
-                    'category' => $event->category,
                     'event_date' => $event->event_date,
                 ],
                 'invitation' => [
@@ -67,7 +66,6 @@ class GroupController extends Controller
             'event' => [
                 'id' => $event->id,
                 'name' => $event->name,
-                'category' => $event->category,
                 'description' => $event->description,
                 'event_date' => $event->event_date,
                 'status' => $event->status,

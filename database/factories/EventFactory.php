@@ -22,7 +22,6 @@ class EventFactory extends Factory
         return [
             'name' => fake()->randomElement(['Super Bowl LVIII', 'NBA Finals 2024', 'World Series', 'March Madness']) . ' ' . fake()->year(),
             'description' => fake()->optional()->paragraph(),
-            'category' => fake()->randomElement(['sports', 'trivia', 'entertainment', 'general']),
             'event_date' => $eventDate,
             'status' => fake()->randomElement(['draft', 'open', 'locked', 'in_progress', 'completed']),
             'lock_date' => $lockDate,

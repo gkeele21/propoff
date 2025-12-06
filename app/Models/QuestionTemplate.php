@@ -43,4 +43,32 @@ class QuestionTemplate extends Model
     {
         return $this->hasMany(Question::class, 'template_id');
     }
+
+    /**
+     * Get categories as array.
+     */
+    public function getCategoriesAttribute(): array
+    {
+        if (!$this->category) {
+            return [];
+        }
+        return array_map('trim', explode(',', $this->category));
+    }
+
+    /**
+     * Check if template has a specific category.
+     */
+    public function hasCategory(string $search): bool
+    {
+        $categories = $this->categories;
+        return in_array(strtolower(trim($search)), array_map('strtolower', $categories));
+    }
+
+    /**
+     * Scope: Filter by category.
+     */
+    public function scopeWithCategory($query, string $category)
+    {
+        return $query->where('category', 'LIKE', "%{$category}%");
+    }
 }

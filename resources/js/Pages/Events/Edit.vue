@@ -13,7 +13,6 @@ const props = defineProps({
 const form = useForm({
     name: props.event.name,
     description: props.event.description,
-    category: props.event.category,
     event_date: props.event.event_date ? props.event.event_date.split('T')[0] + 'T' + props.event.event_date.split('T')[1].substring(0, 5) : '',
     status: props.event.status,
     lock_date: props.event.lock_date ? props.event.lock_date.split('T')[0] + 'T' + props.event.lock_date.split('T')[1].substring(0, 5) : '',
@@ -60,19 +59,6 @@ const submit = () => {
                                 rows="4"
                             ></textarea>
                             <InputError class="mt-2" :message="form.errors.description" />
-                        </div>
-
-                        <!-- Category -->
-                        <div>
-                            <InputLabel for="category" value="Category" />
-                            <TextInput
-                                id="category"
-                                v-model="form.category"
-                                type="text"
-                                class="mt-1 block w-full"
-                                required
-                            />
-                            <InputError class="mt-2" :message="form.errors.category" />
                         </div>
 
                         <!-- Event Date -->

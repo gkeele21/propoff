@@ -108,7 +108,6 @@ class TestDataSeeder extends Seeder
         // Create test event
         $event = Event::create([
             'name' => 'Super Bowl LVIII',
-            'category' => 'Football',
             'status' => 'open',
             'event_date' => now()->addDays(7),
             'created_by' => $admin->id,

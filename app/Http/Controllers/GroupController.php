@@ -44,7 +44,7 @@ class GroupController extends Controller
         $events = \App\Models\Event::where('status', 'open')
             ->orWhere('status', 'draft')
             ->orderBy('event_date', 'desc')
-            ->get(['id', 'name', 'event_date', 'category']);
+            ->get(['id', 'name', 'event_date']);
 
         return Inertia::render('Groups/Create', [
             'events' => $events,
@@ -365,7 +365,6 @@ class GroupController extends Controller
                 'event' => [
                     'id' => $group->event->id,
                     'name' => $group->event->name,
-                    'category' => $group->event->category,
                     'event_date' => $group->event->event_date,
                 ],
             ],

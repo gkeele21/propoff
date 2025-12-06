@@ -43,7 +43,6 @@ const formatDate = (dateString) => {
                     <div class="bg-propoff-blue/10 border border-propoff-blue/30 rounded-lg p-4 mt-4">
                         <p class="text-sm text-propoff-blue font-semibold mb-1">Event</p>
                         <p class="text-lg font-bold text-propoff-blue">{{ group.event.name }}</p>
-                        <p class="text-sm text-propoff-blue mt-1">{{ group.event.category }}</p>
                         <p class="text-sm text-propoff-blue mt-2">
                             Event Date: {{ formatDate(group.event.event_date) }}
                         </p>

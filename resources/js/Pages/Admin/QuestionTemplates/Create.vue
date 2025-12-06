@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import InputLabel from '@/Components/InputLabel.vue';
@@ -43,6 +43,15 @@ const addVariable = () => {
 const removeVariable = (index) => {
     form.variables.splice(index, 1);
 };
+
+// Computed property for category tags preview
+const categoryTags = computed(() => {
+    if (!form.category) return [];
+    return form.category
+        .split(',')
+        .map(c => c.trim())
+        .filter(c => c.length > 0);
+});
 
 const submit = () => {
     form.post(route('admin.question-templates.store'));
@@ -87,17 +96,28 @@ const submit = () => {
 
                         <!-- Category -->
                         <div>
-                            <InputLabel for="category" value="Category" />
+                            <InputLabel for="category" value="Categories" />
                             <TextInput
                                 id="category"
                                 v-model="form.category"
                                 type="text"
                                 class="mt-1 block w-full"
+                                placeholder="e.g., football,nfl,sports"
                             />
                             <InputError :message="form.errors.category" class="mt-2" />
                             <p class="mt-1 text-sm text-gray-500">
-                                Optional: Group similar templates (e.g., "Sports", "Movies")
+                                Enter one or more categories separated by commas (e.g., "football,nfl,sports")
                             </p>
+                            <!-- Category tags preview -->
+                            <div v-if="categoryTags.length > 0" class="mt-2 flex gap-2 flex-wrap">
+                                <span
+                                    v-for="tag in categoryTags"
+                                    :key="tag"
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                >
+                                    {{ tag }}
+                                </span>
+                            </div>
                         </div>
 
                         <!-- Base Points -->
@@ -105,7 +125,7 @@ const submit = () => {
                             <InputLabel for="default_points" value="Base Points" />
                             <TextInput
                                 id="default_points"
-                                v-model.number="form.default_points"
+                                v-model="form.default_points"
                                 type="number"
                                 min="1"
                                 step="1"

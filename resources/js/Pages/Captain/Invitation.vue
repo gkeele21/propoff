@@ -33,7 +33,7 @@
                         <div class="flex-1">
                             <h3 class="text-lg font-semibold text-gray-900">{{ group.name }}</h3>
                             <p class="text-sm text-gray-600 mt-1">
-                                Event: {{ group.event.name }} | {{ group.event.category }}
+                                Event: {{ group.event.name }}
                             </p>
                             <p class="text-xs text-gray-500 mt-1">
                                 {{ formatDate(group.event.event_date) }}

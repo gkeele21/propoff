@@ -63,10 +63,6 @@ const props = defineProps({
                                         <dd class="mt-1 text-sm text-gray-900">{{ event.description || 'No description' }}</dd>
                                     </div>
                                     <div>
-                                        <dt class="text-sm font-medium text-gray-500">Category</dt>
-                                        <dd class="mt-1 text-sm text-gray-900">{{ event.category }}</dd>
-                                    </div>
-                                    <div>
                                         <dt class="text-sm font-medium text-gray-500">Event Date</dt>
                                         <dd class="mt-1 text-sm text-gray-900">
                                             {{ new Date(event.event_date).toLocaleString() }}
