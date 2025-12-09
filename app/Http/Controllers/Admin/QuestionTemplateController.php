@@ -17,8 +17,13 @@ class QuestionTemplateController extends Controller
         $query = QuestionTemplate::query();
 
         // Filter by category
-        if ($request->has('category') && $request->category !== 'all') {
+        if ($request->has('category') && $request->category) {
             $query->where('category', $request->category);
+        }
+
+        // Filter by type
+        if ($request->has('type') && $request->type) {
+            $query->where('question_type', $request->type);
         }
 
         // Search
@@ -40,7 +45,7 @@ class QuestionTemplateController extends Controller
         return Inertia::render('Admin/QuestionTemplates/Index', [
             'templates' => $templates,
             'categories' => $categories,
-            'filters' => $request->only(['category', 'search']),
+            'filters' => $request->only(['category', 'type', 'search']),
         ]);
     }
 

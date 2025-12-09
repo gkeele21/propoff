@@ -29,17 +29,17 @@
                     <div class="p-6">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                                <input 
-                                    type="text" 
-                                    v-model="filters.search" 
-                                    @input="filterTemplates"
-                                    placeholder="Search templates..." 
+                                <input
+                                    type="text"
+                                    v-model="form.search"
+                                    @input="debouncedFilter"
+                                    placeholder="Search templates..."
                                     class="w-full rounded-md border-gray-300 shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
                                 />
                             </div>
                             <div>
-                                <select 
-                                    v-model="filters.type" 
+                                <select
+                                    v-model="form.type"
                                     @change="filterTemplates"
                                     class="w-full rounded-md border-gray-300 shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
                                 >
@@ -51,8 +51,8 @@
                                 </select>
                             </div>
                             <div>
-                                <select 
-                                    v-model="filters.category" 
+                                <select
+                                    v-model="form.category"
                                     @change="filterTemplates"
                                     class="w-full rounded-md border-gray-300 shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
                                 >
@@ -66,7 +66,7 @@
 
                 <!-- Templates Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div v-for="template in filteredTemplates" :key="template.id" class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div v-for="template in templates.data" :key="template.id" class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
                             <div class="flex justify-between items-start mb-4">
                                 <div class="flex-1">
@@ -138,7 +138,7 @@
                 </div>
 
                 <!-- Empty State -->
-                <div v-if="filteredTemplates.length === 0" class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div v-if="templates.data.length === 0" class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-12 text-center">
                         <DocumentTextIcon class="mx-auto h-12 w-12 text-gray-400" />
                         <h3 class="mt-2 text-sm font-medium text-gray-900">No templates found</h3>
@@ -151,6 +151,9 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Pagination -->
+                <Pagination :data="templates" item-name="templates" class="mt-6" />
             </div>
         </div>
     </AuthenticatedLayout>
@@ -161,54 +164,41 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import PageHeader from '@/Components/PageHeader.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import { ref, computed } from 'vue';
+import Pagination from '@/Components/Pagination.vue';
+import { ref, computed, watch } from 'vue';
 import { PlusIcon, DocumentTextIcon } from '@heroicons/vue/24/outline';
+import { debounce } from 'lodash';
 
 const props = defineProps({
-    templates: Object,  // Pagination object, not array
+    templates: Object,  // Pagination object from Laravel
+    categories: Array,
+    filters: Object,
 });
 
-const filters = ref({
-    search: '',
-    type: '',
-    category: '',
+// Initialize form with current filters
+const form = ref({
+    search: props.filters?.search || '',
+    type: props.filters?.type || '',
+    category: props.filters?.category || '',
 });
 
-const categories = computed(() => {
-    if (!props.templates?.data) return [];
-    const cats = props.templates.data
-        .map(t => t.category)
-        .filter(c => c)
-        .filter((value, index, self) => self.indexOf(value) === index);
-    return cats;
-});
-
-const filteredTemplates = computed(() => {
-    if (!props.templates?.data) return [];
-    let result = props.templates.data;
-
-    if (filters.value.search) {
-        const search = filters.value.search.toLowerCase();
-        result = result.filter(t =>
-            t.title?.toLowerCase().includes(search) ||
-            t.question_text?.toLowerCase().includes(search)
-        );
-    }
-
-    if (filters.value.type) {
-        result = result.filter(t => t.question_type === filters.value.type);
-    }
-
-    if (filters.value.category) {
-        result = result.filter(t => t.category === filters.value.category);
-    }
-
-    return result;
-});
-
+// Server-side filter function
 const filterTemplates = () => {
-    // Filters are reactive, no action needed
+    router.get(route('admin.question-templates.index'), {
+        search: form.value.search || undefined,
+        type: form.value.type || undefined,
+        category: form.value.category || undefined,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+    });
 };
+
+// Debounced version for search input
+const debouncedFilter = debounce(() => {
+    filterTemplates();
+}, 300);
 
 const duplicateTemplate = (id) => {
     router.post(route('admin.question-templates.duplicate', id));
