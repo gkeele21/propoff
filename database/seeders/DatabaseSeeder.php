@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Create admin user
-        $admin = \App\Models\User::factory()->create([
+        $admin = \App\Models\User::create([
             'name' => 'Admin User',
             'email' => 'admin@propoff.com',
             'password' => \Illuminate\Support\Facades\Hash::make('password'),
@@ -21,14 +21,14 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Create captain users for testing
-        $captain1 = \App\Models\User::factory()->create([
+        $captain1 = \App\Models\User::create([
             'name' => 'Captain One',
             'email' => 'captain1@propoff.com',
             'password' => \Illuminate\Support\Facades\Hash::make('password'),
             'role' => 'user',
         ]);
 
-        $captain2 = \App\Models\User::factory()->create([
+        $captain2 = \App\Models\User::create([
             'name' => 'Captain Two',
             'email' => 'captain2@propoff.com',
             'password' => \Illuminate\Support\Facades\Hash::make('password'),
@@ -53,9 +53,13 @@ class DatabaseSeeder extends Seeder
         ]);*/
 
         // Create events FIRST (before groups, since groups need event_id)
-        $events = \App\Models\Event::factory(1)->create([
+        $event = \App\Models\Event::create([
+            'name' => 'Test Event',
+            'event_date' => now()->addDays(7),
+            'status' => 'open',
             'created_by' => $admin->id,
         ]);
+        $events = collect([$event]);
 
         // Create groups (first 2 with captains, rest by admin) - WITH event_id
         $groups = collect();
@@ -67,9 +71,12 @@ class DatabaseSeeder extends Seeder
                 $createdBy = $captain2->id;
             }
 
-            $groups->push(\App\Models\Group::factory()->create([
+            $groups->push(\App\Models\Group::create([
+                'name' => 'Group ' . ($i + 1),
+                'code' => 'GRP' . str_pad($i + 1, 3, '0', STR_PAD_LEFT),
                 'created_by' => $createdBy,
                 'event_id' => $events[$i % $events->count()]->id,
+                'grading_source' => 'admin',
             ]));
         }
 
