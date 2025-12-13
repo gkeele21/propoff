@@ -28,6 +28,11 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        // Higher rate limit for America Says real-time polling (500ms * 2 devices = 240 req/min)
+        RateLimiter::for('america-says', function (Request $request) {
+            return Limit::perMinute(500)->by($request->user()?->id ?: $request->ip());
+        });
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')

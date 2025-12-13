@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\Group;
 use App\Models\Entry;
 use App\Models\Leaderboard;
+use App\Http\Controllers\AmericaSays\AmericaSaysController;
 
 /*
 |--------------------------------------------------------------------------

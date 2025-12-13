@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\EventQuestionController as AdminEventQuestionCont
 use App\Http\Controllers\Admin\GradingController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\GroupController as AdminGroupController;
+use App\Http\Controllers\AmericaSays\AmericaSaysController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -214,6 +215,33 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/events/{event}/event-answers/bulk-set', [\App\Http\Controllers\Admin\EventAnswerController::class, 'bulkSetAnswers'])->name('events.event-answers.bulkSetAnswers');
     Route::post('/events/{event}/event-questions/{eventQuestion}/toggle-event-void', [\App\Http\Controllers\Admin\EventAnswerController::class, 'toggleVoid'])->name('events.event-answers.toggleVoid');
     Route::delete('/events/{event}/event-questions/{eventQuestion}/clear-event-answer', [\App\Http\Controllers\Admin\EventAnswerController::class, 'clearAnswer'])->name('events.event-answers.clearAnswer');
+
+    // America Says
+    Route::prefix('america-says')->name('america-says.')->group(function () {
+        Route::get('/events/{event}/display', function ($eventId) {
+            return Inertia::render('AmericaSays/Display', ['eventId' => (int)$eventId]);
+        })->name('display');
+
+        Route::get('/events/{event}/admin', function ($eventId) {
+            return Inertia::render('AmericaSays/Admin', ['eventId' => (int)$eventId]);
+        })->name('admin');
+    });
+});
+
+// America Says API (no throttle, uses web middleware)
+Route::prefix('api/america-says')->group(function () {
+    Route::get('/events/{event}', function (\App\Models\Event $event) {
+        return response()->json($event);
+    });
+    Route::get('/events/{event}/questions', [\App\Http\Controllers\AmericaSays\AmericaSaysController::class, 'getQuestions']);
+    Route::get('/events/{event}/game-state', [\App\Http\Controllers\AmericaSays\AmericaSaysController::class, 'getGameState']);
+    Route::post('/events/{event}/start-timer', [\App\Http\Controllers\AmericaSays\AmericaSaysController::class, 'startTimer']);
+    Route::post('/events/{event}/pause-timer', [\App\Http\Controllers\AmericaSays\AmericaSaysController::class, 'pauseTimer']);
+    Route::post('/events/{event}/reset-timer', [\App\Http\Controllers\AmericaSays\AmericaSaysController::class, 'resetTimer']);
+    Route::post('/events/{event}/reveal-answer', [\App\Http\Controllers\AmericaSays\AmericaSaysController::class, 'revealAnswer']);
+    Route::post('/events/{event}/unreveal-answer', [\App\Http\Controllers\AmericaSays\AmericaSaysController::class, 'unrevealAnswer']);
+    Route::post('/events/{event}/next-question', [\App\Http\Controllers\AmericaSays\AmericaSaysController::class, 'nextQuestion']);
+    Route::post('/events/{event}/previous-question', [\App\Http\Controllers\AmericaSays\AmericaSaysController::class, 'previousQuestion']);
 });
 
 require __DIR__.'/auth.php';
