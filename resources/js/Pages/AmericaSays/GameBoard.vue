@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import { getThemeFromEvent } from './themes.js';
+import GameSound from '@/Components/GameSound.vue';
 import axios from 'axios';
 
 const props = defineProps({
@@ -29,10 +30,15 @@ const timerDisplay = computed(() => {
 });
 
 const timerWarning = computed(() => remainingTime.value <= 10);
+const showAnswers = computed(() => timerStartedAt.value !== null && !timerPausedAt.value);
+const showTimer = computed(() => timerStartedAt.value !== null);
 
 // Polling interval
 let pollInterval = null;
 let timerInterval = null;
+
+// Sound trigger for success
+const successSoundTrigger = ref(0);
 
 // Calculate remaining time based on server timestamp (Unix epoch in seconds)
 const calculateRemainingTime = () => {
@@ -142,6 +148,16 @@ const getAnswerPositionClass = (displayOrder) => {
     return positions[displayOrder] || '';
 };
 
+// Watch for new answers being revealed and trigger success sound
+watch(revealedAnswerIds, (newIds, oldIds) => {
+    if (oldIds && oldIds.length > 0) {
+        const newlyRevealed = newIds.filter(id => !oldIds.includes(id));
+        if (newlyRevealed.length > 0) {
+            successSoundTrigger.value++;
+        }
+    }
+}, { deep: true });
+
 // Start polling and timer
 onMounted(() => {
     fetchEvent();
@@ -169,13 +185,16 @@ onUnmounted(() => {
     </Head>
 
     <div
-        class="min-h-screen flex flex-col p-4 transition-colors duration-300 relative overflow-hidden"
+        class="min-h-screen flex flex-col p-2 transition-colors duration-300 relative overflow-hidden"
         :style="{
             backgroundColor: theme.colors.background,
             color: theme.colors.text,
             fontFamily: theme.fonts.question,
         }"
     >
+        <!-- Sound Component -->
+        <GameSound :trigger="successSoundTrigger" sound-type="success" />
+
         <!-- Snowflakes (inside main container, behind content) -->
         <div
             class="fixed inset-0 pointer-events-none overflow-hidden"
@@ -186,23 +205,23 @@ onUnmounted(() => {
             </div>
         </div>
         <!-- Question Display -->
-        <div class="text-center mb-4 relative" style="z-index: 10;">
+        <div class="text-center mb-2 relative" style="z-index: 10;">
             <h1
-                class="text-2xl mb-2 px-6 py-3 rounded-lg inline-block"
+                class="text-2xl mb-1 px-6 py-2 rounded-lg inline-block"
                 :style="{
                     backgroundColor: theme.colors.primary,
                     color: 'white',
-                    fontFamily: 'Coustard, serif'
+                    fontFamily: theme.fonts.question
                 }"
             >
-                {{ currentQuestion?.question_text || 'Waiting for question...' }}
+                {{ currentQuestion?.question_text || 'Waiting for game to Begin...' }}
             </h1>
         </div>
 
-        <!-- Answers Grid -->
+        <!-- Answers Grid (only shown when timer is running) -->
         <div
-            v-if="answers.length > 0"
-            class="flex-1 grid grid-cols-2 gap-3 max-w-5xl mx-auto w-full relative"
+            v-if="answers.length > 0 && showAnswers"
+            class="flex-1 grid grid-cols-2 gap-2 max-w-5xl mx-auto w-full relative py-1"
             style="z-index: 10;"
         >
             <div
@@ -212,10 +231,10 @@ onUnmounted(() => {
                 class="flex items-center justify-center"
             >
                 <div
-                    class="answer-box relative w-full h-full min-h-[60px] flex items-center justify-center p-2"
+                    class="answer-box relative w-full h-full min-h-[40px] flex items-center justify-center p-1"
                     :style="{
                         fontSize: getAnswerFontSize(answer.display_order),
-                        fontFamily: 'Coustard, serif',
+                        fontFamily: theme.fonts.answer,
                     }"
                 >
                     <div
@@ -235,13 +254,15 @@ onUnmounted(() => {
             </div>
         </div>
 
-        <!-- Timer Display -->
+        <!-- Timer Display (shown when timer has been started) -->
         <div
+            v-if="showTimer"
             class="fixed bottom-4 right-4 text-3xl font-bold tabular-nums px-4 py-2 rounded-xl shadow-2xl"
             style="z-index: 100;"
             :style="{
                 backgroundColor: timerWarning ? theme.colors.timerWarning : theme.colors.secondary,
                 color: 'white',
+                fontFamily: theme.fonts.timer,
             }"
             :class="{
                 'animate-pulse': timerWarning,

@@ -315,6 +315,86 @@
                             </button>
                         </div>
 
+                        <!-- Ranked Answers (for ranked_answers type) -->
+                        <div v-if="form.question_type === 'ranked_answers'" class="space-y-3">
+                            <label class="block text-sm font-medium text-gray-700">
+                                Ranked Answers <span class="text-propoff-red">*</span>
+                            </label>
+                            <p class="text-sm text-gray-500 mb-3">
+                                Add up to 7 ranked answers. Answer #1 should be the most popular/common response.
+                            </p>
+
+                            <div v-if="form.event_answers.length > 0" class="space-y-3">
+                                <div
+                                    v-for="(answer, index) in form.event_answers"
+                                    :key="index"
+                                    class="flex items-center gap-3 p-4 border border-gray-200 rounded-lg"
+                                >
+                                    <!-- Rank Number -->
+                                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-propoff-orange text-white flex items-center justify-center font-bold">
+                                        #{{ answer.display_order }}
+                                    </div>
+
+                                    <!-- Answer Input -->
+                                    <div class="flex-1">
+                                        <input
+                                            type="text"
+                                            v-model="answer.correct_answer"
+                                            class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                            placeholder="Enter answer..."
+                                            required
+                                        />
+                                    </div>
+
+                                    <!-- Reorder Buttons -->
+                                    <div class="flex flex-col gap-1">
+                                        <button
+                                            type="button"
+                                            @click="moveRankedAnswerUp(index)"
+                                            :disabled="index === 0"
+                                            class="p-1 text-gray-600 hover:text-propoff-blue disabled:opacity-30 disabled:cursor-not-allowed"
+                                            title="Move up (higher rank)"
+                                        >
+                                            <ArrowUpIcon class="w-5 h-5" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            @click="moveRankedAnswerDown(index)"
+                                            :disabled="index === form.event_answers.length - 1"
+                                            class="p-1 text-gray-600 hover:text-propoff-blue disabled:opacity-30 disabled:cursor-not-allowed"
+                                            title="Move down (lower rank)"
+                                        >
+                                            <ArrowDownIcon class="w-5 h-5" />
+                                        </button>
+                                    </div>
+
+                                    <!-- Remove Button -->
+                                    <button
+                                        type="button"
+                                        @click="removeRankedAnswer(index)"
+                                        class="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded"
+                                        title="Remove answer"
+                                    >
+                                        <TrashIcon class="w-5 h-5" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button
+                                v-if="form.event_answers.length < 7"
+                                type="button"
+                                @click="addRankedAnswer"
+                                class="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-propoff-blue hover:text-propoff-blue transition"
+                            >
+                                <PlusIcon class="w-5 h-5 inline mr-2" />
+                                Add Answer ({{ form.event_answers.length }}/7)
+                            </button>
+
+                            <p v-if="form.errors.event_answers" class="text-sm text-propoff-red">
+                                {{ form.errors.event_answers }}
+                            </p>
+                        </div>
+
                         <!-- Points and Order -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
@@ -464,6 +544,8 @@ import {
     TrashIcon,
     PlusIcon,
     XMarkIcon,
+    ArrowUpIcon,
+    ArrowDownIcon,
 } from '@heroicons/vue/24/outline';
 import PageHeader from '@/Components/PageHeader.vue';
 import axios from 'axios';
@@ -497,6 +579,7 @@ const questionTypes = [
     { value: 'yes_no', label: 'Yes/No' },
     { value: 'numeric', label: 'Numeric' },
     { value: 'text', label: 'Text' },
+    { value: 'ranked_answers', label: 'Ranked Answers' },
 ];
 
 const form = useForm({
@@ -508,6 +591,7 @@ const form = useForm({
         { label: '', points: 0 },
         { label: '', points: 0 }
     ],
+    event_answers: [],
 });
 
 // Computed: Get all distinct variables across selected templates
@@ -748,6 +832,7 @@ const typeClass = (type) => {
         yes_no: 'bg-propoff-green/10 text-propoff-dark-green',
         numeric: 'bg-propoff-orange/10 text-propoff-orange',
         text: 'bg-gray-100 text-gray-800',
+        ranked_answers: 'bg-propoff-orange/10 text-propoff-orange',
     };
     return classes[type] || 'bg-gray-100 text-gray-800';
 };
@@ -761,6 +846,49 @@ const addOption = () => {
 const removeOption = (index) => {
     if (form.options.length > 2) {
         form.options.splice(index, 1);
+    }
+};
+
+// Ranked Answers functions
+const addRankedAnswer = () => {
+    const nextOrder = form.event_answers.length + 1;
+    if (nextOrder <= 7) {
+        form.event_answers.push({
+            correct_answer: '',
+            display_order: nextOrder,
+        });
+    }
+};
+
+const removeRankedAnswer = (index) => {
+    form.event_answers.splice(index, 1);
+    // Reorder remaining answers
+    form.event_answers.forEach((answer, idx) => {
+        answer.display_order = idx + 1;
+    });
+};
+
+const moveRankedAnswerUp = (index) => {
+    if (index > 0) {
+        const temp = form.event_answers[index];
+        form.event_answers[index] = form.event_answers[index - 1];
+        form.event_answers[index - 1] = temp;
+        // Update display orders
+        form.event_answers.forEach((answer, idx) => {
+            answer.display_order = idx + 1;
+        });
+    }
+};
+
+const moveRankedAnswerDown = (index) => {
+    if (index < form.event_answers.length - 1) {
+        const temp = form.event_answers[index];
+        form.event_answers[index] = form.event_answers[index + 1];
+        form.event_answers[index + 1] = temp;
+        // Update display orders
+        form.event_answers.forEach((answer, idx) => {
+            answer.display_order = idx + 1;
+        });
     }
 };
 

@@ -14,8 +14,9 @@ export const themes = {
             timerWarning: '#FF6B6B',
         },
         fonts: {
-            question: '"Mountains of Christmas", cursive',
-            answer: '"Raleway", sans-serif',
+            question: 'Coustard, serif',
+            answer: 'Coustard, serif',
+            timer: 'Coustard, serif',
         },
         effects: {
             backgroundPattern: 'snowflakes',
@@ -43,6 +44,7 @@ export const themes = {
         fonts: {
             question: '"Inter", sans-serif',
             answer: '"Inter", sans-serif',
+            timer: '"Inter", sans-serif',
         },
         effects: {
             backgroundPattern: 'none',
@@ -70,6 +72,7 @@ export const themes = {
         fonts: {
             question: '"Creepster", cursive',
             answer: '"Raleway", sans-serif',
+            timer: '"Creepster", cursive',
         },
         effects: {
             backgroundPattern: 'spiderwebs',
@@ -97,6 +100,7 @@ export const themes = {
         fonts: {
             question: '"Bebas Neue", sans-serif',
             answer: '"Roboto", sans-serif',
+            timer: '"Bebas Neue", sans-serif',
         },
         effects: {
             backgroundPattern: 'stadium',

@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PageHeader from '@/Components/PageHeader.vue';
+import GameSound from '@/Components/GameSound.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { getThemeFromEvent } from '../../AmericaSays/themes.js';
@@ -34,10 +35,15 @@ const timerDisplay = computed(() => {
 
 const timerWarning = computed(() => remainingTime.value <= 10);
 const timerRunning = computed(() => timerStartedAt.value && !timerPausedAt.value);
+const timerPaused = computed(() => timerStartedAt.value && timerPausedAt.value);
+const gameStarted = computed(() => currentQuestion.value !== null);
 
 // Count of revealed answers
 const revealedCount = computed(() => revealedAnswerIds.value.length);
 const totalAnswers = computed(() => answers.value.length);
+
+// Buzzer sound trigger
+const buzzerTrigger = ref(0);
 
 // Polling interval
 let pollInterval = null;
@@ -97,6 +103,16 @@ const fetchAllQuestions = async () => {
         allQuestions.value = response.data;
     } catch (error) {
         console.error('Error fetching questions:', error);
+    }
+};
+
+// Game controls
+const beginGame = async () => {
+    try {
+        await axios.post(`/api/america-says/events/${props.eventId}/begin-game`);
+        await fetchGameState();
+    } catch (error) {
+        console.error('Error beginning game:', error);
     }
 };
 
@@ -165,6 +181,11 @@ const goToPreviousQuestion = async () => {
     }
 };
 
+// Trigger buzzer sound
+const playBuzzer = () => {
+    buzzerTrigger.value++;
+};
+
 // Check if answer is revealed
 const isAnswerRevealed = (answerId) => {
     return revealedAnswerIds.value.includes(answerId);
@@ -178,7 +199,27 @@ const currentQuestionIndex = computed(() => {
 
 const questionProgress = computed(() => {
     if (allQuestions.value.length === 0) return '';
-    return `${currentQuestionIndex.value + 1} / ${allQuestions.value.length}`;
+    // Show "1 / X" for preview mode when game hasn't started
+    const index = currentQuestionIndex.value >= 0 ? currentQuestionIndex.value : 0;
+    return `${index + 1} / ${allQuestions.value.length}`;
+});
+
+// Show first question as preview if game hasn't started yet
+const displayQuestion = computed(() => {
+    if (currentQuestion.value) {
+        return currentQuestion.value;
+    }
+    // Show first question as preview before game begins
+    return allQuestions.value.length > 0 ? allQuestions.value[0] : null;
+});
+
+// Get answers for display (either from current question or preview)
+const displayAnswers = computed(() => {
+    if (currentQuestion.value) {
+        return answers.value;
+    }
+    // Show answers from first question as preview
+    return allQuestions.value.length > 0 ? allQuestions.value[0].event_answers || [] : [];
 });
 
 // Start polling and timer
@@ -203,6 +244,9 @@ onUnmounted(() => {
     <Head title="America Says - Host Game" />
 
     <AuthenticatedLayout>
+        <!-- Sound Component -->
+        <GameSound :trigger="buzzerTrigger" sound-type="buzzer" />
+
         <template #header>
             <PageHeader
                 title="Host Game"
@@ -213,7 +257,17 @@ onUnmounted(() => {
                     { label: event?.name || 'Event', href: route('admin.events.show', event?.id) },
                     { label: 'Host Game' }
                 ]"
-            />
+            >
+                <template #actions>
+                    <button
+                        v-if="!gameStarted"
+                        @click="beginGame"
+                        class="px-4 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700"
+                    >
+                        🎮 Begin Game
+                    </button>
+                </template>
+            </PageHeader>
         </template>
 
         <div class="py-6">
@@ -226,22 +280,25 @@ onUnmounted(() => {
                             <!-- Left: Question Progress with Navigation -->
                             <div class="flex items-center gap-3 pr-6 border-r border-gray-300">
                                 <div class="flex-1">
-                                    <h3 class="text-lg font-semibold">Question {{ questionProgress }}</h3>
-                                    <p class="text-sm text-gray-600 mt-1">{{ currentQuestion?.question_text }}</p>
+                                    <h3 class="text-lg font-semibold">
+                                        Question {{ questionProgress }}
+                                        <span v-if="!gameStarted" class="text-xs text-gray-500 ml-2">(Preview)</span>
+                                    </h3>
+                                    <p class="text-sm text-gray-600 mt-1">{{ displayQuestion?.question_text }}</p>
                                 </div>
 
                                 <!-- Navigation Buttons -->
                                 <div class="flex gap-2">
                                     <button
                                         @click="goToPreviousQuestion"
-                                        :disabled="currentQuestionIndex <= 0"
+                                        :disabled="!gameStarted || currentQuestionIndex <= 0"
                                         class="px-3 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                                     >
                                         ← Previous
                                     </button>
                                     <button
                                         @click="goToNextQuestion"
-                                        :disabled="currentQuestionIndex >= allQuestions.length - 1"
+                                        :disabled="!gameStarted || currentQuestionIndex >= allQuestions.length - 1"
                                         class="px-3 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                                     >
                                         Next →
@@ -258,6 +315,9 @@ onUnmounted(() => {
                                         'bg-green-100 text-green-600': !timerWarning && timerRunning,
                                         'bg-gray-100 text-gray-600': !timerRunning,
                                     }"
+                                    :style="{
+                                        fontFamily: theme.fonts.timer,
+                                    }"
                                 >
                                     {{ timerDisplay }}
                                 </div>
@@ -267,9 +327,10 @@ onUnmounted(() => {
                                     <button
                                         v-if="!timerRunning"
                                         @click="startTimer"
-                                        class="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
+                                        :disabled="!gameStarted"
+                                        class="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        Start
+                                        {{ timerPaused ? 'Resume' : 'Start' }}
                                     </button>
                                     <button
                                         v-else
@@ -280,7 +341,8 @@ onUnmounted(() => {
                                     </button>
                                     <button
                                         @click="resetTimer"
-                                        class="px-3 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                                        :disabled="!gameStarted"
+                                        class="px-3 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         Reset
                                     </button>
@@ -301,26 +363,29 @@ onUnmounted(() => {
                             </span>
                         </div>
 
-                        <div v-if="answers.length === 0" class="text-center py-8 text-gray-500">
+                        <div v-if="displayAnswers.length === 0" class="text-center py-8 text-gray-500">
                             No answers available
                         </div>
 
                         <div v-else class="grid grid-cols-2 gap-3">
                             <div
-                                v-for="answer in answers"
+                                v-for="answer in displayAnswers"
                                 :key="answer.id"
-                                class="flex items-center p-3 border rounded-lg transition-all cursor-pointer hover:shadow-md"
+                                class="flex items-center p-3 border rounded-lg transition-all"
                                 :class="{
-                                    'border-green-500 bg-green-50': isAnswerRevealed(answer.id),
-                                    'border-gray-200': !isAnswerRevealed(answer.id),
+                                    'border-green-500 bg-green-50': gameStarted && isAnswerRevealed(answer.id),
+                                    'border-gray-200': !gameStarted || !isAnswerRevealed(answer.id),
+                                    'cursor-pointer hover:shadow-md': gameStarted,
+                                    'cursor-not-allowed opacity-60': !gameStarted,
                                 }"
-                                @click="toggleAnswer(answer.id, isAnswerRevealed(answer.id))"
+                                @click="gameStarted && toggleAnswer(answer.id, isAnswerRevealed(answer.id))"
                             >
                                 <input
                                     type="checkbox"
-                                    :checked="isAnswerRevealed(answer.id)"
-                                    @change.stop="toggleAnswer(answer.id, isAnswerRevealed(answer.id))"
-                                    class="h-5 w-5 rounded mr-3 cursor-pointer"
+                                    :checked="gameStarted && isAnswerRevealed(answer.id)"
+                                    :disabled="!gameStarted"
+                                    @change.stop="gameStarted && toggleAnswer(answer.id, isAnswerRevealed(answer.id))"
+                                    class="h-5 w-5 rounded mr-3 cursor-pointer disabled:cursor-not-allowed"
                                     :style="{
                                         accentColor: theme.colors.primary
                                     }"
@@ -329,9 +394,19 @@ onUnmounted(() => {
                                     <span class="font-semibold">{{ answer.correct_answer }}</span>
                                     <span class="ml-2 text-xs text-gray-500">(#{{ answer.display_order }})</span>
                                 </div>
-                                <div v-if="isAnswerRevealed(answer.id)" class="text-green-600 font-bold text-sm">
+                                <div v-if="gameStarted && isAnswerRevealed(answer.id)" class="text-green-600 font-bold text-sm">
                                     ✓
                                 </div>
+                            </div>
+
+                            <!-- Buzzer Button -->
+                            <div class="flex justify-center items-center">
+                                <button
+                                    @click="playBuzzer"
+                                    class="px-4 py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700"
+                                >
+                                    Incorrect
+                                </button>
                             </div>
                         </div>
                     </div>

@@ -89,11 +89,14 @@ class EventQuestionController extends Controller
     {
         $validated = $request->validate([
             'question_text' => 'required|string',
-            'question_type' => 'required|in:multiple_choice,yes_no,numeric,text',
+            'question_type' => 'required|in:multiple_choice,yes_no,numeric,text,ranked_answers',
             'options' => 'nullable|array',
             'points' => 'required|integer|min:1',
             'order' => 'required|integer|min:1',
             'template_id' => 'nullable|exists:question_templates,id',
+            'event_answers' => 'nullable|array',
+            'event_answers.*.correct_answer' => 'required|string',
+            'event_answers.*.display_order' => 'required|integer|min:1',
         ]);
 
         $eventQuestion = $event->eventQuestions()->create([
@@ -104,6 +107,18 @@ class EventQuestionController extends Controller
             'display_order' => $validated['order'],
             'template_id' => $validated['template_id'] ?? null,
         ]);
+
+        // Create ranked answers for ranked_answers type
+        if ($eventQuestion->question_type === 'ranked_answers' && isset($validated['event_answers'])) {
+            foreach ($validated['event_answers'] as $answerData) {
+                \App\Models\EventAnswer::create([
+                    'event_id' => $event->id,
+                    'event_question_id' => $eventQuestion->id,
+                    'correct_answer' => $answerData['correct_answer'],
+                    'display_order' => $answerData['display_order'],
+                ]);
+            }
+        }
 
         // Create group questions for all groups in this event
         foreach ($event->groups as $group) {
