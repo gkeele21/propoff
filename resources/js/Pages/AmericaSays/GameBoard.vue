@@ -40,25 +40,6 @@ let timerInterval = null;
 // Sound trigger for success
 const successSoundTrigger = ref(0);
 
-// Sound testing
-const currentSoundIndex = ref(1);
-const testSoundTrigger = ref(0);
-const currentSoundType = computed(() => `ding${currentSoundIndex.value}`);
-
-const playTestSound = () => {
-    testSoundTrigger.value++;
-};
-
-const nextSound = () => {
-    currentSoundIndex.value = currentSoundIndex.value < 20 ? currentSoundIndex.value + 1 : 1;
-    playTestSound();
-};
-
-const prevSound = () => {
-    currentSoundIndex.value = currentSoundIndex.value > 1 ? currentSoundIndex.value - 1 : 20;
-    playTestSound();
-};
-
 // Calculate remaining time based on server timestamp (Unix epoch in seconds)
 const calculateRemainingTime = () => {
     if (!timerStartedAt.value) {
@@ -214,9 +195,6 @@ onUnmounted(() => {
         <!-- Sound Component -->
         <GameSound :trigger="successSoundTrigger" sound-type="ding7" />
 
-        <!-- Sound Testing Component -->
-        <GameSound :trigger="testSoundTrigger" :sound-type="currentSoundType" />
-
         <!-- Snowflakes (inside main container, behind content) -->
         <div
             class="fixed inset-0 pointer-events-none overflow-hidden"
@@ -291,31 +269,6 @@ onUnmounted(() => {
             }"
         >
             {{ timerDisplay }}
-        </div>
-
-        <!-- Sound Tester (fixed position bottom left) -->
-        <div class="fixed bottom-3 left-3 flex items-center gap-2" style="z-index: 100;">
-            <button
-                @click="prevSound"
-                class="bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg hover:bg-gray-100 font-bold text-xl"
-            >
-                ←
-            </button>
-            <div class="bg-white text-gray-800 px-6 py-2 rounded-lg shadow-lg font-bold text-2xl min-w-[80px] text-center">
-                {{ currentSoundIndex }}
-            </div>
-            <button
-                @click="nextSound"
-                class="bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg hover:bg-gray-100 font-bold text-xl"
-            >
-                →
-            </button>
-            <button
-                @click="playTestSound"
-                class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600 font-bold"
-            >
-                Play
-            </button>
         </div>
     </div>
 </template>
