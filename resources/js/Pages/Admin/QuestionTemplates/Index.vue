@@ -48,6 +48,7 @@
                                     <option value="yes_no">Yes/No</option>
                                     <option value="numeric">Numeric</option>
                                     <option value="text">Text</option>
+                                    <option value="ranked_answers">Ranked Answers</option>
                                 </select>
                             </div>
                             <div>

@@ -168,6 +168,7 @@ const deactivateInvitation = (invitationId) => {
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Manage Questions (Always show) -->
                             <Link
                                 :href="route('admin.events.event-questions.index', event.id)"
                                 class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md border-2 border-gray-200 rounded-lg hover:border-propoff-blue hover:bg-propoff-blue/10 transition"
@@ -181,20 +182,26 @@ const deactivateInvitation = (invitationId) => {
                                 </div>
                             </Link>
 
+                            <!-- Set Event Answers (GameQuiz only) -->
                             <Link
+                                v-if="event.event_type === 'GameQuiz'"
                                 :href="route('admin.events.event-answers.index', event.id)"
-                                class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md border-2 border-gray-200 rounded-lg hover:border-propoff-blue hover:bg-propoff-blue/10 transition"
+                                class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md border-2 border-gray-200 rounded-lg hover:border-propoff-green hover:bg-propoff-green/10 transition"
                             >
                                 <div class="p-6 flex items-center">
                                     <ClipboardDocumentCheckIcon class="w-10 h-10 text-propoff-green mr-4" />
                                     <div>
-                                        <p class="text-sm font-medium text-gray-500">Set Event</p>
+                                        <p class="text-sm font-medium text-gray-500">
+                                            Set Event
+                                        </p>
                                         <p class="text-lg font-semibold text-gray-900">Answers</p>
                                     </div>
                                 </div>
                             </Link>
 
+                            <!-- Captain Invitations (GameQuiz only) -->
                             <Link
+                                v-if="event.event_type === 'GameQuiz'"
                                 :href="route('admin.events.captain-invitations.index', event.id)"
                                 class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md border-2 border-gray-200 rounded-lg hover:border-propoff-blue hover:bg-propoff-blue/10 transition"
                             >
@@ -208,6 +215,42 @@ const deactivateInvitation = (invitationId) => {
                                     </div>
                                 </div>
                             </Link>
+
+                            <!-- Host Game (AmericaSays only) -->
+                            <Link
+                                v-if="event.event_type === 'AmericaSays'"
+                                :href="route('admin.america-says.host-game', event.id)"
+                                class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md border-2 border-gray-200 rounded-lg hover:border-propoff-blue hover:bg-propoff-blue/10 transition"
+                            >
+                                <div class="p-6 flex items-center">
+                                    <svg class="w-10 h-10 text-propoff-blue mr-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-500">Run</p>
+                                        <p class="text-lg font-semibold text-gray-900">Host Game</p>
+                                    </div>
+                                </div>
+                            </Link>
+
+                            <!-- Launch Game Board (AmericaSays only) -->
+                            <Link
+                                v-if="event.event_type === 'AmericaSays'"
+                                :href="route('america-says.game-board', event.id)"
+                                target="_blank"
+                                class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md border-2 border-gray-200 rounded-lg hover:border-propoff-orange hover:bg-propoff-orange/10 transition"
+                            >
+                                <div class="p-6 flex items-center">
+                                    <svg class="w-10 h-10 text-propoff-orange mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-500">Launch</p>
+                                        <p class="text-lg font-semibold text-gray-900">Game Board</p>
+                                    </div>
+                                </div>
+                            </Link>
+                        </div>
 
                             <!-- <Link
                                 :href="route('admin.events.grading.index', event.id)"
@@ -234,7 +277,6 @@ const deactivateInvitation = (invitationId) => {
                                     </div>
                                 </div>
                             </Link> -->
-                        </div>
                     </div>
                 </div>
                 
@@ -338,8 +380,8 @@ const deactivateInvitation = (invitationId) => {
                     </div>
                 </div>
 
-                <!-- Event Invitations -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <!-- Event Invitations (GameQuiz only) -->
+                <div v-if="event.event_type === 'GameQuiz'" class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Event Invitations</h3>
                         

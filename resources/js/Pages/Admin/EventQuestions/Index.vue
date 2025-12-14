@@ -144,7 +144,7 @@
                                                 <span class="text-sm text-gray-600">{{ question.points }} {{ question.points === 1 ? 'point' : 'points' }}</span>
                                             </div>
                                             <p class="text-gray-900 font-medium mb-2">{{ question.question_text }}</p>
-                                            
+
                                             <!-- Options for Multiple Choice -->
                                             <div v-if="question.type === 'multiple_choice' && question.options" class="mt-2 space-y-1">
                                                 <div
@@ -153,6 +153,21 @@
                                                     class="text-sm text-gray-600 pl-4"
                                                 >
                                                     {{ String.fromCharCode(65 + optIndex) }}. {{ option }}
+                                                </div>
+                                            </div>
+
+                                            <!-- Ranked Answers for AmericaSays -->
+                                            <div v-if="question.type === 'ranked_answers'" class="mt-3">
+                                                <div v-if="question.event_answers && question.event_answers.length > 0" class="bg-propoff-blue/5 border border-propoff-blue/20 rounded-lg p-3">
+                                                    <p class="text-xs font-semibold text-propoff-blue mb-2">Ranked Answers ({{ question.event_answers.length }}):</p>
+                                                    <ol class="list-decimal list-inside text-sm text-gray-700 space-y-1">
+                                                        <li v-for="answer in question.event_answers" :key="answer.id">
+                                                            {{ answer.correct_answer }}
+                                                        </li>
+                                                    </ol>
+                                                </div>
+                                                <div v-else class="bg-propoff-orange/10 border border-propoff-orange/30 rounded-lg p-3">
+                                                    <p class="text-xs text-propoff-orange">⚠️ No answers set yet</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -271,6 +286,7 @@ const typeClass = (type) => {
         yes_no: 'bg-propoff-green/10 text-propoff-dark-green',
         numeric: 'bg-propoff-orange/10 text-propoff-orange',
         text: 'bg-gray-100 text-gray-800',
+        ranked_answers: 'bg-propoff-orange/10 text-propoff-orange',
     };
     return classes[type] || 'bg-gray-100 text-gray-800';
 };

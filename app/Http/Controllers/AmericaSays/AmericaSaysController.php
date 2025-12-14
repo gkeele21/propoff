@@ -8,6 +8,7 @@ use App\Models\EventQuestion;
 use App\Models\EventAnswer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class AmericaSaysController extends Controller
 {
@@ -37,7 +38,7 @@ class AmericaSaysController extends Controller
         if (!$gameState) {
             // Initialize game state if it doesn't exist
             $firstQuestion = EventQuestion::where('event_id', $eventId)
-                ->orderBy('id')
+                ->orderBy('display_order')
                 ->first();
 
             $gameState = [
@@ -53,6 +54,23 @@ class AmericaSaysController extends Controller
 
             DB::table('america_says_game_states')->insert($gameState);
             $gameState = (object) $gameState;
+        }
+
+        // If game state exists but has no question set, set it to the first question
+        if (!$gameState->current_question_id) {
+            $firstQuestion = EventQuestion::where('event_id', $eventId)
+                ->orderBy('display_order')
+                ->first();
+
+            if ($firstQuestion) {
+                DB::table('america_says_game_states')
+                    ->where('event_id', $eventId)
+                    ->update([
+                        'current_question_id' => $firstQuestion->id,
+                        'updated_at' => now(),
+                    ]);
+                $gameState->current_question_id = $firstQuestion->id;
+            }
         }
 
         // Get current question with answers
@@ -230,4 +248,5 @@ class AmericaSaysController extends Controller
 
         return response()->json(['success' => true]);
     }
+
 }

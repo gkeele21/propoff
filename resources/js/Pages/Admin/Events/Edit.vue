@@ -17,6 +17,8 @@ const form = useForm({
     event_date: props.event.event_date?.substring(0, 16) || '', // Format for datetime-local
     lock_date: props.event.lock_date?.substring(0, 16) || '',
     status: props.event.status,
+    category: props.event.category || '',
+    event_type: props.event.event_type || 'GameQuiz',
 });
 
 const submit = () => {
@@ -98,6 +100,44 @@ const submit = () => {
                             <InputError :message="form.errors.lock_date" class="mt-2" />
                             <p class="mt-1 text-sm text-gray-500">
                                 Entries cannot be changed after this date
+                            </p>
+                        </div>
+
+                        <!-- Event Type -->
+                        <div>
+                            <InputLabel for="event_type" value="Event Type" />
+                            <select
+                                id="event_type"
+                                v-model="form.event_type"
+                                class="mt-1 block w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                required
+                            >
+                                <option value="GameQuiz">Game Quiz</option>
+                                <option value="AmericaSays">America Says</option>
+                            </select>
+                            <InputError :message="form.errors.event_type" class="mt-2" />
+                            <p class="mt-1 text-sm text-gray-500">
+                                Choose the type of game for this event
+                            </p>
+                        </div>
+
+                        <!-- Category -->
+                        <div>
+                            <InputLabel for="category" value="Category (Optional)" />
+                            <TextInput
+                                id="category"
+                                v-model="form.category"
+                                type="text"
+                                class="mt-1 block w-full"
+                            />
+                            <InputError :message="form.errors.category" class="mt-2" />
+                            <p class="mt-1 text-sm text-gray-500">
+                                <span v-if="form.event_type === 'AmericaSays'">
+                                    For America Says: Use "Christmas", "Halloween", or "Sports" for themed styling
+                                </span>
+                                <span v-else>
+                                    Category for organizing events (e.g., Football, Basketball)
+                                </span>
                             </p>
                         </div>
 

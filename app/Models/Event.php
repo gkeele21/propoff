@@ -18,6 +18,8 @@ class Event extends Model
         'status',
         'lock_date',
         'created_by',
+        'category',
+        'event_type',
     ];
 
     protected $casts = [

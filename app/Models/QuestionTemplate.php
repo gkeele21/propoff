@@ -45,6 +45,14 @@ class QuestionTemplate extends Model
     }
 
     /**
+     * Get the template answers (for AmericaSays templates).
+     */
+    public function templateAnswers()
+    {
+        return $this->hasMany(QuestionTemplateAnswer::class)->orderBy('display_order');
+    }
+
+    /**
      * Get categories as array.
      */
     public function getCategoriesAttribute(): array

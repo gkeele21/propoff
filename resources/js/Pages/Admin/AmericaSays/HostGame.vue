@@ -1,12 +1,14 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
+import PageHeader from '@/Components/PageHeader.vue';
+import { Head, Link } from '@inertiajs/vue3';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { getThemeFromEvent } from './themes.js';
+import { getThemeFromEvent } from '../../AmericaSays/themes.js';
 import axios from 'axios';
 
 const props = defineProps({
     eventId: Number,
+    event: Object,
 });
 
 // Game state
@@ -17,11 +19,11 @@ const timerStartedAt = ref(null);
 const timerPausedAt = ref(null);
 const timerDuration = ref(30);
 const remainingTime = ref(30);
-const event = ref(null);
+const eventDetails = ref(null);
 const allQuestions = ref([]);
 
 // Theme
-const theme = computed(() => getThemeFromEvent(event.value));
+const theme = computed(() => getThemeFromEvent(eventDetails.value));
 
 // Timer display
 const timerDisplay = computed(() => {
@@ -82,7 +84,7 @@ const fetchGameState = async () => {
 const fetchEvent = async () => {
     try {
         const response = await axios.get(`/api/america-says/events/${props.eventId}`);
-        event.value = response.data;
+        eventDetails.value = response.data;
     } catch (error) {
         console.error('Error fetching event:', error);
     }
@@ -198,107 +200,99 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <Head title="America Says - Admin Control" />
+    <Head title="America Says - Host Game" />
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                America Says - Admin Control Panel
-            </h2>
+            <PageHeader
+                title="Host Game"
+                :subtitle="event?.name"
+                :crumbs="[
+                    { label: 'Admin Dashboard', href: route('admin.dashboard') },
+                    { label: 'Events', href: route('admin.events.index') },
+                    { label: event?.name || 'Event', href: route('admin.events.show', event?.id) },
+                    { label: 'Host Game' }
+                ]"
+            />
         </template>
 
         <div class="py-6">
-            <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-                <!-- Event Info -->
+                <!-- Question Progress and Timer Controls Combined -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold mb-2">{{ event?.name }}</h3>
-                        <p class="text-sm text-gray-600">Theme: {{ theme.name }}</p>
-                    </div>
-                </div>
+                    <div class="p-4">
+                        <div class="grid grid-cols-2 gap-6">
+                            <!-- Left: Question Progress with Navigation -->
+                            <div class="flex items-center gap-3 pr-6 border-r border-gray-300">
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold">Question {{ questionProgress }}</h3>
+                                    <p class="text-sm text-gray-600 mt-1">{{ currentQuestion?.question_text }}</p>
+                                </div>
 
-                <!-- Question Progress -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <div>
-                                <h3 class="text-lg font-semibold">Question {{ questionProgress }}</h3>
-                                <p class="text-sm text-gray-600 mt-1">{{ currentQuestion?.question_text }}</p>
+                                <!-- Navigation Buttons -->
+                                <div class="flex gap-2">
+                                    <button
+                                        @click="goToPreviousQuestion"
+                                        :disabled="currentQuestionIndex <= 0"
+                                        class="px-3 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                    >
+                                        ← Previous
+                                    </button>
+                                    <button
+                                        @click="goToNextQuestion"
+                                        :disabled="currentQuestionIndex >= allQuestions.length - 1"
+                                        class="px-3 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                    >
+                                        Next →
+                                    </button>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Navigation Buttons -->
-                        <div class="flex gap-3">
-                            <button
-                                @click="goToPreviousQuestion"
-                                :disabled="currentQuestionIndex <= 0"
-                                class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                ← Previous
-                            </button>
-                            <button
-                                @click="goToNextQuestion"
-                                :disabled="currentQuestionIndex >= allQuestions.length - 1"
-                                class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                Next →
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                            <!-- Right: Timer -->
+                            <div class="flex items-center gap-3 pl-6">
+                                <div
+                                    class="text-3xl font-bold tabular-nums px-4 py-2 rounded-lg"
+                                    :class="{
+                                        'bg-red-100 text-red-600': timerWarning,
+                                        'bg-green-100 text-green-600': !timerWarning && timerRunning,
+                                        'bg-gray-100 text-gray-600': !timerRunning,
+                                    }"
+                                >
+                                    {{ timerDisplay }}
+                                </div>
 
-                <!-- Timer Controls -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold mb-4">Timer Control</h3>
-
-                        <div class="flex items-center gap-4 mb-4">
-                            <div
-                                class="text-5xl font-bold tabular-nums px-6 py-3 rounded-lg"
-                                :class="{
-                                    'bg-red-100 text-red-600': timerWarning,
-                                    'bg-green-100 text-green-600': !timerWarning && timerRunning,
-                                    'bg-gray-100 text-gray-600': !timerRunning,
-                                }"
-                            >
-                                {{ timerDisplay }}
+                                <!-- Timer Buttons -->
+                                <div class="flex gap-2">
+                                    <button
+                                        v-if="!timerRunning"
+                                        @click="startTimer"
+                                        class="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
+                                    >
+                                        Start
+                                    </button>
+                                    <button
+                                        v-else
+                                        @click="pauseTimer"
+                                        class="px-3 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 text-sm"
+                                    >
+                                        Pause
+                                    </button>
+                                    <button
+                                        @click="resetTimer"
+                                        class="px-3 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                                    >
+                                        Reset
+                                    </button>
+                                </div>
                             </div>
-                            <div class="text-sm text-gray-600">
-                                <p v-if="timerRunning" class="text-green-600 font-semibold">Running</p>
-                                <p v-else-if="timerPausedAt" class="text-yellow-600 font-semibold">Paused</p>
-                                <p v-else class="text-gray-600">Not Started</p>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-3">
-                            <button
-                                v-if="!timerRunning"
-                                @click="startTimer"
-                                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-                            >
-                                Start
-                            </button>
-                            <button
-                                v-else
-                                @click="pauseTimer"
-                                class="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700"
-                            >
-                                Pause
-                            </button>
-                            <button
-                                @click="resetTimer"
-                                class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-                            >
-                                Reset
-                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Answers Checklist -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
+                    <div class="p-4">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-semibold">Answers</h3>
                             <span class="text-sm font-semibold"
@@ -311,11 +305,11 @@ onUnmounted(() => {
                             No answers available
                         </div>
 
-                        <div v-else class="space-y-3">
+                        <div v-else class="grid grid-cols-2 gap-3">
                             <div
                                 v-for="answer in answers"
                                 :key="answer.id"
-                                class="flex items-center p-4 border rounded-lg transition-all cursor-pointer hover:shadow-md"
+                                class="flex items-center p-3 border rounded-lg transition-all cursor-pointer hover:shadow-md"
                                 :class="{
                                     'border-green-500 bg-green-50': isAnswerRevealed(answer.id),
                                     'border-gray-200': !isAnswerRevealed(answer.id),
@@ -326,17 +320,17 @@ onUnmounted(() => {
                                     type="checkbox"
                                     :checked="isAnswerRevealed(answer.id)"
                                     @change.stop="toggleAnswer(answer.id, isAnswerRevealed(answer.id))"
-                                    class="h-5 w-5 rounded mr-4 cursor-pointer"
+                                    class="h-5 w-5 rounded mr-3 cursor-pointer"
                                     :style="{
                                         accentColor: theme.colors.primary
                                     }"
                                 />
                                 <div class="flex-1">
-                                    <span class="font-semibold text-lg">{{ answer.correct_answer }}</span>
-                                    <span class="ml-3 text-sm text-gray-500">(Rank #{{ answer.display_order }})</span>
+                                    <span class="font-semibold">{{ answer.correct_answer }}</span>
+                                    <span class="ml-2 text-xs text-gray-500">(#{{ answer.display_order }})</span>
                                 </div>
-                                <div v-if="isAnswerRevealed(answer.id)" class="text-green-600 font-bold">
-                                    ✓ Revealed
+                                <div v-if="isAnswerRevealed(answer.id)" class="text-green-600 font-bold text-sm">
+                                    ✓
                                 </div>
                             </div>
                         </div>

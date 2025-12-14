@@ -91,6 +91,7 @@
                                 <option value="yes_no">Yes/No</option>
                                 <option value="numeric">Numeric</option>
                                 <option value="text">Text</option>
+                                <option value="ranked_answers">Ranked Answers (AmericaSays)</option>
                             </select>
                             <div v-if="form.errors.question_type" class="text-propoff-red text-sm mt-1">{{ form.errors.question_type }}</div>
                         </div>
@@ -197,6 +198,87 @@
                             </button>
                         </div>
 
+                        <!-- Template Answers (for Ranked Answers type) -->
+                        <div v-if="form.question_type === 'ranked_answers'">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="block text-sm font-medium text-gray-700">Ranked Answers</label>
+                                <span class="text-xs text-gray-500">Required for Ranked Answers type</span>
+                            </div>
+                            <p class="mb-3 text-sm text-gray-500">
+                                Add up to 7 ranked answers for this AmericaSays-style question.
+                            </p>
+
+                            <div v-if="form.template_answers.length > 0" class="space-y-3 mb-3">
+                                <div
+                                    v-for="(answer, index) in form.template_answers"
+                                    :key="index"
+                                    class="flex items-center gap-3 p-4 border border-gray-200 rounded-lg"
+                                >
+                                    <!-- Rank Number -->
+                                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-propoff-orange text-white flex items-center justify-center font-bold">
+                                        #{{ answer.display_order }}
+                                    </div>
+
+                                    <!-- Answer Input -->
+                                    <div class="flex-1">
+                                        <input
+                                            v-model="answer.answer_text"
+                                            type="text"
+                                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                            placeholder="Enter answer..."
+                                        />
+                                    </div>
+
+                                    <!-- Reorder Buttons -->
+                                    <div class="flex flex-col gap-1">
+                                        <button
+                                            type="button"
+                                            @click="moveAnswerUp(index)"
+                                            :disabled="index === 0"
+                                            class="p-1 text-gray-600 hover:text-propoff-blue disabled:opacity-30 disabled:cursor-not-allowed"
+                                            title="Move up (higher rank)"
+                                        >
+                                            <ArrowUpIcon class="w-5 h-5" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            @click="moveAnswerDown(index)"
+                                            :disabled="index === form.template_answers.length - 1"
+                                            class="p-1 text-gray-600 hover:text-propoff-blue disabled:opacity-30 disabled:cursor-not-allowed"
+                                            title="Move down (lower rank)"
+                                        >
+                                            <ArrowDownIcon class="w-5 h-5" />
+                                        </button>
+                                    </div>
+
+                                    <!-- Remove Button -->
+                                    <button
+                                        type="button"
+                                        @click="removeTemplateAnswer(index)"
+                                        class="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded"
+                                        title="Remove answer"
+                                    >
+                                        <TrashIcon class="w-5 h-5" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button
+                                v-if="form.template_answers.length < 7"
+                                type="button"
+                                @click="addTemplateAnswer"
+                                class="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-propoff-blue hover:text-propoff-blue transition"
+                            >
+                                + Add Answer ({{ form.template_answers.length }}/7)
+                            </button>
+
+                            <div v-if="form.template_answers.length > 0" class="mt-3 bg-propoff-blue/10 border border-propoff-blue/30 rounded-lg p-3">
+                                <p class="text-xs text-propoff-blue">
+                                    <strong>Tip:</strong> Answer #1 should be the most popular/common response, #7 the least popular.
+                                </p>
+                            </div>
+                        </div>
+
                         <!-- Preview -->
                         <div class="bg-propoff-blue/10 border border-propoff-blue/30 rounded-lg p-4">
                             <h4 class="text-sm font-semibold text-propoff-blue mb-2">Preview</h4>
@@ -234,6 +316,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import PageHeader from '@/Components/PageHeader.vue';
+import { ArrowUpIcon, ArrowDownIcon, TrashIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     template: Object,
@@ -263,6 +346,10 @@ const form = useForm({
     variables: props.template.variables || [],
     default_options: normalizeOptions(props.template.default_options),
     default_points: String(props.template.default_points || 1),
+    template_answers: props.template.template_answers?.map(a => ({
+        answer_text: a.answer_text,
+        display_order: a.display_order
+    })) || [],
 });
 
 const addVariable = () => {
@@ -280,6 +367,49 @@ const addOption = () => {
 const removeOption = (index) => {
     if (form.default_options.length > 2) {
         form.default_options.splice(index, 1);
+    }
+};
+
+// Template Answers functions
+const addTemplateAnswer = () => {
+    const nextOrder = form.template_answers.length + 1;
+    if (nextOrder <= 7) {
+        form.template_answers.push({
+            answer_text: '',
+            display_order: nextOrder,
+        });
+    }
+};
+
+const removeTemplateAnswer = (index) => {
+    form.template_answers.splice(index, 1);
+    // Reorder remaining answers
+    form.template_answers.forEach((answer, idx) => {
+        answer.display_order = idx + 1;
+    });
+};
+
+const moveAnswerUp = (index) => {
+    if (index > 0) {
+        const temp = form.template_answers[index];
+        form.template_answers[index] = form.template_answers[index - 1];
+        form.template_answers[index - 1] = temp;
+        // Update display orders
+        form.template_answers.forEach((answer, idx) => {
+            answer.display_order = idx + 1;
+        });
+    }
+};
+
+const moveAnswerDown = (index) => {
+    if (index < form.template_answers.length - 1) {
+        const temp = form.template_answers[index];
+        form.template_answers[index] = form.template_answers[index + 1];
+        form.template_answers[index + 1] = temp;
+        // Update display orders
+        form.template_answers.forEach((answer, idx) => {
+            answer.display_order = idx + 1;
+        });
     }
 };
 

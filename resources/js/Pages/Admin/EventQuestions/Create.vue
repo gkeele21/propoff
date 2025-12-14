@@ -129,6 +129,18 @@
                                                             {{ template.variables.join(', ') }}
                                                         </span>
                                                     </div>
+
+                                                    <!-- Template Answers Preview -->
+                                                    <div v-if="template.template_answers?.length" class="mt-2 text-xs">
+                                                        <div class="bg-propoff-blue/10 border border-propoff-blue/30 rounded p-2">
+                                                            <p class="font-semibold text-propoff-blue mb-1">Ranked Answers ({{ template.template_answers.length }}):</p>
+                                                            <ol class="list-decimal list-inside text-propoff-blue space-y-0.5">
+                                                                <li v-for="answer in template.template_answers" :key="answer.id">
+                                                                    {{ answer.answer_text }}
+                                                                </li>
+                                                            </ol>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

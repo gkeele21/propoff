@@ -17,6 +17,7 @@ class EventQuestionController extends Controller
     public function index(Event $event)
     {
         $questions = $event->eventQuestions()
+            ->with('eventAnswers')
             ->orderBy('display_order')
             ->get();
 
@@ -59,6 +60,7 @@ class EventQuestionController extends Controller
 
         // Find templates where category contains the search term
         $templates = QuestionTemplate::where('category', 'LIKE', "%{$searchCategory}%")
+            ->with('templateAnswers')
             ->orderBy('display_order')
             ->get();
 
@@ -206,7 +208,7 @@ class EventQuestionController extends Controller
      */
     public function edit(Event $event, EventQuestion $eventQuestion)
     {
-        $eventQuestion->load('template')->loadCount('groupQuestions');
+        $eventQuestion->load('template', 'eventAnswers')->loadCount('groupQuestions');
 
         return Inertia::render('Admin/EventQuestions/Edit', [
             'event' => $event,
@@ -221,10 +223,13 @@ class EventQuestionController extends Controller
     {
         $validated = $request->validate([
             'question_text' => 'required|string',
-            'question_type' => 'required|in:multiple_choice,yes_no,numeric,text',
+            'question_type' => 'required|in:multiple_choice,yes_no,numeric,text,ranked_answers',
             'options' => 'nullable|array',
             'points' => 'required|integer|min:1',
-            'order' => 'required|integer|min:1',
+            'display_order' => 'required|integer|min:1',
+            'answers' => 'nullable|array',
+            'answers.*.correct_answer' => 'required|string',
+            'answers.*.display_order' => 'required|integer|min:1',
         ]);
 
         $eventQuestion->update([
@@ -232,7 +237,7 @@ class EventQuestionController extends Controller
             'question_type' => $validated['question_type'],
             'options' => $validated['options'] ?? null,
             'points' => $validated['points'],
-            'display_order' => $validated['order'],
+            'display_order' => $validated['display_order'],
         ]);
 
         // Update all associated group questions
@@ -241,8 +246,24 @@ class EventQuestionController extends Controller
             'question_type' => $validated['question_type'],
             'options' => $validated['options'] ?? null,
             'points' => $validated['points'],
-            'display_order' => $validated['order'],
+            'display_order' => $validated['display_order'],
         ]);
+
+        // Update answers for ranked_answers type
+        if ($eventQuestion->question_type === 'ranked_answers' && isset($validated['answers'])) {
+            // Delete existing answers
+            $eventQuestion->eventAnswers()->delete();
+
+            // Create new answers
+            foreach ($validated['answers'] as $answerData) {
+                \App\Models\EventAnswer::create([
+                    'event_id' => $event->id,
+                    'event_question_id' => $eventQuestion->id,
+                    'correct_answer' => $answerData['correct_answer'],
+                    'display_order' => $answerData['display_order'],
+                ]);
+            }
+        }
 
         return redirect()->route('admin.events.event-questions.index', $event)
             ->with('success', 'Question updated successfully!');
@@ -370,7 +391,7 @@ class EventQuestionController extends Controller
         $nextOrder = $event->eventQuestions()->max('display_order') + 1;
 
         foreach ($validated['templates'] as $templateData) {
-            $template = QuestionTemplate::findOrFail($templateData['template_id']);
+            $template = QuestionTemplate::with('templateAnswers')->findOrFail($templateData['template_id']);
             $variableValues = $templateData['variable_values'] ?? [];
 
             // Substitute variables in question text
@@ -379,9 +400,9 @@ class EventQuestionController extends Controller
                 $variableValues
             );
 
-            // Substitute variables in options
+            // Substitute variables in options (skip for ranked_answers type)
             $options = null;
-            if ($template->default_options) {
+            if ($template->question_type !== 'ranked_answers' && $template->default_options) {
                 $options = collect($template->default_options)->map(function ($option) use ($variableValues) {
                     if (is_array($option) && isset($option['label'])) {
                         $option['label'] = $this->substituteVariables($option['label'], $variableValues);
@@ -402,6 +423,18 @@ class EventQuestionController extends Controller
                 'points' => $template->default_points,
                 'display_order' => $nextOrder++,
             ]);
+
+            // Import template answers if they exist
+            if ($template->templateAnswers && $template->templateAnswers->count() > 0) {
+                foreach ($template->templateAnswers as $templateAnswer) {
+                    \App\Models\EventAnswer::create([
+                        'event_id' => $event->id,
+                        'event_question_id' => $eventQuestion->id,
+                        'correct_answer' => $templateAnswer->answer_text,
+                        'display_order' => $templateAnswer->display_order,
+                    ]);
+                }
+            }
 
             // Create group questions for all groups in this event
             foreach ($event->groups as $group) {

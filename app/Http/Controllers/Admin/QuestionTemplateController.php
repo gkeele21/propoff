@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\QuestionTemplate;
+use App\Models\QuestionTemplateAnswer;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -73,22 +74,43 @@ class QuestionTemplateController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'question_text' => 'required|string',
-            'question_type' => 'required|in:multiple_choice,yes_no,numeric,text',
+            'question_type' => 'required|in:multiple_choice,yes_no,numeric,text,ranked_answers',
             'default_options' => 'nullable|array',
             'variables' => 'nullable|array',
             'category' => 'nullable|string|max:100',
             'description' => 'nullable|string|max:500',
             'default_points' => 'nullable|integer|min:1',
+            'template_answers' => 'nullable|array|max:7',
+            'template_answers.*.answer_text' => 'required|string|max:255',
+            'template_answers.*.display_order' => 'required|integer|min:1|max:7',
         ]);
 
         // Get the highest display_order and add 1
         $maxDisplayOrder = QuestionTemplate::max('display_order') ?? 0;
 
         $template = QuestionTemplate::create([
-            ...$validated,
+            'title' => $validated['title'],
+            'question_text' => $validated['question_text'],
+            'question_type' => $validated['question_type'],
+            'default_options' => $validated['default_options'] ?? null,
+            'variables' => $validated['variables'] ?? null,
+            'category' => $validated['category'] ?? null,
+            'description' => $validated['description'] ?? null,
+            'default_points' => $validated['default_points'] ?? null,
             'display_order' => $maxDisplayOrder + 1,
             'created_by' => auth()->id(),
         ]);
+
+        // Save template answers if provided
+        if (isset($validated['template_answers']) && is_array($validated['template_answers'])) {
+            foreach ($validated['template_answers'] as $answerData) {
+                QuestionTemplateAnswer::create([
+                    'question_template_id' => $template->id,
+                    'answer_text' => $answerData['answer_text'],
+                    'display_order' => $answerData['display_order'],
+                ]);
+            }
+        }
 
         return redirect()->route('admin.question-templates.index')
             ->with('success', 'Question template created successfully!');
@@ -109,6 +131,9 @@ class QuestionTemplateController extends Controller
      */
     public function edit(QuestionTemplate $question_template)
     {
+        // Load template answers
+        $question_template->load('templateAnswers');
+
         // Get existing categories for suggestions
         $categories = QuestionTemplate::distinct('category')
             ->pluck('category')
@@ -129,15 +154,42 @@ class QuestionTemplateController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'question_text' => 'required|string',
-            'question_type' => 'required|in:multiple_choice,yes_no,numeric,text',
+            'question_type' => 'required|in:multiple_choice,yes_no,numeric,text,ranked_answers',
             'default_options' => 'nullable|array',
             'variables' => 'nullable|array',
             'category' => 'nullable|string|max:100',
             'description' => 'nullable|string|max:500',
             'default_points' => 'nullable|integer|min:1',
+            'template_answers' => 'nullable|array|max:7',
+            'template_answers.*.answer_text' => 'required|string|max:255',
+            'template_answers.*.display_order' => 'required|integer|min:1|max:7',
         ]);
 
-        $question_template->update($validated);
+        $question_template->update([
+            'title' => $validated['title'],
+            'question_text' => $validated['question_text'],
+            'question_type' => $validated['question_type'],
+            'default_options' => $validated['default_options'] ?? null,
+            'variables' => $validated['variables'] ?? null,
+            'category' => $validated['category'] ?? null,
+            'description' => $validated['description'] ?? null,
+            'default_points' => $validated['default_points'] ?? null,
+        ]);
+
+        // Update template answers
+        // Delete existing answers
+        $question_template->templateAnswers()->delete();
+
+        // Create new answers if provided
+        if (isset($validated['template_answers']) && is_array($validated['template_answers'])) {
+            foreach ($validated['template_answers'] as $answerData) {
+                QuestionTemplateAnswer::create([
+                    'question_template_id' => $question_template->id,
+                    'answer_text' => $answerData['answer_text'],
+                    'display_order' => $answerData['display_order'],
+                ]);
+            }
+        }
 
         return redirect()->route('admin.question-templates.index')
             ->with('success', 'Question template updated successfully!');

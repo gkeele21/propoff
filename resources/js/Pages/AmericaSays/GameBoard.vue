@@ -92,28 +92,36 @@ const isAnswerRevealed = (answerId) => {
 const getAnswerDisplay = (answer) => {
     const words = answer.correct_answer.split(' ');
 
-    // For each word, show first letter + underscores for remaining letters
+    // For each word, handle hyphenated parts
     const displayWords = words.map(word => {
-        const firstLetter = word.charAt(0).toUpperCase();
-        // Use 1.5x underscores per letter (word length + half, rounded)
-        const underscoreCount = Math.floor((word.length - 1) * 1.5);
-        const underscores = '_'.repeat(underscoreCount);
-        return firstLetter + underscores;
+        // Split on hyphens but keep the hyphens
+        const parts = word.split('-');
+
+        const displayParts = parts.map(part => {
+            const firstLetter = part.charAt(0).toUpperCase();
+            // Use 1.5x underscores per letter (part length + half, rounded)
+            const underscoreCount = Math.floor((part.length - 1) * 1.5);
+            const underscores = '_'.repeat(underscoreCount);
+            return firstLetter + underscores;
+        });
+
+        // Join hyphenated parts with hyphens
+        return displayParts.join('-');
     });
 
-    // Join with NO space - continuous line to hide word count
-    return displayWords.join('');
+    // Join with spaces between words
+    return displayWords.join(' ');
 };
 
-// Get font size based on display_order (rank) - more dramatic scaling
+// Get font size based on display_order (rank) - scaled to fit on TV
 const getAnswerFontSize = (displayOrder) => {
     const sizes = {
-        1: '3.5rem',   // Most popular - biggest
-        2: '2.75rem',
-        3: '2.25rem',
-        4: '1.875rem',
-        5: '1.5rem',
-        6: '1.25rem',
+        1: '2.5rem',   // Most popular - biggest
+        2: '2rem',
+        3: '1.75rem',
+        4: '1.5rem',
+        5: '1.25rem',
+        6: '1.1rem',
         7: '1rem',     // Least popular - smallest
     };
     return sizes[displayOrder] || '1.5rem';
@@ -154,14 +162,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <Head title="America Says - Display">
+    <Head title="America Says - Game Board">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Coustard:wght@400;900&display=swap" rel="stylesheet">
     </Head>
 
     <div
-        class="min-h-screen flex flex-col p-8 transition-colors duration-300 relative"
+        class="min-h-screen flex flex-col p-4 transition-colors duration-300 relative overflow-hidden"
         :style="{
             backgroundColor: theme.colors.background,
             color: theme.colors.text,
@@ -178,9 +186,9 @@ onUnmounted(() => {
             </div>
         </div>
         <!-- Question Display -->
-        <div class="text-center mb-8 relative" style="z-index: 10;">
+        <div class="text-center mb-4 relative" style="z-index: 10;">
             <h1
-                class="text-3xl mb-4 px-8 py-4 rounded-lg inline-block"
+                class="text-2xl mb-2 px-6 py-3 rounded-lg inline-block"
                 :style="{
                     backgroundColor: theme.colors.primary,
                     color: 'white',
@@ -194,7 +202,7 @@ onUnmounted(() => {
         <!-- Answers Grid -->
         <div
             v-if="answers.length > 0"
-            class="flex-1 grid grid-cols-2 gap-6 max-w-6xl mx-auto w-full relative"
+            class="flex-1 grid grid-cols-2 gap-3 max-w-5xl mx-auto w-full relative"
             style="z-index: 10;"
         >
             <div
@@ -204,7 +212,7 @@ onUnmounted(() => {
                 class="flex items-center justify-center"
             >
                 <div
-                    class="answer-box relative w-full h-full min-h-[80px] flex items-center justify-center p-4"
+                    class="answer-box relative w-full h-full min-h-[60px] flex items-center justify-center p-2"
                     :style="{
                         fontSize: getAnswerFontSize(answer.display_order),
                         fontFamily: 'Coustard, serif',
@@ -212,12 +220,11 @@ onUnmounted(() => {
                 >
                     <div
                         class="text-center"
-                        style="letter-spacing: -0.15em;"
                         :style="{
                             color: theme.colors.secondary
                         }"
                     >
-                        <span v-if="!isAnswerRevealed(answer.id)">
+                        <span v-if="!isAnswerRevealed(answer.id)" style="letter-spacing: -0.15em;">
                             {{ getAnswerDisplay(answer) }}
                         </span>
                         <span v-else class="uppercase typing-reveal">
@@ -230,7 +237,7 @@ onUnmounted(() => {
 
         <!-- Timer Display -->
         <div
-            class="fixed bottom-6 right-6 text-4xl font-bold tabular-nums px-6 py-3 rounded-xl shadow-2xl"
+            class="fixed bottom-4 right-4 text-3xl font-bold tabular-nums px-4 py-2 rounded-xl shadow-2xl"
             style="z-index: 100;"
             :style="{
                 backgroundColor: timerWarning ? theme.colors.timerWarning : theme.colors.secondary,
@@ -247,7 +254,7 @@ onUnmounted(() => {
 
 <style scoped>
 .answer-box {
-    backdrop-filter: blur(10px);
+    /* Removed blur effect to prevent text cutoff */
 }
 
 /* Typing reveal animation - faster */
