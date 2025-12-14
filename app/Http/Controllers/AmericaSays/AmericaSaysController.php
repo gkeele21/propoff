@@ -36,14 +36,10 @@ class AmericaSaysController extends Controller
             ->first();
 
         if (!$gameState) {
-            // Initialize game state if it doesn't exist
-            $firstQuestion = EventQuestion::where('event_id', $eventId)
-                ->orderBy('display_order')
-                ->first();
-
+            // Initialize game state without a question - requires explicit Begin action
             $gameState = [
                 'event_id' => $eventId,
-                'current_question_id' => $firstQuestion?->id,
+                'current_question_id' => null,
                 'timer_started_at' => null,
                 'timer_paused_at' => null,
                 'timer_duration' => 30,
@@ -54,23 +50,6 @@ class AmericaSaysController extends Controller
 
             DB::table('america_says_game_states')->insert($gameState);
             $gameState = (object) $gameState;
-        }
-
-        // If game state exists but has no question set, set it to the first question
-        if (!$gameState->current_question_id) {
-            $firstQuestion = EventQuestion::where('event_id', $eventId)
-                ->orderBy('display_order')
-                ->first();
-
-            if ($firstQuestion) {
-                DB::table('america_says_game_states')
-                    ->where('event_id', $eventId)
-                    ->update([
-                        'current_question_id' => $firstQuestion->id,
-                        'updated_at' => now(),
-                    ]);
-                $gameState->current_question_id = $firstQuestion->id;
-            }
         }
 
         // Get current question with answers
@@ -94,17 +73,63 @@ class AmericaSaysController extends Controller
     }
 
     /**
+     * Begin the game - set the first question
+     */
+    public function beginGame(Request $request, $eventId)
+    {
+        $firstQuestion = EventQuestion::where('event_id', $eventId)
+            ->orderBy('display_order')
+            ->first();
+
+        if ($firstQuestion) {
+            DB::table('america_says_game_states')
+                ->where('event_id', $eventId)
+                ->update([
+                    'current_question_id' => $firstQuestion->id,
+                    'timer_started_at' => null,
+                    'timer_paused_at' => null,
+                    'revealed_answer_ids' => json_encode([]),
+                    'updated_at' => now(),
+                ]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
      * Start the timer
      */
     public function startTimer(Request $request, $eventId)
     {
-        DB::table('america_says_game_states')
+        $gameState = DB::table('america_says_game_states')
             ->where('event_id', $eventId)
-            ->update([
-                'timer_started_at' => now(),
-                'timer_paused_at' => null,
-                'updated_at' => now(),
-            ]);
+            ->first();
+
+        // If resuming from pause, adjust the start time
+        if ($gameState->timer_paused_at && $gameState->timer_started_at) {
+            $pausedAt = strtotime($gameState->timer_paused_at);
+            $startedAt = strtotime($gameState->timer_started_at);
+            $elapsed = $pausedAt - $startedAt;
+            $now = time();
+            $newStartTime = $now - $elapsed;
+
+            DB::table('america_says_game_states')
+                ->where('event_id', $eventId)
+                ->update([
+                    'timer_started_at' => date('Y-m-d H:i:s', $newStartTime),
+                    'timer_paused_at' => null,
+                    'updated_at' => now(),
+                ]);
+        } else {
+            // Starting fresh
+            DB::table('america_says_game_states')
+                ->where('event_id', $eventId)
+                ->update([
+                    'timer_started_at' => now(),
+                    'timer_paused_at' => null,
+                    'updated_at' => now(),
+                ]);
+        }
 
         return response()->json(['success' => true]);
     }

@@ -25,6 +25,7 @@ class UpdateEventRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
             'event_date' => ['required', 'date'],
+            'event_type' => ['required', 'in:GameQuiz,AmericaSays'],
             'status' => ['required', 'in:draft,open,locked,in_progress,completed'],
             'lock_date' => ['nullable', 'date'],
         ];

@@ -239,6 +239,7 @@ Route::prefix('api/america-says')->group(function () {
     });
     Route::get('/events/{event}/questions', [\App\Http\Controllers\AmericaSays\AmericaSaysController::class, 'getQuestions']);
     Route::get('/events/{event}/game-state', [\App\Http\Controllers\AmericaSays\AmericaSaysController::class, 'getGameState']);
+    Route::post('/events/{event}/begin-game', [\App\Http\Controllers\AmericaSays\AmericaSaysController::class, 'beginGame']);
     Route::post('/events/{event}/start-timer', [\App\Http\Controllers\AmericaSays\AmericaSaysController::class, 'startTimer']);
     Route::post('/events/{event}/pause-timer', [\App\Http\Controllers\AmericaSays\AmericaSaysController::class, 'pauseTimer']);
     Route::post('/events/{event}/reset-timer', [\App\Http\Controllers\AmericaSays\AmericaSaysController::class, 'resetTimer']);
