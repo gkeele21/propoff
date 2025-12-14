@@ -216,17 +216,21 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/events/{event}/event-questions/{eventQuestion}/toggle-event-void', [\App\Http\Controllers\Admin\EventAnswerController::class, 'toggleVoid'])->name('events.event-answers.toggleVoid');
     Route::delete('/events/{event}/event-questions/{eventQuestion}/clear-event-answer', [\App\Http\Controllers\Admin\EventAnswerController::class, 'clearAnswer'])->name('events.event-answers.clearAnswer');
 
-    // America Says
+    // America Says Admin (requires auth)
     Route::prefix('america-says')->name('america-says.')->group(function () {
-        Route::get('/events/{event}/display', function ($eventId) {
-            return Inertia::render('AmericaSays/Display', ['eventId' => (int)$eventId]);
-        })->name('display');
-
-        Route::get('/events/{event}/admin', function ($eventId) {
-            return Inertia::render('AmericaSays/Admin', ['eventId' => (int)$eventId]);
-        })->name('admin');
+        Route::get('/events/{event}/host-game', function (\App\Models\Event $event) {
+            return Inertia::render('Admin/AmericaSays/HostGame', [
+                'eventId' => $event->id,
+                'event' => $event,
+            ]);
+        })->name('host-game');
     });
 });
+
+// America Says Game Board (public - no auth required)
+Route::get('/america-says/events/{event}/game-board', function ($eventId) {
+    return Inertia::render('AmericaSays/GameBoard', ['eventId' => (int)$eventId]);
+})->name('america-says.game-board');
 
 // America Says API (no throttle, uses web middleware)
 Route::prefix('api/america-says')->group(function () {

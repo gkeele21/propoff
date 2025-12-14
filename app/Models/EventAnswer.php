@@ -13,6 +13,7 @@ class EventAnswer extends Model
         'event_id',
         'event_question_id',
         'correct_answer',
+        'display_order',
         'is_void',
         'set_at',
         'set_by',

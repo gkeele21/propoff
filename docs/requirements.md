@@ -823,6 +823,49 @@ PropOff is a web-based prediction/guessing event platform where users can submit
 - Single Groups/Show.vue with v-if directives for captain-specific content
 - Same component serves both captain and member views
 
+### ✅ 12. America Says Game Type (COMPLETED - December 2025)
+
+#### 12.1 Event Type System
+- ✅ FR-12.1.1: Event type enum (GameQuiz, AmericaSays)
+- ✅ FR-12.1.2: Default event type to GameQuiz for backward compatibility
+- ✅ FR-12.1.3: Event type selection in create/edit forms
+- ✅ FR-12.1.4: Conditional UI based on event type
+
+#### 12.2 America Says Specific Features
+- ✅ FR-12.2.1: Live game board display (public access, no login required)
+- ✅ FR-12.2.2: Admin game setup panel (timer controls, answer reveal, question navigation)
+- ✅ FR-12.2.3: Manage ranked answers page (7 answers per question, drag-to-reorder)
+- ✅ FR-12.2.4: Real-time game state synchronization (500ms polling on display, 2s on admin)
+- ✅ FR-12.2.5: Theme system (Christmas, Halloween, Sports, Default)
+- ✅ FR-12.2.6: Category-based theme detection
+- ✅ FR-12.2.7: Answer display with first letters + underscores (hide word length)
+- ✅ FR-12.2.8: Typing animation for revealed answers
+- ✅ FR-12.2.9: Timer with pause/resume/reset functionality
+- ✅ FR-12.2.10: Visual effects (snowflakes for Christmas theme)
+
+#### 12.3 Game Management
+- ✅ FR-12.3.1: Question management (same interface, no template import for America Says)
+- ✅ FR-12.3.2: Answer management (7 ranked answers with display_order)
+- ✅ FR-12.3.3: Game state persistence (current question, timer, revealed answers)
+- ✅ FR-12.3.4: Previous/Next question navigation
+- ✅ FR-12.3.5: Individual answer reveal/unreveal toggle
+
+#### 12.4 Display Features
+- ✅ FR-12.4.1: Responsive layout optimized for TV/projector display
+- ✅ FR-12.4.2: Font size scaling based on answer popularity rank (#1 biggest, #7 smallest)
+- ✅ FR-12.4.3: Hyphenated word support (show first letter of each hyphenated part)
+- ✅ FR-12.4.4: Grid layout with center-focused design (#1 answer in center)
+- ✅ FR-12.4.5: Themed backgrounds and animations
+
+#### 12.5 Technical Implementation
+- ✅ FR-12.5.1: Database migration for event_type column
+- ✅ FR-12.5.2: America Says game states table
+- ✅ FR-12.5.3: Event answers table reuse with display_order
+- ✅ FR-12.5.4: AmericaSaysController with 11 API endpoints
+- ✅ FR-12.5.5: Conditional Quick Actions based on event type
+- ✅ FR-12.5.6: Public game board route (no authentication)
+- ✅ FR-12.5.7: Admin-only game setup and answer management routes
+
 ---
 
 ## Future Considerations
