@@ -40,6 +40,25 @@ let timerInterval = null;
 // Sound trigger for success
 const successSoundTrigger = ref(0);
 
+// Sound testing
+const currentSoundIndex = ref(1);
+const testSoundTrigger = ref(0);
+const currentSoundType = computed(() => `ding${currentSoundIndex.value}`);
+
+const playTestSound = () => {
+    testSoundTrigger.value++;
+};
+
+const nextSound = () => {
+    currentSoundIndex.value = currentSoundIndex.value < 20 ? currentSoundIndex.value + 1 : 1;
+    playTestSound();
+};
+
+const prevSound = () => {
+    currentSoundIndex.value = currentSoundIndex.value > 1 ? currentSoundIndex.value - 1 : 20;
+    playTestSound();
+};
+
 // Calculate remaining time based on server timestamp (Unix epoch in seconds)
 const calculateRemainingTime = () => {
     if (!timerStartedAt.value) {
@@ -122,15 +141,15 @@ const getAnswerDisplay = (answer) => {
 // Get font size based on display_order (rank) - scaled to fit on TV
 const getAnswerFontSize = (displayOrder) => {
     const sizes = {
-        1: '2.5rem',   // Most popular - biggest
-        2: '2rem',
-        3: '1.75rem',
-        4: '1.5rem',
-        5: '1.25rem',
+        1: '2.25rem',  // Most popular - biggest
+        2: '1.75rem',
+        3: '1.5rem',
+        4: '1.35rem',
+        5: '1.2rem',
         6: '1.1rem',
         7: '1rem',     // Least popular - smallest
     };
-    return sizes[displayOrder] || '1.5rem';
+    return sizes[displayOrder] || '1.35rem';
 };
 
 // Get position class based on display_order
@@ -185,7 +204,7 @@ onUnmounted(() => {
     </Head>
 
     <div
-        class="min-h-screen flex flex-col p-2 transition-colors duration-300 relative overflow-hidden"
+        class="h-screen flex flex-col p-3 transition-colors duration-300 relative overflow-hidden"
         :style="{
             backgroundColor: theme.colors.background,
             color: theme.colors.text,
@@ -193,7 +212,10 @@ onUnmounted(() => {
         }"
     >
         <!-- Sound Component -->
-        <GameSound :trigger="successSoundTrigger" sound-type="success" />
+        <GameSound :trigger="successSoundTrigger" sound-type="ding7" />
+
+        <!-- Sound Testing Component -->
+        <GameSound :trigger="testSoundTrigger" :sound-type="currentSoundType" />
 
         <!-- Snowflakes (inside main container, behind content) -->
         <div
@@ -205,9 +227,9 @@ onUnmounted(() => {
             </div>
         </div>
         <!-- Question Display -->
-        <div class="text-center mb-2 relative" style="z-index: 10;">
+        <div class="text-center mb-3 relative flex-shrink-0" style="z-index: 10;">
             <h1
-                class="text-2xl mb-1 px-6 py-2 rounded-lg inline-block"
+                class="text-2xl px-6 py-2 rounded-lg inline-block"
                 :style="{
                     backgroundColor: theme.colors.primary,
                     color: 'white',
@@ -221,24 +243,24 @@ onUnmounted(() => {
         <!-- Answers Grid (only shown when timer is running) -->
         <div
             v-if="answers.length > 0 && showAnswers"
-            class="flex-1 grid grid-cols-2 gap-2 max-w-5xl mx-auto w-full relative py-1"
-            style="z-index: 10;"
+            class="flex-1 grid grid-cols-2 gap-2 max-w-6xl mx-auto w-full relative overflow-hidden"
+            style="z-index: 10; max-height: calc(100vh - 140px);"
         >
             <div
                 v-for="answer in answers"
                 :key="answer.id"
                 :class="getAnswerPositionClass(answer.display_order)"
-                class="flex items-center justify-center"
+                class="flex items-center justify-center overflow-hidden"
             >
                 <div
-                    class="answer-box relative w-full h-full min-h-[40px] flex items-center justify-center p-1"
+                    class="answer-box relative w-full h-full flex items-center justify-center p-2"
                     :style="{
                         fontSize: getAnswerFontSize(answer.display_order),
                         fontFamily: theme.fonts.answer,
                     }"
                 >
                     <div
-                        class="text-center"
+                        class="text-center truncate-answer"
                         :style="{
                             color: theme.colors.secondary
                         }"
@@ -257,7 +279,7 @@ onUnmounted(() => {
         <!-- Timer Display (shown when timer has been started) -->
         <div
             v-if="showTimer"
-            class="fixed bottom-4 right-4 text-3xl font-bold tabular-nums px-4 py-2 rounded-xl shadow-2xl"
+            class="fixed bottom-3 right-3 text-2xl font-bold tabular-nums px-3 py-2 rounded-xl shadow-2xl"
             style="z-index: 100;"
             :style="{
                 backgroundColor: timerWarning ? theme.colors.timerWarning : theme.colors.secondary,
@@ -269,6 +291,31 @@ onUnmounted(() => {
             }"
         >
             {{ timerDisplay }}
+        </div>
+
+        <!-- Sound Tester (fixed position bottom left) -->
+        <div class="fixed bottom-3 left-3 flex items-center gap-2" style="z-index: 100;">
+            <button
+                @click="prevSound"
+                class="bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg hover:bg-gray-100 font-bold text-xl"
+            >
+                ←
+            </button>
+            <div class="bg-white text-gray-800 px-6 py-2 rounded-lg shadow-lg font-bold text-2xl min-w-[80px] text-center">
+                {{ currentSoundIndex }}
+            </div>
+            <button
+                @click="nextSound"
+                class="bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg hover:bg-gray-100 font-bold text-xl"
+            >
+                →
+            </button>
+            <button
+                @click="playTestSound"
+                class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600 font-bold"
+            >
+                Play
+            </button>
         </div>
     </div>
 </template>
