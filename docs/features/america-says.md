@@ -45,9 +45,11 @@ events:
 america_says_game_states:
   - event_id
   - current_question_id
-  - current_timer_seconds
-  - is_timer_running
+  - timer_started_at (timestamp, nullable)
+  - timer_paused_at (timestamp, nullable)
+  - timer_duration (integer, default 30)
   - revealed_answer_ids (JSON array)
+  - created_at
   - updated_at
 
 event_answers:
