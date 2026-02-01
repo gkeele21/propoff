@@ -35,7 +35,7 @@ class QuestionTemplateController extends Controller
             });
         }
 
-        $templates = $query->orderBy('display_order')->paginate(20);
+        $templates = $query->orderBy('display_order')->paginate(50);
 
         // Get all unique categories
         $categories = QuestionTemplate::distinct('category')

@@ -324,7 +324,20 @@ const props = defineProps({
 
 // Normalize options to new format if needed (backward compatibility)
 const normalizeOptions = (options) => {
-    if (!options || options.length === 0) return [];
+    // Handle null, undefined, or empty
+    if (!options) return [];
+
+    // If it's a string, try to parse it as JSON
+    if (typeof options === 'string') {
+        try {
+            options = JSON.parse(options);
+        } catch (e) {
+            return [];
+        }
+    }
+
+    // Ensure it's an array
+    if (!Array.isArray(options) || options.length === 0) return [];
 
     // Check if already in new format
     if (typeof options[0] === 'object' && options[0].label !== undefined) {

@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\QuestionTemplate;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +10,14 @@ class QuestionTemplateSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * Football and Super Bowl question templates based on prop bet sheet.
+     *
+     * Token naming convention:
+     * - {afc_team_or_visitor_team} / {nfc_team_or_home_team} - for teams
+     * - {afc_qb_or_visitor_qb} / {nfc_qb_or_home_qb} - for QBs
+     * - {afc_rb1_or_visitor_rb1} / {nfc_rb1_or_home_rb1} - for RBs
+     * - {afc_wr1_or_visitor_wr1} / {nfc_wr1_or_home_wr1} - for WRs
      */
     public function run(): void
     {
@@ -20,639 +27,775 @@ class QuestionTemplateSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $templates = [
-            // Basketball Templates
+            // =====================================================
+            // PRE-GAME / HALFTIME / POST-GAME (Super Bowl specific)
+            // =====================================================
+
+            // Q1 - National Anthem Duration
             [
-                'title' => 'Player Points Performance',
-                'question_text' => 'Will {player_name} score over {points} points in this game?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 5],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['player_name', 'points'],
-                'category' => 'Basketball',
-                'default_points' => 10,
-            ],
-            [
-                'title' => 'Team Total Points Range',
-                'question_text' => 'How many points will {team_name} score?',
+                'title' => 'National Anthem Duration',
+                'question_text' => 'How long will it take {anthem_singer} to sing the National Anthem?',
                 'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => 'Under 100', 'points' => 0],
-                    ['label' => '100-110', 'points' => 3],
-                    ['label' => '111-120', 'points' => 5],
-                    ['label' => 'Over 120', 'points' => 3]
-                ]),
-                'variables' => ['team_name'],
-                'category' => 'Basketball',
-                'default_points' => 15,
-            ],
-            [
-                'title' => 'Triple Double Achievement',
-                'question_text' => 'Will {player_name} record a triple-double?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 20],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['player_name'],
-                'category' => 'Basketball',
-                'default_points' => 25,
-            ],
-            [
-                'title' => 'Three-Pointers Made',
-                'question_text' => 'How many three-pointers will {player_name} make?',
-                'question_type' => 'numeric',
-                'default_options' => null,
-                'variables' => ['player_name'],
-                'category' => 'Basketball',
-                'default_points' => 12,
-            ],
-            [
-                'title' => 'Game Winner Prediction',
-                'question_text' => 'Which team will win the {team1} vs {team2} game?',
-                'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => '{team1}', 'points' => 10],
-                    ['label' => '{team2}', 'points' => 10]
-                ]),
-                'variables' => ['team1', 'team2'],
-                'category' => 'Basketball',
-                'default_points' => 20,
+                'default_options' => [
+                    ['label' => 'Under {anthem_duration}', 'points' => 0],
+                    ['label' => '{anthem_duration} or more', 'points' => 0]
+                ],
+                'variables' => ['anthem_singer', 'anthem_duration'],
+                'category' => 'Super Bowl,Football',
+                'default_points' => 1,
             ],
 
-            // Football Templates
+            // Q2 - Coin Toss
             [
-                'title' => 'Quarterback Passing Yards',
-                'question_text' => 'Will {qb_name} throw for over {yards} yards?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 8],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['qb_name', 'yards'],
+                'title' => 'Coin Toss Result',
+                'question_text' => 'What will be the coin toss result?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Heads', 'points' => 0],
+                    ['label' => 'Tails', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Super Bowl,Football',
+                'default_points' => 1,
+            ],
+
+            // Q3 - Liquid Color on Coach
+            [
+                'title' => 'Liquid Color on Winning Coach',
+                'question_text' => 'What will be the color of liquid poured on the winning coach?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '{liquid_color_1}', 'points' => 0],
+                    ['label' => '{liquid_color_2}', 'points' => 0],
+                    ['label' => 'Any other color or no liquid poured', 'points' => 0]
+                ],
+                'variables' => ['liquid_color_1', 'liquid_color_2'],
+                'category' => 'Super Bowl,Football',
+                'default_points' => 1,
+            ],
+
+            // Q4 - MVP Winner
+            [
+                'title' => 'MVP Winner',
+                'question_text' => 'Who will win the MVP?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '{afc_qb_or_visitor_qb} ({afc_team_or_visitor_team} quarterback)', 'points' => 0],
+                    ['label' => '{nfc_qb_or_home_qb} ({nfc_team_or_home_team} quarterback)', 'points' => 0],
+                    ['label' => 'Any other player', 'points' => 0]
+                ],
+                'variables' => ['afc_qb_or_visitor_qb', 'afc_team_or_visitor_team', 'nfc_qb_or_home_qb', 'nfc_team_or_home_team'],
+                'category' => 'Super Bowl,Football',
+                'default_points' => 3,
+            ],
+
+            // Q5 - MVP Thanks First
+            [
+                'title' => 'MVP Thanks First',
+                'question_text' => 'Who will the MVP thank first?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Teammates', 'points' => 0],
+                    ['label' => 'God', 'points' => 0],
+                    ['label' => 'Any other result', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Super Bowl,Football',
+                'default_points' => 1,
+            ],
+
+            // =====================================================
+            // GAME FIRSTS
+            // =====================================================
+
+            // Q6 - AFC/Visitor First Possession
+            [
+                'title' => 'Team 1 First Offensive Possession',
+                'question_text' => 'What will the {afc_team_or_visitor_team} do on their first offensive possession?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Score', 'points' => 0],
+                    ['label' => 'Punt', 'points' => 0],
+                    ['label' => 'Any other result', 'points' => 0]
+                ],
+                'variables' => ['afc_team_or_visitor_team'],
                 'category' => 'Football',
-                'default_points' => 15,
+                'default_points' => 1,
             ],
+
+            // Q7 - NFC/Home First Possession
             [
-                'title' => 'Touchdown Count',
-                'question_text' => 'How many touchdowns will {player_name} score?',
+                'title' => 'Team 2 First Offensive Possession',
+                'question_text' => 'What will the {nfc_team_or_home_team} do on their first offensive possession?',
                 'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => '0', 'points' => 0],
-                    ['label' => '1', 'points' => 5],
-                    ['label' => '2', 'points' => 10],
-                    ['label' => '3+', 'points' => 15]
-                ]),
-                'variables' => ['player_name'],
+                'default_options' => [
+                    ['label' => 'Score', 'points' => 0],
+                    ['label' => 'Punt', 'points' => 0],
+                    ['label' => 'Any other result', 'points' => 0]
+                ],
+                'variables' => ['nfc_team_or_home_team'],
                 'category' => 'Football',
-                'default_points' => 18,
+                'default_points' => 1,
             ],
+
+            // Q8 - First Scoring Play
             [
-                'title' => 'Field Goal Success',
-                'question_text' => 'Will {kicker_name} make all field goal attempts?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 12],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['kicker_name'],
-                'category' => 'Football',
-                'default_points' => 15,
-            ],
-            [
-                'title' => 'Total Game Points',
-                'question_text' => 'What will be the total combined score?',
+                'title' => 'First Scoring Play',
+                'question_text' => 'What will be the first scoring play?',
                 'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => 'Under 40', 'points' => 5],
-                    ['label' => '40-50', 'points' => 8],
-                    ['label' => '51-60', 'points' => 8],
-                    ['label' => 'Over 60', 'points' => 5]
-                ]),
+                'default_options' => [
+                    ['label' => 'Offensive touchdown', 'points' => 0],
+                    ['label' => 'Field Goal', 'points' => 0],
+                    ['label' => 'Defensive or Kick / Punt Return score', 'points' => 0]
+                ],
                 'variables' => [],
                 'category' => 'Football',
-                'default_points' => 12,
+                'default_points' => 1,
             ],
+
+            // Q9 - First AFC/Visitor TD Scorer
             [
-                'title' => 'Rushing Yards Achievement',
-                'question_text' => 'Will {rb_name} rush for over {yards} yards?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 7],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['rb_name', 'yards'],
+                'title' => 'Team 1 Touchdown Scorer',
+                'question_text' => 'Who scores the first {afc_team_or_visitor_team} touchdown?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '{afc_rb1_or_visitor_rb1} - RB', 'points' => 0],
+                    ['label' => '{afc_wr1_or_visitor_wr1} - WR', 'points' => 0],
+                    ['label' => '{afc_wr2_or_visitor_wr2} - WR', 'points' => 0],
+                    ['label' => 'Any other player or no touchdown', 'points' => 0]
+                ],
+                'variables' => ['afc_team_or_visitor_team', 'afc_rb1_or_visitor_rb1', 'afc_wr1_or_visitor_wr1', 'afc_wr2_or_visitor_wr2'],
                 'category' => 'Football',
-                'default_points' => 13,
+                'default_points' => 2,
             ],
 
-            // Soccer Templates
+            // Q10 - First NFC/Home TD Scorer
             [
-                'title' => 'Goal Scorer Prediction',
-                'question_text' => 'Will {player_name} score a goal?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 10],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['player_name'],
-                'category' => 'Soccer',
-                'default_points' => 15,
-            ],
-            [
-                'title' => 'Match Result',
-                'question_text' => 'What will be the result of {team1} vs {team2}?',
+                'title' => 'Team 2 Touchdown Scorer',
+                'question_text' => 'Who scores the first {nfc_team_or_home_team} touchdown?',
                 'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => '{team1} Win', 'points' => 10],
-                    ['label' => 'Draw', 'points' => 8],
-                    ['label' => '{team2} Win', 'points' => 10]
-                ]),
-                'variables' => ['team1', 'team2'],
-                'category' => 'Soccer',
-                'default_points' => 20,
-            ],
-            [
-                'title' => 'Total Goals in Match',
-                'question_text' => 'How many total goals will be scored?',
-                'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => '0-1', 'points' => 5],
-                    ['label' => '2-3', 'points' => 8],
-                    ['label' => '4-5', 'points' => 8],
-                    ['label' => '6+', 'points' => 5]
-                ]),
-                'variables' => [],
-                'category' => 'Soccer',
-                'default_points' => 12,
-            ],
-            [
-                'title' => 'Clean Sheet Prediction',
-                'question_text' => 'Will {team_name} keep a clean sheet?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 12],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['team_name'],
-                'category' => 'Soccer',
-                'default_points' => 15,
-            ],
-            [
-                'title' => 'Yellow Card Count',
-                'question_text' => 'How many yellow cards will be shown?',
-                'question_type' => 'numeric',
-                'default_options' => null,
-                'variables' => [],
-                'category' => 'Soccer',
-                'default_points' => 10,
+                'default_options' => [
+                    ['label' => '{nfc_rb1_or_home_rb1} - RB', 'points' => 0],
+                    ['label' => '{nfc_wr1_or_home_wr1} - WR', 'points' => 0],
+                    ['label' => '{nfc_wr2_or_home_wr2} - WR', 'points' => 0],
+                    ['label' => 'Any other player or no touchdown', 'points' => 0]
+                ],
+                'variables' => ['nfc_team_or_home_team', 'nfc_rb1_or_home_rb1', 'nfc_wr1_or_home_wr1', 'nfc_wr2_or_home_wr2'],
+                'category' => 'Football',
+                'default_points' => 2,
             ],
 
-            // Baseball Templates
+            // Q11 - First Turnover
             [
-                'title' => 'Home Run Prediction',
-                'question_text' => 'Will {player_name} hit a home run?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 15],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['player_name'],
-                'category' => 'Baseball',
-                'default_points' => 18,
-            ],
-            [
-                'title' => 'Pitcher Strikeouts',
-                'question_text' => 'How many strikeouts will {pitcher_name} record?',
+                'title' => 'First Turnover',
+                'question_text' => 'What will be the first turnover?',
                 'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => '0-3', 'points' => 3],
-                    ['label' => '4-6', 'points' => 8],
-                    ['label' => '7-9', 'points' => 10],
-                    ['label' => '10+', 'points' => 15]
-                ]),
-                'variables' => ['pitcher_name'],
-                'category' => 'Baseball',
-                'default_points' => 16,
-            ],
-            [
-                'title' => 'Total Runs Scored',
-                'question_text' => 'What will be the total runs in the game?',
-                'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => 'Under 7', 'points' => 5],
-                    ['label' => '7-10', 'points' => 8],
-                    ['label' => '11-14', 'points' => 8],
-                    ['label' => 'Over 14', 'points' => 5]
-                ]),
+                'default_options' => [
+                    ['label' => 'Fumble', 'points' => 0],
+                    ['label' => 'Interception', 'points' => 0],
+                    ['label' => 'Turnover on Downs or No Turnovers', 'points' => 0]
+                ],
                 'variables' => [],
-                'category' => 'Baseball',
-                'default_points' => 12,
-            ],
-            [
-                'title' => 'Batting Average Performance',
-                'question_text' => 'Will {player_name} get at least {hits} hits?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 8],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['player_name', 'hits'],
-                'category' => 'Baseball',
-                'default_points' => 12,
-            ],
-            [
-                'title' => 'Stolen Base Attempt',
-                'question_text' => 'Will {player_name} steal a base?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 10],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['player_name'],
-                'category' => 'Baseball',
-                'default_points' => 14,
+                'category' => 'Football',
+                'default_points' => 1,
             ],
 
-            // Hockey Templates
+            // Q12 - First to 10 Points
             [
-                'title' => 'Goal Scorer Prediction',
-                'question_text' => 'Will {player_name} score a goal?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 12],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['player_name'],
-                'category' => 'Hockey',
-                'default_points' => 15,
-            ],
-            [
-                'title' => 'Goalie Saves',
-                'question_text' => 'Will {goalie_name} make over {saves} saves?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 10],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['goalie_name', 'saves'],
-                'category' => 'Hockey',
-                'default_points' => 14,
-            ],
-            [
-                'title' => 'Power Play Goals',
-                'question_text' => 'Will {team_name} score a power play goal?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 8],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['team_name'],
-                'category' => 'Hockey',
-                'default_points' => 12,
-            ],
-            [
-                'title' => 'Total Goals in Game',
-                'question_text' => 'How many total goals will be scored?',
+                'title' => 'First Team to 10 Points',
+                'question_text' => 'Which team scores 10+ points first?',
                 'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => 'Under 5', 'points' => 5],
-                    ['label' => '5-6', 'points' => 8],
-                    ['label' => '7-8', 'points' => 8],
-                    ['label' => 'Over 8', 'points' => 5]
-                ]),
-                'variables' => [],
-                'category' => 'Hockey',
-                'default_points' => 10,
-            ],
-            [
-                'title' => 'Shutout Prediction',
-                'question_text' => 'Will {goalie_name} record a shutout?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 20],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['goalie_name'],
-                'category' => 'Hockey',
-                'default_points' => 25,
+                'default_options' => [
+                    ['label' => '{afc_team_or_visitor_team}', 'points' => 0],
+                    ['label' => '{nfc_team_or_home_team}', 'points' => 0]
+                ],
+                'variables' => ['afc_team_or_visitor_team', 'nfc_team_or_home_team'],
+                'category' => 'Football',
+                'default_points' => 1,
             ],
 
-            // Tennis Templates
+            // =====================================================
+            // IN GAME OCCURRENCES
+            // =====================================================
+
+            // Q13 - Score in Last 2 Min of 1st Half
             [
-                'title' => 'Match Winner',
-                'question_text' => 'Who will win the {player1} vs {player2} match?',
+                'title' => 'Score in Last 2 Minutes of 1st Half',
+                'question_text' => 'Will a score occur in the last 2 minutes of the 1st half?',
                 'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => '{player1}', 'points' => 10],
-                    ['label' => '{player2}', 'points' => 10]
-                ]),
-                'variables' => ['player1', 'player2'],
-                'category' => 'Tennis',
-                'default_points' => 15,
-            ],
-            [
-                'title' => 'Total Sets Played',
-                'question_text' => 'How many sets will be played?',
-                'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => '2 Sets', 'points' => 5],
-                    ['label' => '3 Sets', 'points' => 8],
-                    ['label' => '4 Sets', 'points' => 8],
-                    ['label' => '5 Sets', 'points' => 5]
-                ]),
-                'variables' => [],
-                'category' => 'Tennis',
-                'default_points' => 12,
-            ],
-            [
-                'title' => 'Aces Count',
-                'question_text' => 'Will {player_name} serve over {aces} aces?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 10],
+                'default_options' => [
+                    ['label' => 'Yes', 'points' => 0],
                     ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['player_name', 'aces'],
-                'category' => 'Tennis',
-                'default_points' => 14,
-            ],
-            [
-                'title' => 'Tiebreak Occurrence',
-                'question_text' => 'Will there be a tiebreak in the match?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 8],
-                    ['label' => 'No', 'points' => 0]
-                ]),
+                ],
                 'variables' => [],
-                'category' => 'Tennis',
-                'default_points' => 10,
-            ],
-            [
-                'title' => 'Break Points Converted',
-                'question_text' => 'How many break points will {player_name} convert?',
-                'question_type' => 'numeric',
-                'default_options' => null,
-                'variables' => ['player_name'],
-                'category' => 'Tennis',
-                'default_points' => 12,
+                'category' => 'Football',
+                'default_points' => 1,
             ],
 
-            // Golf Templates
+            // Q14 - Score in Last 2 Min of Game
             [
-                'title' => 'Tournament Winner',
-                'question_text' => 'Will {player_name} win the tournament?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 25],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['player_name'],
-                'category' => 'Golf',
-                'default_points' => 30,
-            ],
-            [
-                'title' => 'Under Par Score',
-                'question_text' => 'Will {player_name} finish under par?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 10],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['player_name'],
-                'category' => 'Golf',
-                'default_points' => 15,
-            ],
-            [
-                'title' => 'Hole-in-One Prediction',
-                'question_text' => 'Will there be a hole-in-one in the round?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 30],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => [],
-                'category' => 'Golf',
-                'default_points' => 35,
-            ],
-            [
-                'title' => 'Birdie Count',
-                'question_text' => 'How many birdies will {player_name} make?',
+                'title' => 'Score in Last 2 Minutes of Game',
+                'question_text' => 'Will a score occur in the last 2 minutes of the game?',
                 'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => '0-2', 'points' => 3],
-                    ['label' => '3-5', 'points' => 8],
-                    ['label' => '6-8', 'points' => 10],
-                    ['label' => '9+', 'points' => 15]
-                ]),
-                'variables' => ['player_name'],
-                'category' => 'Golf',
-                'default_points' => 16,
-            ],
-            [
-                'title' => 'Top 10 Finish',
-                'question_text' => 'Will {player_name} finish in the top 10?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 15],
+                'default_options' => [
+                    ['label' => 'Yes', 'points' => 0],
                     ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['player_name'],
-                'category' => 'Golf',
-                'default_points' => 18,
+                ],
+                'variables' => [],
+                'category' => 'Football',
+                'default_points' => 1,
             ],
 
-            // MMA Templates
+            // Q15 - Safety
             [
-                'title' => 'Fight Winner',
-                'question_text' => 'Who will win {fighter1} vs {fighter2}?',
+                'title' => 'Safety Occurrence',
+                'question_text' => 'Will any team get a safety?',
                 'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => '{fighter1}', 'points' => 12],
-                    ['label' => '{fighter2}', 'points' => 12]
-                ]),
-                'variables' => ['fighter1', 'fighter2'],
-                'category' => 'MMA',
-                'default_points' => 20,
-            ],
-            [
-                'title' => 'Knockout Victory',
-                'question_text' => 'Will the fight end in a knockout?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 15],
+                'default_options' => [
+                    ['label' => 'Yes', 'points' => 1],
                     ['label' => 'No', 'points' => 0]
-                ]),
+                ],
                 'variables' => [],
-                'category' => 'MMA',
-                'default_points' => 18,
-            ],
-            [
-                'title' => 'Fight Duration',
-                'question_text' => 'Which round will the fight end in?',
-                'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => 'Round 1', 'points' => 10],
-                    ['label' => 'Round 2', 'points' => 8],
-                    ['label' => 'Round 3', 'points' => 8],
-                    ['label' => 'Decision', 'points' => 5]
-                ]),
-                'variables' => [],
-                'category' => 'MMA',
-                'default_points' => 15,
-            ],
-            [
-                'title' => 'Submission Victory',
-                'question_text' => 'Will {fighter_name} win by submission?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 18],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['fighter_name'],
-                'category' => 'MMA',
-                'default_points' => 20,
-            ],
-            [
-                'title' => 'Total Takedowns',
-                'question_text' => 'How many takedowns will there be?',
-                'question_type' => 'numeric',
-                'default_options' => null,
-                'variables' => [],
-                'category' => 'MMA',
-                'default_points' => 12,
+                'category' => 'Football',
+                'default_points' => 1,
             ],
 
-            // Boxing Templates
+            // Q16 - Defensive/Special Teams TD
             [
-                'title' => 'Fight Winner',
-                'question_text' => 'Who will win {boxer1} vs {boxer2}?',
+                'title' => 'Defensive or Kick/Punt Return Touchdown',
+                'question_text' => 'Will a defensive or Kick / Punt Return touchdown occur?',
                 'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => '{boxer1}', 'points' => 12],
-                    ['label' => '{boxer2}', 'points' => 12],
-                    ['label' => 'Draw', 'points' => 5]
-                ]),
-                'variables' => ['boxer1', 'boxer2'],
-                'category' => 'Boxing',
-                'default_points' => 20,
-            ],
-            [
-                'title' => 'Knockout Prediction',
-                'question_text' => 'Will the fight end in a knockout?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 15],
+                'default_options' => [
+                    ['label' => 'Yes', 'points' => 1],
                     ['label' => 'No', 'points' => 0]
-                ]),
+                ],
                 'variables' => [],
-                'category' => 'Boxing',
-                'default_points' => 18,
-            ],
-            [
-                'title' => 'Total Rounds',
-                'question_text' => 'How many rounds will the fight last?',
-                'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => '1-4 Rounds', 'points' => 10],
-                    ['label' => '5-8 Rounds', 'points' => 8],
-                    ['label' => '9-12 Rounds', 'points' => 5]
-                ]),
-                'variables' => [],
-                'category' => 'Boxing',
-                'default_points' => 15,
-            ],
-            [
-                'title' => 'Knockdown Occurrence',
-                'question_text' => 'Will {boxer_name} score a knockdown?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 12],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['boxer_name'],
-                'category' => 'Boxing',
-                'default_points' => 15,
-            ],
-            [
-                'title' => 'Unanimous Decision',
-                'question_text' => 'Will the fight end in a unanimous decision?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 8],
-                    ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => [],
-                'category' => 'Boxing',
-                'default_points' => 12,
+                'category' => 'Football',
+                'default_points' => 1,
             ],
 
-            // Esports Templates
+            // Q17 - 2 Point Conversion Attempted
             [
-                'title' => 'Match Winner',
-                'question_text' => 'Which team will win {team1} vs {team2}?',
+                'title' => '2 Point Conversion Attempt',
+                'question_text' => 'Will a 2 point conversion be attempted?',
                 'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => '{team1}', 'points' => 10],
-                    ['label' => '{team2}', 'points' => 10]
-                ]),
-                'variables' => ['team1', 'team2'],
-                'category' => 'Esports',
-                'default_points' => 15,
-            ],
-            [
-                'title' => 'First Blood',
-                'question_text' => 'Which team will get first blood?',
-                'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => '{team1}', 'points' => 8],
-                    ['label' => '{team2}', 'points' => 8]
-                ]),
-                'variables' => ['team1', 'team2'],
-                'category' => 'Esports',
-                'default_points' => 10,
-            ],
-            [
-                'title' => 'Player MVP',
-                'question_text' => 'Will {player_name} be the match MVP?',
-                'question_type' => 'yes_no',
-                'default_options' => json_encode([
-                    ['label' => 'Yes', 'points' => 20],
+                'default_options' => [
+                    ['label' => 'Yes', 'points' => 0],
                     ['label' => 'No', 'points' => 0]
-                ]),
-                'variables' => ['player_name'],
-                'category' => 'Esports',
-                'default_points' => 22,
-            ],
-            [
-                'title' => 'Total Kills',
-                'question_text' => 'How many total kills will {player_name} get?',
-                'question_type' => 'numeric',
-                'default_options' => null,
-                'variables' => ['player_name'],
-                'category' => 'Esports',
-                'default_points' => 12,
-            ],
-            [
-                'title' => 'Game Duration',
-                'question_text' => 'How long will the game last?',
-                'question_type' => 'multiple_choice',
-                'default_options' => json_encode([
-                    ['label' => 'Under 30 min', 'points' => 5],
-                    ['label' => '30-40 min', 'points' => 8],
-                    ['label' => '40-50 min', 'points' => 8],
-                    ['label' => 'Over 50 min', 'points' => 5]
-                ]),
+                ],
                 'variables' => [],
-                'category' => 'Esports',
-                'default_points' => 10,
+                'category' => 'Football',
+                'default_points' => 1,
+            ],
+
+            // Q18 - Kick Attempt Result
+            [
+                'title' => 'Kick Attempt Result',
+                'question_text' => 'A kick attempt will:',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Hit the uprights / crossbar', 'points' => 1],
+                    ['label' => 'Always be successful', 'points' => 0],
+                    ['label' => 'Miss short / wide or get blocked', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Football',
+                'default_points' => 1,
+            ],
+
+            // Q19 - Non-Starting QB Pass Attempt
+            [
+                'title' => '3 Players Attempt a Pass',
+                'question_text' => 'Will another player besides the starting quarterbacks attempt a pass?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Yes', 'points' => 1],
+                    ['label' => 'No', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Football',
+                'default_points' => 1,
+            ],
+
+            // Q20 - Greater Distance
+            [
+                'title' => 'Greater Distance - FG vs Touchdown',
+                'question_text' => 'Which will be of greater distance?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Longest touchdown', 'points' => 0],
+                    ['label' => 'Longest made field goal kick or tie', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Football',
+                'default_points' => 1,
+            ],
+
+            // Q21 - 1 Yard Touchdown
+            [
+                'title' => '1 Yard Touchdown',
+                'question_text' => 'Will there be a 1 yard touchdown?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Yes', 'points' => 0],
+                    ['label' => 'No', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Football',
+                'default_points' => 1,
+            ],
+
+            // Q22 - 3 Consecutive Scores
+            [
+                'title' => '3 Consecutive Scores',
+                'question_text' => 'Will either team score 3 consecutive times without the other team scoring?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Yes', 'points' => 1],
+                    ['label' => 'No', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Football',
+                'default_points' => 1,
+            ],
+
+            // Q23 - Overtime
+            [
+                'title' => 'Overtime',
+                'question_text' => 'Will the game go into overtime?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Yes', 'points' => 2],
+                    ['label' => 'No', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Football',
+                'default_points' => 1,
+            ],
+
+            // =====================================================
+            // GAME SCORING
+            // =====================================================
+
+            // Q24 - AFC/Visitor Halftime Points
+            [
+                'title' => 'Team 1 Halftime Points',
+                'question_text' => 'How many points will the {afc_team_or_visitor_team} have at halftime?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '0-14 Points', 'points' => 0],
+                    ['label' => '15+ Points', 'points' => 0]
+                ],
+                'variables' => ['afc_team_or_visitor_team'],
+                'category' => 'Football',
+                'default_points' => 1,
+            ],
+
+            // Q25 - NFC/Home Halftime Points
+            [
+                'title' => 'Team 2 Halftime Points',
+                'question_text' => 'How many points will the {nfc_team_or_home_team} have at halftime?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '0-14 Points', 'points' => 0],
+                    ['label' => '15+ Points', 'points' => 0]
+                ],
+                'variables' => ['nfc_team_or_home_team'],
+                'category' => 'Football',
+                'default_points' => 1,
+            ],
+
+            // Q26 - First to Score 2nd Half
+            [
+                'title' => 'First to Score in 2nd Half',
+                'question_text' => 'Who will score first in the 2nd half?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '{afc_team_or_visitor_team}', 'points' => 0],
+                    ['label' => '{nfc_team_or_home_team}', 'points' => 0]
+                ],
+                'variables' => ['afc_team_or_visitor_team', 'nfc_team_or_home_team'],
+                'category' => 'Football',
+                'default_points' => 1,
+            ],
+
+            // Q27 - Last to Score
+            [
+                'title' => 'Last Team to Score',
+                'question_text' => 'Which team will be the last to score?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '{afc_team_or_visitor_team}', 'points' => 0],
+                    ['label' => '{nfc_team_or_home_team}', 'points' => 0]
+                ],
+                'variables' => ['afc_team_or_visitor_team', 'nfc_team_or_home_team'],
+                'category' => 'Football',
+                'default_points' => 1,
+            ],
+
+            // Q28 - Game Winner
+            [
+                'title' => 'Game Winner',
+                'question_text' => 'Who will win the game?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '{afc_team_or_visitor_team}', 'points' => 0],
+                    ['label' => '{nfc_team_or_home_team}', 'points' => 0]
+                ],
+                'variables' => ['afc_team_or_visitor_team', 'nfc_team_or_home_team'],
+                'category' => 'Football',
+                'default_points' => 3,
+            ],
+
+            // Q29 - AFC/Visitor Final Score
+            [
+                'title' => 'Team 1 Final Score Range',
+                'question_text' => 'What will be the {afc_team_or_visitor_team} final score?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '0-19 Points', 'points' => 0],
+                    ['label' => '20-29 Points', 'points' => 0],
+                    ['label' => '30-39 Points', 'points' => 0],
+                    ['label' => '40 or more Points', 'points' => 0]
+                ],
+                'variables' => ['afc_team_or_visitor_team'],
+                'category' => 'Football',
+                'default_points' => 1,
+            ],
+
+            // Q30 - NFC/Home Final Score
+            [
+                'title' => 'Team 2 Final Score Range',
+                'question_text' => 'What will be the {nfc_team_or_home_team} final score?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '0-19 Points', 'points' => 0],
+                    ['label' => '20-29 Points', 'points' => 0],
+                    ['label' => '30-39 Points', 'points' => 0],
+                    ['label' => '40 or more Points', 'points' => 0]
+                ],
+                'variables' => ['nfc_team_or_home_team'],
+                'category' => 'Football',
+                'default_points' => 1,
+            ],
+
+            // Q31 - Victory Margin
+            [
+                'title' => 'Victory Margin',
+                'question_text' => 'What will be the final victory margin?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '1-4 Points', 'points' => 0],
+                    ['label' => '5-9 Points', 'points' => 0],
+                    ['label' => '10 or more Points', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Football',
+                'default_points' => 1,
+            ],
+
+            // Q32 - Highest Scoring Quarter
+            [
+                'title' => 'Highest Scoring Quarter',
+                'question_text' => 'Which quarter will have the most points scored?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '1st Quarter', 'points' => 0],
+                    ['label' => '2nd Quarter', 'points' => 0],
+                    ['label' => '3rd Quarter', 'points' => 0],
+                    ['label' => '4th Quarter', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Football',
+                'default_points' => 1,
+            ],
+
+            // =====================================================
+            // GAME TOTALS
+            // =====================================================
+
+            // Q33 - Most Offensive Yards
+            [
+                'title' => 'Most Total Offensive Yards',
+                'question_text' => 'Which team will have the most total offensive yards?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '{afc_team_or_visitor_team}', 'points' => 0],
+                    ['label' => '{nfc_team_or_home_team}', 'points' => 0]
+                ],
+                'variables' => ['afc_team_or_visitor_team', 'nfc_team_or_home_team'],
+                'category' => 'Football',
+                'default_points' => 2,
+            ],
+
+            // Q34 - Quarterback Total Yards
+            [
+                'title' => 'Quarterback Total Yards',
+                'question_text' => 'Which quarterback will have more total yards?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '{afc_qb_or_visitor_qb} ({afc_team_or_visitor_team})', 'points' => 0],
+                    ['label' => '{nfc_qb_or_home_qb} ({nfc_team_or_home_team})', 'points' => 0]
+                ],
+                'variables' => ['afc_qb_or_visitor_qb', 'afc_team_or_visitor_team', 'nfc_qb_or_home_qb', 'nfc_team_or_home_team'],
+                'category' => 'Football',
+                'default_points' => 2,
+            ],
+
+            // Q35 - Most Pass TDs
+            [
+                'title' => 'Most Passing Touchdowns',
+                'question_text' => 'Who will have the most passing touchdowns?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '{afc_qb_or_visitor_qb} ({afc_team_or_visitor_team})', 'points' => 0],
+                    ['label' => '{nfc_qb_or_home_qb} ({nfc_team_or_home_team})', 'points' => 0],
+                    ['label' => 'Any other player or tie', 'points' => 0]
+                ],
+                'variables' => ['afc_qb_or_visitor_qb', 'afc_team_or_visitor_team', 'nfc_qb_or_home_qb', 'nfc_team_or_home_team'],
+                'category' => 'Football',
+                'default_points' => 2,
+            ],
+
+            // Q36 - Most Interceptions
+            [
+                'title' => 'Most Interceptions Thrown',
+                'question_text' => 'Who will throw more interceptions?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '{afc_qb_or_visitor_qb} ({afc_team_or_visitor_team})', 'points' => 0],
+                    ['label' => '{nfc_qb_or_home_qb} ({nfc_team_or_home_team})', 'points' => 0],
+                    ['label' => 'Any other player or tie', 'points' => 0]
+                ],
+                'variables' => ['afc_qb_or_visitor_qb', 'afc_team_or_visitor_team', 'nfc_qb_or_home_qb', 'nfc_team_or_home_team'],
+                'category' => 'Football',
+                'default_points' => 1,
+            ],
+
+            // Q37 - Most Rushing Yards
+            [
+                'title' => 'Most Rushing Yards',
+                'question_text' => 'Who will have more rushing yards?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '{afc_rb1_or_visitor_rb1} ({afc_team_or_visitor_team})', 'points' => 0],
+                    ['label' => '{nfc_rb1_or_home_rb1} ({nfc_team_or_home_team})', 'points' => 0],
+                    ['label' => 'Any other player or tie', 'points' => 0]
+                ],
+                'variables' => ['afc_rb1_or_visitor_rb1', 'afc_team_or_visitor_team', 'nfc_rb1_or_home_rb1', 'nfc_team_or_home_team'],
+                'category' => 'Football',
+                'default_points' => 2,
+            ],
+
+            // Q38 - Most Receptions
+            [
+                'title' => 'Most Receptions',
+                'question_text' => 'Who will have the most receptions?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '{afc_wr1_or_visitor_wr1} ({afc_team_or_visitor_team})', 'points' => 0],
+                    ['label' => '{nfc_wr1_or_home_wr1} ({nfc_team_or_home_team})', 'points' => 0],
+                    ['label' => 'Any other player or tie', 'points' => 0]
+                ],
+                'variables' => ['afc_wr1_or_visitor_wr1', 'afc_team_or_visitor_team', 'nfc_wr1_or_home_wr1', 'nfc_team_or_home_team'],
+                'category' => 'Football',
+                'default_points' => 2,
+            ],
+
+            // Q39 - Most Receiving Yards
+            [
+                'title' => 'Most Receiving Yards',
+                'question_text' => 'Who will have the most receiving yards?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '{afc_wr1_or_visitor_wr1} ({afc_team_or_visitor_team})', 'points' => 0],
+                    ['label' => '{nfc_wr1_or_home_wr1} ({nfc_team_or_home_team})', 'points' => 0],
+                    ['label' => 'Any other player or tie', 'points' => 0]
+                ],
+                'variables' => ['afc_wr1_or_visitor_wr1', 'afc_team_or_visitor_team', 'nfc_wr1_or_home_wr1', 'nfc_team_or_home_team'],
+                'category' => 'Football',
+                'default_points' => 2,
+            ],
+
+            // Q40 - Total QB Sacks
+            [
+                'title' => 'Total Quarterback Sacks',
+                'question_text' => 'How many total quarterback sacks will the defenses get in the game?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => '3 or less', 'points' => 0],
+                    ['label' => '4-5', 'points' => 0],
+                    ['label' => '6 or more', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Football',
+                'default_points' => 2,
+            ],
+
+            // =====================================================
+            // COMMERCIALS (Super Bowl specific)
+            // =====================================================
+
+            // Q41 - Commercial - Automotive
+            [
+                'title' => 'First Commercial - Automotive',
+                'question_text' => 'Which Automotive brand commercial will air first after kickoff?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Hyundai', 'points' => 0],
+                    ['label' => 'Kia', 'points' => 0],
+                    ['label' => 'Ram/Jeep', 'points' => 0],
+                    ['label' => 'Toyota', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Super Bowl,Football,Commercials',
+                'default_points' => 1,
+            ],
+
+            // Q42 - Commercial - Beer
+            [
+                'title' => 'First Commercial - Beer',
+                'question_text' => 'Which Beer brand commercial will air first after kickoff?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Bud Light', 'points' => 0],
+                    ['label' => 'Budweiser', 'points' => 0],
+                    ['label' => 'Coors', 'points' => 0],
+                    ['label' => 'Michelob Ultra', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Super Bowl,Football,Commercials',
+                'default_points' => 1,
+            ],
+
+            // Q43 - Commercial - Candy
+            [
+                'title' => 'First Commercial - Candy',
+                'question_text' => 'Which Candy brand commercial will air first after kickoff?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'M&M\'s', 'points' => 0],
+                    ['label' => 'Nerds', 'points' => 0],
+                    ['label' => 'Reese\'s', 'points' => 0],
+                    ['label' => 'Snickers', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Super Bowl,Football,Commercials',
+                'default_points' => 1,
+            ],
+
+            // Q44 - Commercial - Chips
+            [
+                'title' => 'First Commercial - Chips',
+                'question_text' => 'Which Chips brand commercial will air first after kickoff?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Cheetos', 'points' => 0],
+                    ['label' => 'Doritos', 'points' => 0],
+                    ['label' => 'Pringles', 'points' => 0],
+                    ['label' => 'Tostitos', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Super Bowl,Football,Commercials',
+                'default_points' => 1,
+            ],
+
+            // Q45 - Commercial - Fast Food
+            [
+                'title' => 'First Commercial - Fast Food',
+                'question_text' => 'Which Fast Food brand commercial will air first after kickoff?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Dunkin\'', 'points' => 0],
+                    ['label' => 'Little Caesars', 'points' => 0],
+                    ['label' => 'McDonald\'s', 'points' => 0],
+                    ['label' => 'Taco Bell', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Super Bowl,Football,Commercials',
+                'default_points' => 1,
+            ],
+
+            // Q46 - Commercial - Food Delivery
+            [
+                'title' => 'First Commercial - Food Delivery',
+                'question_text' => 'Which Food Delivery brand commercial will air first after kickoff?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'DoorDash', 'points' => 0],
+                    ['label' => 'Grubhub', 'points' => 0],
+                    ['label' => 'Instacart', 'points' => 0],
+                    ['label' => 'Uber Eats', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Super Bowl,Football,Commercials',
+                'default_points' => 1,
+            ],
+
+            // Q47 - Commercial - Insurance
+            [
+                'title' => 'First Commercial - Insurance',
+                'question_text' => 'Which Insurance brand commercial will air first after kickoff?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Allstate', 'points' => 0],
+                    ['label' => 'Geico', 'points' => 0],
+                    ['label' => 'Progressive', 'points' => 0],
+                    ['label' => 'State Farm', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Super Bowl,Football,Commercials',
+                'default_points' => 1,
+            ],
+
+            // Q48 - Commercial - Soda
+            [
+                'title' => 'First Commercial - Soda',
+                'question_text' => 'Which Soda brand commercial will air first after kickoff?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Coca Cola', 'points' => 0],
+                    ['label' => 'Dr. Pepper', 'points' => 0],
+                    ['label' => 'Mtn Dew', 'points' => 0],
+                    ['label' => 'Pepsi', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Super Bowl,Football,Commercials',
+                'default_points' => 1,
+            ],
+
+            // Q49 - Commercial - Streaming
+            [
+                'title' => 'First Commercial - Streaming',
+                'question_text' => 'Which Streaming brand commercial will air first after kickoff?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Disney+', 'points' => 0],
+                    ['label' => 'Max', 'points' => 0],
+                    ['label' => 'Paramount+', 'points' => 0],
+                    ['label' => 'Peacock', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Super Bowl,Football,Commercials',
+                'default_points' => 1,
+            ],
+
+            // Q50 - Commercial - Tech
+            [
+                'title' => 'First Commercial - Tech',
+                'question_text' => 'Which Tech brand commercial will air first after kickoff?',
+                'question_type' => 'multiple_choice',
+                'default_options' => [
+                    ['label' => 'Apple', 'points' => 0],
+                    ['label' => 'Google', 'points' => 0],
+                    ['label' => 'T-Mobile', 'points' => 0],
+                    ['label' => 'Verizon', 'points' => 0]
+                ],
+                'variables' => [],
+                'category' => 'Super Bowl,Football,Commercials',
+                'default_points' => 1,
             ],
         ];
-
-        // Insert templates with display order (disable FK checks since we may not have users yet)
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
         foreach ($templates as $index => $template) {
             QuestionTemplate::create([
@@ -662,8 +805,6 @@ class QuestionTemplateSeeder extends Seeder
             ]);
         }
 
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
-        $this->command->info('50 sports question templates created successfully!');
+        $this->command->info('50 Football question templates created successfully!');
     }
 }

@@ -117,7 +117,7 @@
                                 </button>
                             </div>
 
-                            <div class="space-y-4">
+                            <div class="space-y-6">
                                 <div
                                     v-for="(question, index) in displayQuestions"
                                     :key="question.id"
@@ -127,74 +127,126 @@
                                     @drop="drop(index)"
                                     :class="{
                                         'cursor-move': isReordering,
-                                        'border-l-4 border-propoff-blue': draggedIndex === index,
+                                        'border-l-4 border-l-propoff-blue': draggedIndex === index,
                                         'opacity-50': draggedIndex === index
                                     }"
-                                    class="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition"
+                                    class="border border-gray-200 rounded-lg overflow-hidden hover:border-gray-300 transition bg-gray-50"
                                 >
-                                    <div class="flex items-start justify-between gap-4">
-                                        <div class="flex-1">
-                                            <div class="flex items-center gap-3 mb-2">
-                                                <span class="inline-flex items-center justify-center w-8 h-8 bg-propoff-blue/10 text-propoff-blue font-bold rounded-full text-sm">
+                                    <!-- Question Header -->
+                                    <div class="bg-white px-6 py-4 border-b border-gray-200">
+                                        <div class="flex items-start justify-between gap-4">
+                                            <div class="flex items-center gap-3">
+                                                <span class="inline-flex items-center justify-center w-10 h-10 bg-propoff-blue text-white font-bold rounded-full text-lg">
                                                     {{ question.order_number }}
                                                 </span>
-                                                <span :class="typeClass(question.type)" class="px-2 py-1 rounded text-xs font-medium">
-                                                    {{ formatType(question.type) }}
+                                                <div>
+                                                    <p class="text-lg font-semibold text-gray-900">{{ question.question_text }}</p>
+                                                    <div class="flex items-center gap-2 mt-1">
+                                                        <span :class="typeClass(question.type)" class="px-2 py-0.5 rounded text-xs font-medium">
+                                                            {{ formatType(question.type) }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center gap-2 flex-shrink-0">
+                                                <span class="px-3 py-1.5 bg-propoff-blue/10 text-propoff-blue text-sm font-semibold rounded-lg">
+                                                    {{ question.points }} {{ question.points === 1 ? 'point' : 'points' }}
                                                 </span>
-                                                <span class="text-sm text-gray-600">{{ question.points }} {{ question.points === 1 ? 'point' : 'points' }}</span>
-                                            </div>
-                                            <p class="text-gray-900 font-medium mb-2">{{ question.question_text }}</p>
-
-                                            <!-- Options for Multiple Choice -->
-                                            <div v-if="question.type === 'multiple_choice' && question.options" class="mt-2 space-y-1">
-                                                <div
-                                                    v-for="(option, optIndex) in question.options"
-                                                    :key="optIndex"
-                                                    class="text-sm text-gray-600 pl-4"
+                                                <Link
+                                                    :href="route('admin.events.event-questions.edit', [event.id, question.id])"
+                                                    class="p-2 text-propoff-blue hover:bg-propoff-blue/10 rounded"
+                                                    title="Edit"
                                                 >
-                                                    {{ String.fromCharCode(65 + optIndex) }}. {{ option }}
-                                                </div>
+                                                    <PencilIcon class="w-5 h-5" />
+                                                </Link>
+                                                <button
+                                                    @click="duplicateQuestion(question.id)"
+                                                    class="p-2 text-propoff-green hover:bg-propoff-green/10 rounded"
+                                                    title="Duplicate"
+                                                >
+                                                    <DocumentDuplicateIcon class="w-5 h-5" />
+                                                </button>
+                                                <button
+                                                    @click="deleteQuestion(question.id)"
+                                                    class="p-2 text-propoff-red hover:bg-propoff-red/10 rounded"
+                                                    title="Delete"
+                                                >
+                                                    <TrashIcon class="w-5 h-5" />
+                                                </button>
                                             </div>
+                                        </div>
+                                    </div>
 
-                                            <!-- Ranked Answers for AmericaSays -->
-                                            <div v-if="question.type === 'ranked_answers'" class="mt-3">
-                                                <div v-if="question.event_answers && question.event_answers.length > 0" class="bg-propoff-blue/5 border border-propoff-blue/20 rounded-lg p-3">
-                                                    <p class="text-xs font-semibold text-propoff-blue mb-2">Ranked Answers ({{ question.event_answers.length }}):</p>
-                                                    <ol class="list-decimal list-inside text-sm text-gray-700 space-y-1">
-                                                        <li v-for="answer in question.event_answers" :key="answer.id">
-                                                            {{ answer.correct_answer }}
-                                                        </li>
-                                                    </ol>
+                                    <!-- Options Preview (Multiple Choice) -->
+                                    <div v-if="question.type === 'multiple_choice' && question.options" class="px-6 py-4">
+                                        <div class="space-y-2">
+                                            <div
+                                                v-for="(option, optIndex) in question.options"
+                                                :key="optIndex"
+                                                class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg"
+                                            >
+                                                <div class="flex items-center gap-3">
+                                                    <span class="w-6 h-6 flex items-center justify-center bg-gray-100 text-gray-600 text-sm font-medium rounded-full">
+                                                        {{ String.fromCharCode(65 + optIndex) }}
+                                                    </span>
+                                                    <span class="text-gray-900">{{ getOptionLabel(option) }}</span>
                                                 </div>
-                                                <div v-else class="bg-propoff-orange/10 border border-propoff-orange/30 rounded-lg p-3">
-                                                    <p class="text-xs text-propoff-orange">⚠️ No answers set yet</p>
+                                                <div v-if="getOptionPoints(option) > 0" class="flex items-center gap-1">
+                                                    <span class="text-xs font-medium text-propoff-green bg-propoff-green/10 px-2 py-1 rounded">
+                                                        +{{ getOptionPoints(option) }} bonus {{ getOptionPoints(option) === 1 ? 'pt' : 'pts' }}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
+                                        <p class="text-xs text-gray-500 mt-3 pl-1">
+                                            Base: {{ question.points }} {{ question.points === 1 ? 'pt' : 'pts' }} for correct answer + any bonus shown
+                                        </p>
+                                    </div>
 
-                                        <div class="flex items-center gap-2">
-                                            <Link
-                                                :href="route('admin.events.event-questions.edit', [event.id, question.id])"
-                                                class="p-2 text-propoff-blue hover:bg-propoff-blue/10 rounded"
-                                                title="Edit"
-                                            >
-                                                <PencilIcon class="w-5 h-5" />
-                                            </Link>
-                                            <button
-                                                @click="duplicateQuestion(question.id)"
-                                                class="p-2 text-propoff-green hover:bg-propoff-green/10 rounded"
-                                                title="Duplicate"
-                                            >
-                                                <DocumentDuplicateIcon class="w-5 h-5" />
-                                            </button>
-                                            <button
-                                                @click="deleteQuestion(question.id)"
-                                                class="p-2 text-propoff-red hover:bg-propoff-red/10 rounded"
-                                                title="Delete"
-                                            >
-                                                <TrashIcon class="w-5 h-5" />
-                                            </button>
+                                    <!-- Yes/No Preview -->
+                                    <div v-else-if="question.type === 'yes_no'" class="px-6 py-4">
+                                        <div class="flex gap-3">
+                                            <div class="flex-1 p-3 bg-white border border-gray-200 rounded-lg text-center">
+                                                <span class="text-gray-900 font-medium">Yes</span>
+                                            </div>
+                                            <div class="flex-1 p-3 bg-white border border-gray-200 rounded-lg text-center">
+                                                <span class="text-gray-900 font-medium">No</span>
+                                            </div>
                                         </div>
+                                        <p class="text-xs text-gray-500 mt-3 pl-1">
+                                            {{ question.points }} {{ question.points === 1 ? 'pt' : 'pts' }} for correct answer
+                                        </p>
+                                    </div>
+
+                                    <!-- Ranked Answers for AmericaSays -->
+                                    <div v-else-if="question.type === 'ranked_answers'" class="px-6 py-4">
+                                        <div v-if="question.event_answers && question.event_answers.length > 0" class="bg-white border border-propoff-blue/20 rounded-lg p-4">
+                                            <p class="text-sm font-semibold text-propoff-blue mb-3">Ranked Answers ({{ question.event_answers.length }}):</p>
+                                            <ol class="space-y-2">
+                                                <li v-for="(answer, ansIndex) in question.event_answers" :key="answer.id"
+                                                    class="flex items-center gap-3 p-2 bg-gray-50 rounded">
+                                                    <span class="w-6 h-6 flex items-center justify-center bg-propoff-blue/10 text-propoff-blue text-sm font-bold rounded-full">
+                                                        {{ ansIndex + 1 }}
+                                                    </span>
+                                                    <span class="text-gray-900">{{ answer.correct_answer }}</span>
+                                                </li>
+                                            </ol>
+                                        </div>
+                                        <div v-else class="bg-propoff-orange/10 border border-propoff-orange/30 rounded-lg p-4">
+                                            <p class="text-sm text-propoff-orange">⚠️ No answers set yet</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Numeric/Text Preview -->
+                                    <div v-else class="px-6 py-4">
+                                        <div class="p-3 bg-white border border-gray-200 rounded-lg">
+                                            <span class="text-gray-400 italic">
+                                                {{ question.type === 'numeric' ? 'Enter a number...' : 'Enter text answer...' }}
+                                            </span>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-3 pl-1">
+                                            {{ question.points }} {{ question.points === 1 ? 'pt' : 'pts' }} for correct answer
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -293,6 +345,17 @@ const typeClass = (type) => {
 
 const formatType = (type) => {
     return type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+};
+
+// Helper functions to handle both old format (string) and new format (object with label/points)
+const getOptionLabel = (option) => {
+    if (typeof option === 'string') return option;
+    return option.label || option;
+};
+
+const getOptionPoints = (option) => {
+    if (typeof option === 'string') return 0;
+    return option.points || 0;
 };
 
 const deleteQuestion = (questionId) => {
