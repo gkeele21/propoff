@@ -38,6 +38,11 @@ Route::get('/', function () {
     ]);
 });
 
+// Design System Preview (temporary - remove after finalizing colors)
+Route::get('/design-system', function () {
+    return view('design-system-preview');
+})->name('design-system');
+
 // Guest routes (public - no auth required)
 Route::get('/join/{token}', [GuestController::class, 'show'])->name('guest.join');
 Route::post('/join/{token}', [GuestController::class, 'register'])->name('guest.register');

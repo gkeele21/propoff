@@ -10,6 +10,7 @@ use App\Models\QuestionTemplate;
 use App\Models\Entry;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -31,13 +32,21 @@ class DashboardController extends Controller
     private function getAdminStats()
     {
         return [
+            // Primary counts
             'total_events' => Event::count(),
             'total_templates' => QuestionTemplate::count(),
-            'total_questions' => EventQuestion::count(),
             'total_users' => User::count(),
             'total_groups' => Group::count(),
-            'total_entries' => Entry::count(),
-            'completed_entries' => Entry::where('is_complete', true)->count(),
+
+            // Secondary stats for Events
+            'open_events' => Event::where('status', 'open')->count(),
+            'draft_events' => Event::where('status', 'draft')->count(),
+
+            // Secondary stats for Users
+            'admin_users' => User::where('role', 'admin')->count(),
+
+            // Secondary stats for Groups
+            'total_group_members' => DB::table('user_groups')->count(),
         ];
     }
 }
