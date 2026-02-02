@@ -78,15 +78,14 @@
                                         {{ template.category }}
                                     </span>
                                 </div>
-                                <span :class="[
-                                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                                    template.question_type === 'multiple_choice' ? 'bg-info/10 text-info' :
-                                    template.question_type === 'yes_no' ? 'bg-success/10 text-success' :
-                                    template.question_type === 'numeric' ? 'bg-warning/10 text-warning' :
-                                    'bg-surface-elevated text-body'
-                                ]">
+                                <Badge
+                                    :variant="template.question_type === 'multiple_choice' ? 'info-soft' :
+                                              template.question_type === 'yes_no' ? 'success-soft' :
+                                              template.question_type === 'numeric' ? 'warning-soft' : 'default'"
+                                    size="sm"
+                                >
                                     {{ template.question_type?.replace('_', ' ') }}
-                                </span>
+                                </Badge>
                             </div>
 
                             <p class="text-sm text-muted mb-4 line-clamp-2">{{ template.question_text }}</p>
@@ -155,6 +154,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import PageHeader from '@/Components/PageHeader.vue';
 import Button from '@/Components/Base/Button.vue';
+import Badge from '@/Components/Base/Badge.vue';
 import Pagination from '@/Components/Pagination.vue';
 import { ref, computed, watch } from 'vue';
 import { DocumentTextIcon } from '@heroicons/vue/24/outline';

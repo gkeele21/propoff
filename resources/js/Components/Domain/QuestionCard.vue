@@ -26,8 +26,8 @@
                 @click="!disabled && $emit('update:modelValue', option.value)"
             >
                 <div class="flex items-center flex-1 gap-3">
-                    <!-- Result Icon (results mode only) -->
-                    <div v-if="showResults" class="w-5 flex-shrink-0">
+                    <!-- Result Icon (results mode only, when showResultIcons is true) -->
+                    <div v-if="showResults && showResultIcons" class="w-5 flex-shrink-0">
                         <Icon
                             v-if="isCorrect(option) && isSelected(option)"
                             name="check"
@@ -53,8 +53,8 @@
                         class="w-[18px] h-[18px] rounded-full border-2 flex-shrink-0 relative transition-colors"
                         :class="[
                             isSelected(option)
-                                ? 'border-primary bg-primary'
-                                : 'border-border-strong bg-transparent'
+                                ? (selectionColor === 'info' ? 'border-info bg-info' : 'border-primary bg-primary')
+                                : (showResults && isCorrect(option) ? 'border-success bg-success' : 'border-border-strong bg-transparent')
                         ]"
                     >
                         <!-- Inner dot when selected -->
@@ -117,6 +117,8 @@ const props = defineProps({
     disabled: { type: Boolean, default: false },
     error: { type: [String, Boolean], default: false },
     name: { type: String, default: '' },
+    selectionColor: { type: String, default: 'primary' }, // 'primary' or 'info'
+    showResultIcons: { type: Boolean, default: true }, // Show check/x/arrow icons in results mode
 });
 
 defineEmits(['update:modelValue']);
@@ -162,21 +164,31 @@ function isCorrect(option) {
 function getOptionClasses(option) {
     // Results mode styling
     if (props.showResults) {
+        // Selection takes precedence (for pending selections)
+        if (isSelected(option) && !isCorrect(option)) {
+            return props.selectionColor === 'info'
+                ? 'border-info bg-info/10'
+                : 'border-primary bg-primary/10';
+        }
         if (isCorrect(option) && isSelected(option)) {
             return 'border-success bg-success/10';
         }
         if (isCorrect(option) && !isSelected(option)) {
-            return 'border-success/50 bg-success/5';
+            return 'border-success bg-success/10';
         }
         if (!isCorrect(option) && isSelected(option)) {
-            return 'border-danger bg-danger/10';
+            return props.selectionColor === 'info'
+                ? 'border-info bg-info/10'
+                : 'border-danger bg-danger/10';
         }
         return 'border-border bg-surface-inset';
     }
 
     // Normal mode styling
     if (isSelected(option)) {
-        return 'border-primary bg-primary/10';
+        return props.selectionColor === 'info'
+            ? 'border-info bg-info/10'
+            : 'border-primary bg-primary/10';
     }
     return 'border-border bg-surface-inset hover:border-border-strong hover:bg-surface-header';
 }

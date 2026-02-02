@@ -23,7 +23,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['close', 'success']);
+const emit = defineEmits(['close', 'success', 'delete']);
 
 // Check if we're editing (has question) or adding (no question)
 const isEditing = computed(() => !!props.question);
@@ -240,17 +240,27 @@ const handleClose = () => {
                     <Button
                         type="button"
                         variant="outline"
+                        class="!border-primary !text-primary hover:!bg-primary/10"
                         @click="handleClose"
                         :disabled="form.processing"
                     >
                         Cancel
                     </Button>
                     <Button
+                        v-if="isEditing"
+                        type="button"
+                        variant="danger"
+                        @click="emit('delete', question)"
+                        :disabled="form.processing"
+                    >
+                        Delete
+                    </Button>
+                    <Button
                         type="submit"
                         variant="primary"
                         :loading="form.processing"
                     >
-                        {{ isEditing ? 'Update Question' : 'Add Question' }}
+                        {{ isEditing ? 'Save' : 'Add Question' }}
                     </Button>
                 </div>
             </form>

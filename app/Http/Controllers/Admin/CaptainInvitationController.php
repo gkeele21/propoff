@@ -6,7 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CreateCaptainInvitationRequest;
 use App\Models\CaptainInvitation;
 use App\Models\Event;
+use App\Models\EventInvitation;
+use App\Models\Group;
+use App\Models\GroupQuestion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class CaptainInvitationController extends Controller
@@ -187,5 +191,63 @@ class CaptainInvitationController extends Controller
 
         return redirect()->route('admin.events.captain-invitations.index', $event)
             ->with('success', 'Captain invitation deleted successfully!');
+    }
+
+    /**
+     * Create a group for the current admin (bypass invitation flow).
+     */
+    public function createMyGroup(Request $request, Event $event)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'grading_source' => 'required|in:captain,admin',
+        ]);
+
+        $user = $request->user();
+
+        // Create the group
+        $group = Group::create([
+            'event_id' => $event->id,
+            'name' => $validated['name'],
+            'grading_source' => $validated['grading_source'],
+            'code' => Str::upper(Str::random(8)),
+            'created_by' => $user->id,
+        ]);
+
+        // Add admin as captain
+        $group->members()->attach($user->id, [
+            'is_captain' => true,
+            'joined_at' => now(),
+        ]);
+
+        // Create group questions from event questions
+        $eventQuestions = $event->eventQuestions()->orderBy('display_order')->get();
+
+        foreach ($eventQuestions as $eventQuestion) {
+            GroupQuestion::create([
+                'group_id' => $group->id,
+                'event_question_id' => $eventQuestion->id,
+                'question_text' => $eventQuestion->question_text,
+                'question_type' => $eventQuestion->question_type,
+                'options' => $eventQuestion->options,
+                'points' => $eventQuestion->points,
+                'display_order' => $eventQuestion->display_order,
+                'is_active' => true,
+                'is_custom' => false,
+            ]);
+        }
+
+        // Create EventInvitation for this group so admin can invite members
+        EventInvitation::create([
+            'event_id' => $event->id,
+            'group_id' => $group->id,
+            'token' => EventInvitation::generateToken(),
+            'max_uses' => null,
+            'times_used' => 0,
+            'expires_at' => null,
+            'is_active' => true,
+        ]);
+
+        return back()->with('success', "Group '{$group->name}' created! You are now a captain.");
     }
 }

@@ -212,6 +212,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/events/{event}/captain-invitations/{invitation}/deactivate', [\App\Http\Controllers\Admin\CaptainInvitationController::class, 'deactivate'])->name('events.captain-invitations.deactivate');
     Route::post('/events/{event}/captain-invitations/{invitation}/reactivate', [\App\Http\Controllers\Admin\CaptainInvitationController::class, 'reactivate'])->name('events.captain-invitations.reactivate');
     Route::post('/events/{event}/generate-captain-invitation', [AdminEventController::class, 'generateCaptainInvitation'])->name('events.generateCaptainInvitation');
+    Route::post('/events/{event}/create-my-group', [\App\Http\Controllers\Admin\CaptainInvitationController::class, 'createMyGroup'])->name('events.createMyGroup');
 
     // Event Answers - Void functionality
     Route::post('/events/{event}/event-questions/{eventQuestion}/toggle-event-void', [\App\Http\Controllers\Admin\EventAnswerController::class, 'toggleVoid'])->name('events.event-answers.toggleVoid');

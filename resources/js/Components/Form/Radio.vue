@@ -1,5 +1,14 @@
 <template>
-    <div class="flex items-start gap-2">
+    <label
+        :for="inputId"
+        :class="[
+            'flex items-start gap-3 p-4 border rounded-lg transition-colors',
+            disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+            modelValue === value
+                ? 'border-primary bg-primary/10'
+                : 'border-border bg-surface-inset hover:border-border-strong hover:bg-surface-overlay'
+        ]"
+    >
         <input
             :id="inputId"
             type="radio"
@@ -9,26 +18,30 @@
             @change="$emit('update:modelValue', value)"
             :required="required"
             :disabled="disabled"
-            :class="[
-                'border-border text-primary mt-0.5',
-                'focus:ring-primary focus:ring-offset-0',
-                disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-            ]"
+            class="sr-only"
         />
-        <label
-            v-if="label"
-            :for="inputId"
+        <!-- Custom Radio Circle -->
+        <div
             :class="[
-                'select-none',
-                disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
-                'text-gray-dark'
+                'w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors',
+                modelValue === value
+                    ? 'border-primary bg-primary'
+                    : 'border-border-strong bg-transparent'
             ]"
         >
-            {{ label }}
-            <span v-if="required" class="text-danger">*</span>
-            <p v-if="description" class="text-sm text-subtle mt-0.5">{{ description }}</p>
-        </label>
-    </div>
+            <div
+                v-if="modelValue === value"
+                class="w-2 h-2 rounded-full bg-white"
+            ></div>
+        </div>
+        <div class="flex-1">
+            <span class="font-semibold text-body">
+                {{ label }}
+                <span v-if="required" class="text-danger">*</span>
+            </span>
+            <p v-if="description" class="text-sm text-muted mt-1">{{ description }}</p>
+        </div>
+    </label>
 </template>
 
 <script setup>

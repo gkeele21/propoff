@@ -1,12 +1,14 @@
 <script setup>
 import { ref } from 'vue';
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Button from '@/Components/Base/Button.vue';
 import Badge from '@/Components/Base/Badge.vue';
 import Card from '@/Components/Base/Card.vue';
 import Icon from '@/Components/Base/Icon.vue';
-import Dropdown from '@/Components/Form/Dropdown.vue';
+import TextField from '@/Components/Form/TextField.vue';
+import Radio from '@/Components/Form/Radio.vue';
+import Modal from '@/Components/Base/Modal.vue';
 import QuestionCard from '@/Components/Domain/QuestionCard.vue';
 import QuestionModal from '@/Components/Domain/QuestionModal.vue';
 import Confirm from '@/Components/Feedback/Confirm.vue';
@@ -101,19 +103,6 @@ const saveAnswer = (question) => {
     );
 };
 
-// Duplicate question
-const duplicateQuestion = (question) => {
-    router.post(
-        route('admin.events.event-questions.duplicate', [props.event.id, question.id]),
-        {},
-        {
-            onSuccess: () => {
-                showToastMessage('Question duplicated successfully');
-            },
-        }
-    );
-};
-
 // Toggle void for question
 const toggleVoid = (question) => {
     router.post(
@@ -125,12 +114,6 @@ const toggleVoid = (question) => {
             },
         }
     );
-};
-
-// Delete question (show confirmation)
-const confirmDelete = (question) => {
-    questionToDelete.value = question;
-    showDeleteConfirm.value = true;
 };
 
 // Execute delete
@@ -147,6 +130,14 @@ const deleteQuestion = () => {
             },
         }
     );
+};
+
+// Handle delete from modal (close modal and show confirmation)
+const handleDeleteFromModal = (question) => {
+    showAddEditModal.value = false;
+    editingQuestion.value = null;
+    questionToDelete.value = question;
+    showDeleteConfirm.value = true;
 };
 
 // Drag and drop reordering
@@ -240,6 +231,23 @@ const getStatusVariant = (status) => {
     };
     return variants[status] || 'default';
 };
+
+// Create My Group
+const showCreateGroupModal = ref(false);
+const createGroupForm = useForm({
+    name: '',
+    grading_source: 'captain',
+});
+
+const submitCreateGroup = () => {
+    createGroupForm.post(route('admin.events.createMyGroup', props.event.id), {
+        onSuccess: () => {
+            showCreateGroupModal.value = false;
+            createGroupForm.reset();
+            showToastMessage('Group created! You are now a captain.');
+        },
+    });
+};
 </script>
 
 <template>
@@ -263,21 +271,23 @@ const getStatusVariant = (status) => {
                             <span class="text-subtle">
                                 👥 {{ stats.total_entries || 0 }} entries
                             </span>
+                            <Link :href="route('admin.events.edit', event.id)" class="text-primary hover:text-primary-hover transition-colors">
+                                Edit
+                            </Link>
                         </div>
                         <p class="text-muted">{{ event.description }}</p>
                     </div>
 
                     <!-- Right: Action Buttons -->
                     <div class="flex gap-2">
+                        <Button variant="secondary" size="sm" class="!bg-info !text-white !border-info hover:!bg-info/80" @click="showCreateGroupModal = true">
+                            <Icon name="users" class="mr-2" size="sm" />
+                            Create My Group
+                        </Button>
                         <Link :href="route('admin.events.captain-invitations.index', event.id)">
                             <Button variant="accent" size="sm">
+                                <Icon name="paper-plane" class="mr-2" size="sm" />
                                 Manage Invitations
-                            </Button>
-                        </Link>
-                        <Link :href="route('admin.events.edit', event.id)">
-                            <Button variant="primary">
-                                <Icon name="pencil" class="mr-2" size="sm" />
-                                Edit Event
                             </Button>
                         </Link>
                     </div>
@@ -289,20 +299,20 @@ const getStatusVariant = (status) => {
         <div class="max-w-7xl mx-auto px-6 pb-12">
             <!-- Stats Row -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-surface-inset border border-border rounded-lg p-5 text-center">
+                <div class="bg-surface-inset border border-border border-t-4 border-t-success rounded-lg p-5 text-center">
                     <div class="text-3xl font-bold text-success mb-1">{{ questions.length }}</div>
                     <div class="text-xs text-muted uppercase tracking-wider">Questions</div>
                 </div>
-                <div class="bg-surface-inset border border-border rounded-lg p-5 text-center">
+                <div class="bg-surface-inset border border-border border-t-4 border-t-warning rounded-lg p-5 text-center">
+                    <div class="text-3xl font-bold text-warning mb-1">{{ stats.graded_count || 0 }}</div>
+                    <div class="text-xs text-muted uppercase tracking-wider">Answered</div>
+                </div>
+                <div class="bg-surface-inset border border-border border-t-4 border-t-primary rounded-lg p-5 text-center">
                     <div class="text-3xl font-bold text-primary mb-1">{{ stats.total_entries || 0 }}</div>
                     <div class="text-xs text-muted uppercase tracking-wider">Entries</div>
                 </div>
-                <div class="bg-surface-inset border border-border rounded-lg p-5 text-center">
-                    <div class="text-3xl font-bold text-warning mb-1">{{ stats.graded_count || 0 }}</div>
-                    <div class="text-xs text-muted uppercase tracking-wider">Graded</div>
-                </div>
-                <div class="bg-surface-inset border border-border rounded-lg p-5 text-center">
-                    <div class="text-3xl font-bold text-success mb-1">{{ stats.total_points || 0 }}</div>
+                <div class="bg-surface-inset border border-border border-t-4 border-t-info rounded-lg p-5 text-center">
+                    <div class="text-3xl font-bold text-info mb-1">{{ stats.total_points || 0 }}</div>
                     <div class="text-xs text-muted uppercase tracking-wider">Total Points</div>
                 </div>
             </div>
@@ -355,7 +365,14 @@ const getStatusVariant = (status) => {
                             <div class="flex-1">
                                 <div class="flex items-center gap-2 flex-wrap">
                                     <h3 class="text-lg font-semibold text-body">{{ index + 1 }}. {{ question.question_text }}</h3>
-                                    <Badge variant="primary-soft" size="sm">Multiple Choice</Badge>
+                                    <Badge
+                                        :variant="question.question_type === 'multiple_choice' ? 'info-soft' :
+                                                  question.question_type === 'yes_no' ? 'success-soft' :
+                                                  question.question_type === 'numeric' ? 'warning-soft' : 'default'"
+                                        size="sm"
+                                    >
+                                        {{ question.question_type?.replace('_', ' ') }}
+                                    </Badge>
                                     <Badge v-if="question.is_void" variant="danger" size="sm">Voided</Badge>
                                     <span class="text-sm text-subtle">{{ question.points }} pts</span>
                                 </div>
@@ -364,39 +381,16 @@ const getStatusVariant = (status) => {
                             <!-- Action Buttons -->
                             <div class="flex items-center gap-2">
                                 <Button variant="ghost" size="sm" @click="openEditModal(question)">
-                                    <Icon name="pencil" />
+                                    Edit
                                 </Button>
-                                <Dropdown>
-                                    <template #trigger>
-                                        <Button variant="ghost" size="sm">
-                                            <Icon name="ellipsis-vertical" />
-                                        </Button>
-                                    </template>
-                                    <template #content>
-                                        <button
-                                            @click="duplicateQuestion(question)"
-                                            class="w-full text-left px-4 py-2 text-sm text-body hover:bg-surface-overlay flex items-center gap-2"
-                                        >
-                                            <Icon name="copy" size="sm" />
-                                            Duplicate
-                                        </button>
-                                        <button
-                                            @click="toggleVoid(question)"
-                                            class="w-full text-left px-4 py-2 text-sm hover:bg-surface-overlay flex items-center gap-2"
-                                            :class="question.is_void ? 'text-success' : 'text-warning'"
-                                        >
-                                            <Icon :name="question.is_void ? 'check-circle' : 'ban'" size="sm" />
-                                            {{ question.is_void ? 'Unvoid' : 'Void' }} Question
-                                        </button>
-                                        <button
-                                            @click="confirmDelete(question)"
-                                            class="w-full text-left px-4 py-2 text-sm hover:bg-surface-overlay text-danger flex items-center gap-2"
-                                        >
-                                            <Icon name="trash" size="sm" />
-                                            Delete
-                                        </button>
-                                    </template>
-                                </Dropdown>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    class="!text-warning"
+                                    @click="toggleVoid(question)"
+                                >
+                                    {{ question.is_void ? 'Unvoid' : 'Void' }}
+                                </Button>
                             </div>
                         </div>
 
@@ -409,20 +403,16 @@ const getStatusVariant = (status) => {
                                 :options="question.options"
                                 :points="question.points"
                                 :correct-answer="question.correct_answer"
-                                :show-results="false"
+                                :show-results="!!question.correct_answer"
                                 :show-header="false"
+                                selection-color="info"
+                                :show-result-icons="false"
                             />
-                        </div>
-
-                        <!-- Current Answer Display -->
-                        <div v-if="question.correct_answer" class="mb-4 text-sm text-success flex items-center gap-2">
-                            <Icon name="check" size="sm" />
-                            Current Answer: {{ question.correct_answer }}
                         </div>
 
                         <!-- Save Answer Button (conditional) -->
                         <div v-if="hasSelectedAnswer(question.id)" class="flex justify-end">
-                            <Button variant="success" @click="saveAnswer(question)">
+                            <Button variant="secondary" class="!bg-info !text-white !border-info hover:!bg-info/80" @click="saveAnswer(question)">
                                 Save Answer
                             </Button>
                         </div>
@@ -453,6 +443,7 @@ const getStatusVariant = (status) => {
             :event-id="event.id"
             @close="closeModal"
             @success="showToastMessage('Question saved successfully')"
+            @delete="handleDeleteFromModal"
         />
 
         <!-- Delete Confirmation Modal -->
@@ -472,5 +463,58 @@ const getStatusVariant = (status) => {
             :message="toastMessage"
             @close="showToast = false"
         />
+
+        <!-- Create My Group Modal -->
+        <Modal :show="showCreateGroupModal" @close="showCreateGroupModal = false" max-width="md">
+            <div class="p-6">
+                <h2 class="text-xl font-bold text-body mb-4">Create My Group</h2>
+                <p class="text-muted text-sm mb-6">
+                    Create your own group for this event. You'll become the captain and can invite members to join.
+                </p>
+
+                <form @submit.prevent="submitCreateGroup" class="space-y-4">
+                    <TextField
+                        v-model="createGroupForm.name"
+                        label="Group Name"
+                        placeholder="Enter a name for your group"
+                        :error="createGroupForm.errors.name"
+                        required
+                    />
+
+                    <div>
+                        <label class="block text-sm font-semibold text-muted mb-2">Grading Source</label>
+                        <div class="space-y-2">
+                            <Radio
+                                v-model="createGroupForm.grading_source"
+                                name="grading_source"
+                                value="captain"
+                                label="Captain Sets Answers"
+                                description="You control when and how questions are graded"
+                            />
+                            <Radio
+                                v-model="createGroupForm.grading_source"
+                                name="grading_source"
+                                value="admin"
+                                label="Use Admin Answers"
+                                description="Scores calculated from official event answers"
+                            />
+                        </div>
+                        <p v-if="createGroupForm.errors.grading_source" class="text-danger text-sm mt-1">
+                            {{ createGroupForm.errors.grading_source }}
+                        </p>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-4">
+                        <Button type="button" variant="outline" class="!border-primary !text-primary hover:!bg-primary/10" @click="showCreateGroupModal = false">
+                            Cancel
+                        </Button>
+                        <Button type="submit" variant="secondary" class="!bg-info !text-white !border-info hover:!bg-info/80" :loading="createGroupForm.processing">
+                            <Icon name="users" class="mr-2" size="sm" />
+                            Create Group
+                        </Button>
+                    </div>
+                </form>
+            </div>
+        </Modal>
     </AuthenticatedLayout>
 </template>

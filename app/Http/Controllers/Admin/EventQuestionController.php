@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Models\EventAnswer;
 use App\Models\EventQuestion;
 use App\Models\QuestionTemplate;
+use App\Services\EntryService;
+use App\Services\LeaderboardService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -479,83 +482,42 @@ class EventQuestionController extends Controller
             'answer' => 'required|string',
         ]);
 
-        // Update the correct answer
-        $eventQuestion->update([
-            'correct_answer' => $validated['answer'],
-        ]);
+        // Ensure question belongs to this event
+        if ($eventQuestion->event_id !== $event->id) {
+            abort(404);
+        }
 
-        // Recalculate scores for all entries in this event
-        $this->recalculateEventScores($event);
+        // Create or update the event answer
+        EventAnswer::updateOrCreate(
+            [
+                'event_id' => $event->id,
+                'event_question_id' => $eventQuestion->id,
+            ],
+            [
+                'correct_answer' => $validated['answer'],
+                'is_void' => false,
+                'set_at' => now(),
+                'set_by' => $request->user()->id,
+            ]
+        );
+
+        // Recalculate scores for all admin-graded groups
+        $entryService = app(EntryService::class);
+        $leaderboardService = app(LeaderboardService::class);
+
+        $adminGroups = $event->groups()->where('grading_source', 'admin')->get();
+
+        foreach ($adminGroups as $group) {
+            $entries = $group->entries()->where('is_complete', true)->get();
+            foreach ($entries as $entry) {
+                $entryService->calculateScore($entry);
+            }
+
+            // Update leaderboard for this group
+            $leaderboardService->updateLeaderboard($event, $group);
+        }
 
         return back()->with('success', 'Answer saved and scores calculated');
-    }
-
-    /**
-     * Recalculate scores for all entries in an event.
-     */
-    protected function recalculateEventScores(Event $event)
-    {
-        $entries = $event->entries;
-
-        foreach ($entries as $entry) {
-            $score = $this->calculateEntryScore($entry);
-            $percentage = $this->calculateEntryPercentage($entry, $score);
-
-            $entry->update([
-                'score' => $score,
-                'percentage' => $percentage,
-            ]);
-        }
-    }
-
-    /**
-     * Calculate the score for a single entry.
-     */
-    protected function calculateEntryScore($entry)
-    {
-        $totalScore = 0;
-        $userAnswers = $entry->userAnswers;
-
-        foreach ($userAnswers as $userAnswer) {
-            $eventQuestion = $userAnswer->eventQuestion;
-
-            if (!$eventQuestion) {
-                continue;
-            }
-
-            // Check if answer is correct
-            if ($eventQuestion->correct_answer && $userAnswer->answer === $eventQuestion->correct_answer) {
-                // Add base points
-                $totalScore += $eventQuestion->points;
-
-                // Add bonus points if applicable (for multiple choice)
-                if ($eventQuestion->question_type === 'multiple_choice' && $eventQuestion->options) {
-                    foreach ($eventQuestion->options as $option) {
-                        if (isset($option['label']) && $option['label'] === $userAnswer->answer) {
-                            $totalScore += ($option['points'] ?? 0);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        return $totalScore;
-    }
-
-    /**
-     * Calculate the percentage score for an entry.
-     */
-    protected function calculateEntryPercentage($entry, $score)
-    {
-        $event = $entry->event;
-        $maxPossibleScore = $event->eventQuestions()->sum('points');
-
-        if ($maxPossibleScore === 0) {
-            return 0;
-        }
-
-        return ($score / $maxPossibleScore) * 100;
     }
 
     /**

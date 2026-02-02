@@ -79,6 +79,11 @@ class EventController extends Controller
         $event->loadCount(['entries', 'eventQuestions']);
 
         // Calculate statistics
+        $gradedCount = \App\Models\EventAnswer::where('event_id', $event->id)
+            ->where('is_void', false)
+            ->count();
+        $totalPoints = $event->eventQuestions()->sum('points');
+
         $stats = [
             'total_questions' => $event->event_questions_count,
             'total_entries' => $event->entries_count,
@@ -87,6 +92,8 @@ class EventController extends Controller
                 ->where('is_complete', true)
                 ->avg('percentage') ?? 0),
             'participating_groups' => $event->groups()->count(),
+            'graded_count' => $gradedCount,
+            'total_points' => $totalPoints,
         ];
 
         // Get questions with all necessary data
@@ -98,6 +105,7 @@ class EventController extends Controller
             ->orderBy('display_order')
             ->get()
             ->map(function ($question) {
+                $eventAnswer = $question->eventAnswers->first();
                 return [
                     'id' => $question->id,
                     'question_text' => $question->question_text,
@@ -105,9 +113,9 @@ class EventController extends Controller
                     'options' => $question->options,
                     'points' => $question->points,
                     'display_order' => $question->display_order,
-                    'correct_answer' => $question->correct_answer,
+                    'correct_answer' => $eventAnswer?->correct_answer,
+                    'is_void' => $eventAnswer?->is_void ?? false,
                     'user_answers_count' => $question->user_answers_count ?? 0,
-                    'event_answers' => $question->eventAnswers,
                 ];
             });
 
