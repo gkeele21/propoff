@@ -699,7 +699,7 @@ onBeforeUnmount(() => {
 }
 
 .rich-text-editor .ProseMirror a {
-    color: #3b82f6;
+    color: rgb(var(--color-primary));
     text-decoration: underline;
 }
 
@@ -741,7 +741,7 @@ onBeforeUnmount(() => {
     right: 0;
     top: 0;
     bottom: 0;
-    background: rgba(59, 130, 246, 0.15);
+    background: rgb(var(--color-primary) / 0.15);
     pointer-events: none;
 }
 
@@ -751,7 +751,7 @@ onBeforeUnmount(() => {
     top: 0;
     bottom: -2px;
     width: 4px;
-    background-color: #3b82f6;
+    background-color: rgb(var(--color-primary));
     pointer-events: none;
 }
 
@@ -769,6 +769,6 @@ onBeforeUnmount(() => {
 }
 
 .rich-text-editor .ProseMirror img.ProseMirror-selectednode {
-    outline: 2px solid #3b82f6;
+    outline: 2px solid rgb(var(--color-primary));
 }
 </style>

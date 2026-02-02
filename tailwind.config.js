@@ -14,30 +14,66 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                // Logo font - load via Google Fonts in app.blade.php
+                logo: ['Space Grotesk', ...defaultTheme.fontFamily.sans],
             },
             colors: {
-                // Semantic brand colors
-                primary: '#1a3490',
-                secondary: '#525252',   // Neutral gray for secondary actions
-                success: '#57d025',
-                warning: '#f47612',
-                danger: '#af1919',
-                info: '#1a3490',        // Same as primary for informational
+                /*
+                 * Theme-aware colors (use CSS variables)
+                 * These adapt when theme class changes on <html>
+                 */
+                primary: {
+                    DEFAULT: 'rgb(var(--color-primary) / <alpha-value>)',
+                    hover: 'rgb(var(--color-primary-hover) / <alpha-value>)',
+                },
+                success: 'rgb(var(--color-success) / <alpha-value>)',
+                warning: 'rgb(var(--color-warning) / <alpha-value>)',
+                danger: 'rgb(var(--color-danger) / <alpha-value>)',
+                info: 'rgb(var(--color-info) / <alpha-value>)',
 
-                // Neutrals
+                /*
+                 * Dark mode surface colors
+                 */
+                bg: 'rgb(var(--color-bg) / <alpha-value>)',
+                surface: {
+                    DEFAULT: 'rgb(var(--color-surface) / <alpha-value>)',
+                    elevated: 'rgb(var(--color-surface-elevated) / <alpha-value>)',
+                    overlay: 'rgb(var(--color-surface-overlay) / <alpha-value>)',
+                    inset: 'rgb(var(--color-surface-inset) / <alpha-value>)',
+                    header: 'rgb(var(--color-surface-header) / <alpha-value>)',
+                },
+
+                /*
+                 * Text colors
+                 */
+                body: 'rgb(var(--color-text) / <alpha-value>)',
+                muted: 'rgb(var(--color-text-muted) / <alpha-value>)',
+                subtle: 'rgb(var(--color-text-subtle) / <alpha-value>)',
+
+                /*
+                 * Border colors
+                 */
+                border: {
+                    DEFAULT: 'rgb(var(--color-border) / <alpha-value>)',
+                    strong: 'rgb(var(--color-border-strong) / <alpha-value>)',
+                },
+
+                /*
+                 * Static colors (don't change with theme)
+                 */
                 white: '#ffffff',
                 black: '#171717',
                 'gray-light': '#a3a3a3',
                 'gray-dark': '#525252',
 
-                // UI semantic colors (for components)
-                surface: '#f5f5f5',     // Subtle background for forms/sections
-                border: '#d4d4d4',      // Default border color
-                body: '#171717',        // Body text (same as black)
-                subtle: '#525252',      // Subtle text (same as gray-dark)
-                muted: '#a3a3a3',       // Muted elements (same as gray-light)
+                /*
+                 * Secondary (neutral gray, theme-independent)
+                 */
+                secondary: '#525252',
 
-                // Legacy aliases (remove after migration)
+                /*
+                 * Legacy aliases (to be removed after migration)
+                 */
                 'propoff-red': '#af1919',
                 'propoff-orange': '#f47612',
                 'propoff-green': '#57d025',

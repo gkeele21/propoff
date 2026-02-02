@@ -151,9 +151,48 @@ const deleteQuestion = () => {
 
 // Drag and drop reordering
 const draggedQuestion = ref(null);
+let scrollInterval = null;
 
 const handleDragStart = (question) => {
     draggedQuestion.value = question;
+};
+
+const handleDrag = (e) => {
+    // Auto-scroll when dragging near viewport edges
+    const scrollThreshold = 100; // pixels from edge to start scrolling
+    const scrollSpeed = 15; // pixels per frame
+
+    // Clear any existing scroll interval
+    if (scrollInterval) {
+        clearInterval(scrollInterval);
+        scrollInterval = null;
+    }
+
+    // e.clientY is 0 when drag ends or is outside viewport
+    if (e.clientY === 0) return;
+
+    const viewportHeight = window.innerHeight;
+
+    if (e.clientY < scrollThreshold) {
+        // Near top - scroll up
+        scrollInterval = setInterval(() => {
+            window.scrollBy(0, -scrollSpeed);
+        }, 16);
+    } else if (e.clientY > viewportHeight - scrollThreshold) {
+        // Near bottom - scroll down
+        scrollInterval = setInterval(() => {
+            window.scrollBy(0, scrollSpeed);
+        }, 16);
+    }
+};
+
+const handleDragEnd = () => {
+    // Clean up scroll interval
+    if (scrollInterval) {
+        clearInterval(scrollInterval);
+        scrollInterval = null;
+    }
+    draggedQuestion.value = null;
 };
 
 const handleDragOver = (e) => {
@@ -195,9 +234,9 @@ const showToastMessage = (message) => {
 const getStatusVariant = (status) => {
     const variants = {
         draft: 'default',
-        open: 'success',
-        locked: 'warning',
-        completed: 'success',
+        open: 'success-soft',
+        locked: 'warning-soft',
+        completed: 'success-soft',
     };
     return variants[status] || 'default';
 };
@@ -208,7 +247,7 @@ const getStatusVariant = (status) => {
 
     <AuthenticatedLayout>
         <!-- Compact Event Header -->
-        <div class="bg-white shadow-sm mb-8">
+        <div class="bg-surface shadow-sm mb-8 border-b border-border">
             <div class="max-w-7xl mx-auto px-6 py-6">
                 <div class="flex justify-between items-start gap-6">
                     <!-- Left: Title, Status, Meta Info -->
@@ -248,8 +287,28 @@ const getStatusVariant = (status) => {
 
         <!-- Main Content -->
         <div class="max-w-7xl mx-auto px-6 pb-12">
+            <!-- Stats Row -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-surface-inset border border-border rounded-lg p-5 text-center">
+                    <div class="text-3xl font-bold text-success mb-1">{{ questions.length }}</div>
+                    <div class="text-xs text-muted uppercase tracking-wider">Questions</div>
+                </div>
+                <div class="bg-surface-inset border border-border rounded-lg p-5 text-center">
+                    <div class="text-3xl font-bold text-primary mb-1">{{ stats.total_entries || 0 }}</div>
+                    <div class="text-xs text-muted uppercase tracking-wider">Entries</div>
+                </div>
+                <div class="bg-surface-inset border border-border rounded-lg p-5 text-center">
+                    <div class="text-3xl font-bold text-warning mb-1">{{ stats.graded_count || 0 }}</div>
+                    <div class="text-xs text-muted uppercase tracking-wider">Graded</div>
+                </div>
+                <div class="bg-surface-inset border border-border rounded-lg p-5 text-center">
+                    <div class="text-3xl font-bold text-success mb-1">{{ stats.total_points || 0 }}</div>
+                    <div class="text-xs text-muted uppercase tracking-wider">Total Points</div>
+                </div>
+            </div>
+
             <!-- Questions Section -->
-            <Card :header-padding="false">
+            <Card :header-padding="false" header-bg-class="bg-surface-header">
                 <template #header>
                     <div class="p-6">
                         <div class="flex items-center justify-between">
@@ -258,7 +317,7 @@ const getStatusVariant = (status) => {
                                 <Badge variant="primary-soft" size="sm">{{ questions.length }}</Badge>
                             </div>
                             <div class="flex gap-2">
-                                <Button variant="secondary" size="sm" @click="navigateToImport">
+                                <Button variant="secondary" size="sm" class="!bg-info !text-white !border-info hover:!bg-info/80" @click="navigateToImport">
                                     <Icon name="file-import" class="mr-2" size="sm" />
                                     Import from Template
                                 </Button>
@@ -276,10 +335,12 @@ const getStatusVariant = (status) => {
                     <div
                         v-for="(question, index) in questions"
                         :key="question.id"
-                        class="bg-white border-2 border-border rounded-lg p-6 transition-opacity"
+                        class="bg-surface-elevated border border-border rounded-lg p-6 transition-opacity"
                         :class="{ 'opacity-50': draggedQuestion?.id === question.id }"
                         draggable="true"
                         @dragstart="handleDragStart(question)"
+                        @drag="handleDrag"
+                        @dragend="handleDragEnd"
                         @dragover="handleDragOver"
                         @drop="handleDrop(question)"
                     >
@@ -314,14 +375,14 @@ const getStatusVariant = (status) => {
                                     <template #content>
                                         <button
                                             @click="duplicateQuestion(question)"
-                                            class="w-full text-left px-4 py-2 text-sm hover:bg-surface flex items-center gap-2"
+                                            class="w-full text-left px-4 py-2 text-sm text-body hover:bg-surface-overlay flex items-center gap-2"
                                         >
                                             <Icon name="copy" size="sm" />
                                             Duplicate
                                         </button>
                                         <button
                                             @click="toggleVoid(question)"
-                                            class="w-full text-left px-4 py-2 text-sm hover:bg-surface flex items-center gap-2"
+                                            class="w-full text-left px-4 py-2 text-sm hover:bg-surface-overlay flex items-center gap-2"
                                             :class="question.is_void ? 'text-success' : 'text-warning'"
                                         >
                                             <Icon :name="question.is_void ? 'check-circle' : 'ban'" size="sm" />
@@ -329,7 +390,7 @@ const getStatusVariant = (status) => {
                                         </button>
                                         <button
                                             @click="confirmDelete(question)"
-                                            class="w-full text-left px-4 py-2 text-sm hover:bg-surface text-danger flex items-center gap-2"
+                                            class="w-full text-left px-4 py-2 text-sm hover:bg-surface-overlay text-danger flex items-center gap-2"
                                         >
                                             <Icon name="trash" size="sm" />
                                             Delete
@@ -373,7 +434,7 @@ const getStatusVariant = (status) => {
                         <p class="text-lg mb-2">No questions yet</p>
                         <p class="text-sm mb-4">Get started by adding a custom question or importing from a template</p>
                         <div class="flex justify-center gap-2">
-                            <Button variant="secondary" @click="navigateToImport">
+                            <Button variant="secondary" class="!bg-info !text-white !border-info hover:!bg-info/80" @click="navigateToImport">
                                 Import from Template
                             </Button>
                             <Button variant="primary" @click="openAddModal">

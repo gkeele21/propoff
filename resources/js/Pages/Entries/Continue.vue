@@ -129,13 +129,13 @@ const getOptionPoints = (option) => {
             >
                 <template #metadata>
                     <div class="w-64">
-                        <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="w-full bg-surface-elevated rounded-full h-2">
                             <div
                                 class="bg-primary h-2 rounded-full transition-all duration-300"
                                 :style="{ width: `${progress}%` }"
                             ></div>
                         </div>
-                        <p class="mt-1 text-sm text-gray-600">
+                        <p class="mt-1 text-sm text-muted">
                             {{ Object.keys(answers).length }} of {{ entry.group.group_questions.length }} questions answered
                         </p>
                     </div>
@@ -148,8 +148,8 @@ const getOptionPoints = (option) => {
                 <div class="flex gap-6">
                     <!-- Question Navigation Sidebar -->
                     <div class="w-48 flex-shrink-0">
-                        <div class="bg-white rounded-lg shadow-sm p-4 sticky top-6">
-                            <h3 class="font-semibold text-gray-900 mb-3">Questions</h3>
+                        <div class="bg-surface rounded-lg shadow-sm p-4 sticky top-6 border border-border">
+                            <h3 class="font-semibold text-body mb-3">Questions</h3>
                             <div class="space-y-2">
                                 <button
                                     v-for="(question, index) in entry.group.group_questions"
@@ -159,7 +159,7 @@ const getOptionPoints = (option) => {
                                     :class="{
                                         'bg-primary text-white': index === currentQuestionIndex,
                                         'bg-success/10 text-success': answers[question.id] && index !== currentQuestionIndex,
-                                        'bg-gray-100 text-gray-700 hover:bg-gray-200': !answers[question.id] && index !== currentQuestionIndex,
+                                        'bg-surface-elevated text-body hover:bg-surface-overlay': !answers[question.id] && index !== currentQuestionIndex,
                                     }"
                                 >
                                     <div class="flex items-center justify-between">
@@ -169,10 +169,10 @@ const getOptionPoints = (option) => {
                                 </button>
                             </div>
 
-                            <div class="mt-4 pt-4 border-t">
+                            <div class="mt-4 pt-4 border-t border-border">
                                 <button
                                     @click="saveAnswers"
-                                    class="w-full px-3 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded transition"
+                                    class="w-full px-3 py-2 text-sm text-body bg-surface-elevated hover:bg-surface-overlay rounded transition"
                                 >
                                     Save Progress
                                 </button>
@@ -182,19 +182,19 @@ const getOptionPoints = (option) => {
 
                     <!-- Main Question Area -->
                     <div class="flex-1">
-                        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                             <div class="p-8">
                                 <!-- Question -->
                                 <div class="mb-8">
                                     <div class="flex items-start justify-between mb-4">
-                                        <h3 class="text-2xl font-bold text-gray-900">
+                                        <h3 class="text-2xl font-bold text-body">
                                             Question {{ currentQuestionIndex + 1 }}
                                         </h3>
                                         <span class="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded">
                                             {{ currentQuestion.points }} {{ currentQuestion.points === 1 ? 'point' : 'points' }}
                                         </span>
                                     </div>
-                                    <p class="text-lg text-gray-700">{{ currentQuestion.question_text }}</p>
+                                    <p class="text-lg text-body">{{ currentQuestion.question_text }}</p>
                                 </div>
 
                                 <!-- Answer Input -->
@@ -208,7 +208,7 @@ const getOptionPoints = (option) => {
                                                 class="flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition"
                                                 :class="{
                                                     'border-primary bg-primary/10': answers[currentQuestion.id] === getOptionValue(option),
-                                                    'border-gray-200 hover:border-gray-300': answers[currentQuestion.id] !== getOptionValue(option),
+                                                    'border-border hover:border-muted': answers[currentQuestion.id] !== getOptionValue(option),
                                                 }"
                                             >
                                                 <div class="flex items-center flex-1">
@@ -218,7 +218,7 @@ const getOptionPoints = (option) => {
                                                         :value="getOptionValue(option)"
                                                         class="h-4 w-4 text-primary focus:ring-primary/50"
                                                     />
-                                                    <span class="ml-3 text-gray-900">{{ getOptionLabel(option) }}</span>
+                                                    <span class="ml-3 text-body">{{ getOptionLabel(option) }}</span>
                                                 </div>
                                                 <div v-if="getOptionPoints(option) > 0" class="ml-4 flex items-center gap-1">
                                                     <span class="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded">
@@ -227,7 +227,7 @@ const getOptionPoints = (option) => {
                                                 </div>
                                             </label>
                                         </div>
-                                        <p class="text-xs text-gray-500 mt-3">
+                                        <p class="text-xs text-muted mt-3">
                                             Base: {{ currentQuestion.points }} {{ currentQuestion.points === 1 ? 'pt' : 'pts' }} per question + any bonus shown
                                         </p>
                                     </div>
@@ -239,7 +239,7 @@ const getOptionPoints = (option) => {
                                                 class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition"
                                                 :class="{
                                                     'border-primary bg-primary/10': answers[currentQuestion.id] === 'Yes',
-                                                    'border-gray-200 hover:border-gray-300': answers[currentQuestion.id] !== 'Yes',
+                                                    'border-border hover:border-muted': answers[currentQuestion.id] !== 'Yes',
                                                 }"
                                             >
                                                 <input
@@ -248,13 +248,13 @@ const getOptionPoints = (option) => {
                                                     value="Yes"
                                                     class="h-4 w-4 text-primary focus:ring-primary/50"
                                                 />
-                                                <span class="ml-3 text-gray-900">Yes</span>
+                                                <span class="ml-3 text-body">Yes</span>
                                             </label>
                                             <label
                                                 class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition"
                                                 :class="{
                                                     'border-primary bg-primary/10': answers[currentQuestion.id] === 'No',
-                                                    'border-gray-200 hover:border-gray-300': answers[currentQuestion.id] !== 'No',
+                                                    'border-border hover:border-muted': answers[currentQuestion.id] !== 'No',
                                                 }"
                                             >
                                                 <input
@@ -263,7 +263,7 @@ const getOptionPoints = (option) => {
                                                     value="No"
                                                     class="h-4 w-4 text-primary focus:ring-primary/50"
                                                 />
-                                                <span class="ml-3 text-gray-900">No</span>
+                                                <span class="ml-3 text-body">No</span>
                                             </label>
                                         </div>
                                     </div>
@@ -275,7 +275,7 @@ const getOptionPoints = (option) => {
                                                 class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition"
                                                 :class="{
                                                     'border-primary bg-primary/10': answers[currentQuestion.id] === 'True',
-                                                    'border-gray-200 hover:border-gray-300': answers[currentQuestion.id] !== 'True',
+                                                    'border-border hover:border-muted': answers[currentQuestion.id] !== 'True',
                                                 }"
                                             >
                                                 <input
@@ -284,13 +284,13 @@ const getOptionPoints = (option) => {
                                                     value="True"
                                                     class="h-4 w-4 text-primary focus:ring-primary/50"
                                                 />
-                                                <span class="ml-3 text-gray-900">True</span>
+                                                <span class="ml-3 text-body">True</span>
                                             </label>
                                             <label
                                                 class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition"
                                                 :class="{
                                                     'border-primary bg-primary/10': answers[currentQuestion.id] === 'False',
-                                                    'border-gray-200 hover:border-gray-300': answers[currentQuestion.id] !== 'False',
+                                                    'border-border hover:border-muted': answers[currentQuestion.id] !== 'False',
                                                 }"
                                             >
                                                 <input
@@ -299,7 +299,7 @@ const getOptionPoints = (option) => {
                                                     value="False"
                                                     class="h-4 w-4 text-primary focus:ring-primary/50"
                                                 />
-                                                <span class="ml-3 text-gray-900">False</span>
+                                                <span class="ml-3 text-body">False</span>
                                             </label>
                                         </div>
                                     </div>
@@ -319,12 +319,12 @@ const getOptionPoints = (option) => {
                                     <button
                                         @click="previousQuestion"
                                         :disabled="!canGoPrevious"
-                                        class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded disabled:opacity-50 disabled:cursor-not-allowed transition"
+                                        class="px-4 py-2 text-body bg-surface-elevated hover:bg-surface-overlay rounded disabled:opacity-50 disabled:cursor-not-allowed transition"
                                     >
                                         ← Previous
                                     </button>
 
-                                    <div class="text-sm text-gray-600">
+                                    <div class="text-sm text-muted">
                                         Question {{ currentQuestionIndex + 1 }} of {{ entry.group.group_questions.length }}
                                     </div>
 

@@ -31,11 +31,13 @@ const submit = () => {
     <GuestLayout>
         <Head title="Log in" />
 
+        <h1 class="text-2xl font-bold text-body mb-6 text-center">Welcome back</h1>
+
         <div v-if="status" class="mb-4 font-medium text-sm text-success">
             {{ status }}
         </div>
 
-        <form @submit.prevent="submit">
+        <form @submit.prevent="submit" class="space-y-4">
             <TextField
                 id="email"
                 v-model="form.email"
@@ -55,29 +57,32 @@ const submit = () => {
                 :error="form.errors.password"
                 required
                 autocomplete="current-password"
-                class="mt-4"
             />
 
-            <div class="block mt-4">
-                <label class="flex items-center">
+            <div class="flex items-center justify-between">
+                <label class="flex items-center gap-2 cursor-pointer">
                     <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-sm text-gray-600">Remember me</span>
+                    <span class="text-sm text-muted">Remember me</span>
                 </label>
-            </div>
-
-            <div class="flex items-center justify-end mt-4">
                 <Link
                     v-if="canResetPassword"
                     :href="route('password.request')"
-                    class="underline text-sm text-primary hover:text-warning rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-warning"
+                    class="text-sm text-warning hover:text-body transition-colors"
                 >
-                    Forgot your password?
+                    Forgot password?
                 </Link>
-
-                <Button type="submit" variant="primary" class="ms-4" :disabled="form.processing">
-                    Log in
-                </Button>
             </div>
+
+            <Button type="submit" variant="primary" size="lg" class="w-full" :disabled="form.processing">
+                Log in
+            </Button>
         </form>
+
+        <p class="mt-6 text-center text-sm text-muted">
+            Don't have an account?
+            <Link :href="route('register')" class="text-primary hover:text-body transition-colors font-medium">
+                Sign up
+            </Link>
+        </p>
     </GuestLayout>
 </template>

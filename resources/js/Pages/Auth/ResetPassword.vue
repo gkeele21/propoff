@@ -33,7 +33,9 @@ const submit = () => {
     <GuestLayout>
         <Head title="Reset Password" />
 
-        <form @submit.prevent="submit">
+        <h1 class="text-2xl font-bold text-body mb-6 text-center">Reset your password</h1>
+
+        <form @submit.prevent="submit" class="space-y-4">
             <TextField
                 id="email"
                 v-model="form.email"
@@ -49,29 +51,25 @@ const submit = () => {
                 id="password"
                 v-model="form.password"
                 type="password"
-                label="Password"
+                label="New Password"
                 :error="form.errors.password"
                 required
                 autocomplete="new-password"
-                class="mt-4"
             />
 
             <TextField
                 id="password_confirmation"
                 v-model="form.password_confirmation"
                 type="password"
-                label="Confirm Password"
+                label="Confirm New Password"
                 :error="form.errors.password_confirmation"
                 required
                 autocomplete="new-password"
-                class="mt-4"
             />
 
-            <div class="flex items-center justify-end mt-4">
-                <Button variant="primary" :disabled="form.processing">
-                    Reset Password
-                </Button>
-            </div>
+            <Button type="submit" variant="primary" size="lg" class="w-full" :disabled="form.processing">
+                Reset Password
+            </Button>
         </form>
     </GuestLayout>
 </template>

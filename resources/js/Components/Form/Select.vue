@@ -75,7 +75,7 @@ const shouldBeFullWidth = computed(() => !props.autoWidth);
 
 // Arrow color based on variant
 const arrowStyle = computed(() => {
-    const color = props.variant === 'outline-light' ? 'white' : '%23374151'; // %23 = # for URL encoding (gray-700)
+    const color = props.variant === 'outline-light' ? 'white' : '%23a3a3a3'; // %23 = # for URL encoding (muted gray for dark mode)
     const svg = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='${color}' d='M5 6L0 0h10z'/%3E%3C/svg%3E")`;
     return {
         backgroundImage: svg,
@@ -86,17 +86,17 @@ const arrowStyle = computed(() => {
 
 const variantClasses = computed(() => {
     if (props.error) {
-        return 'border-danger focus:border-danger focus:ring-danger bg-white';
+        return 'border-danger focus:border-danger focus:ring-danger bg-surface-elevated text-body';
     }
 
     switch (props.variant) {
         case 'outline-light':
             // For dark backgrounds (e.g., primary header)
-            return 'bg-transparent text-white border-white focus:ring-white/50 [&>option]:text-body';
+            return 'bg-transparent text-white border-white focus:ring-white/50 [&>option]:text-black [&>option]:bg-white';
         default:
             return props.disabled
-                ? 'bg-surface border-border focus:border-primary focus:ring-primary'
-                : 'bg-white border-border focus:border-primary focus:ring-primary';
+                ? 'bg-surface border-border focus:border-primary focus:ring-primary text-muted'
+                : 'bg-surface-elevated border-border focus:border-primary focus:ring-primary text-body';
     }
 });
 

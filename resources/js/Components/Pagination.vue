@@ -1,9 +1,9 @@
 <template>
-    <div v-if="data.data && data.data.length > 0" class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+    <div v-if="data.data && data.data.length > 0" class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
         <div class="p-6">
             <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-700">
-                    Showing <span class="font-medium">{{ data.from }}</span> to <span class="font-medium">{{ data.to }}</span> of <span class="font-medium">{{ data.total }}</span> {{ itemName }}
+                <div class="text-sm text-muted">
+                    Showing <span class="font-medium text-body">{{ data.from }}</span> to <span class="font-medium text-body">{{ data.to }}</span> of <span class="font-medium text-body">{{ data.total }}</span> {{ itemName }}
                 </div>
                 <div class="flex items-center space-x-2">
                     <Link
@@ -15,8 +15,8 @@
                             link.active
                                 ? 'bg-primary text-white'
                                 : link.url
-                                    ? 'text-gray-700 hover:bg-gray-100'
-                                    : 'text-gray-400 cursor-not-allowed'
+                                    ? 'text-body hover:bg-surface-overlay'
+                                    : 'text-subtle cursor-not-allowed'
                         ]"
                         :preserve-state="preserveState"
                         :preserve-scroll="preserveScroll"

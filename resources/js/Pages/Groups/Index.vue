@@ -43,7 +43,7 @@ const joinGroup = () => {
                 <template #actions>
                     <button
                         @click="showJoinModal = true"
-                        class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700"
+                        class="inline-flex items-center px-4 py-2 bg-surface-elevated border border-border rounded-md font-semibold text-xs text-body uppercase tracking-widest hover:bg-surface-overlay"
                     >
                         Join Group
                     </button>
@@ -60,11 +60,11 @@ const joinGroup = () => {
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 <!-- My Groups -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">My Groups</h3>
+                        <h3 class="text-lg font-semibold text-body mb-4">My Groups</h3>
 
-                        <div v-if="userGroups.length === 0" class="text-center py-8 text-gray-500">
+                        <div v-if="userGroups.length === 0" class="text-center py-8 text-muted">
                             You're not a member of any groups yet.
                         </div>
 
@@ -73,14 +73,14 @@ const joinGroup = () => {
                                 v-for="group in userGroups"
                                 :key="group.id"
                                 :href="route('groups.show', group.id)"
-                                class="border rounded-lg p-4 hover:shadow-md transition"
+                                class="border border-border rounded-lg p-4 hover:shadow-md hover:bg-surface-elevated transition"
                             >
                                 <div class="flex items-start gap-3">
                                     <UserGroupIcon class="w-8 h-8 text-warning flex-shrink-0" />
                                     <div class="flex-1 min-w-0">
-                                        <h4 class="font-semibold text-gray-900 truncate">{{ group.name }}</h4>
-                                        <p class="text-sm text-gray-600 mt-1 line-clamp-2">{{ group.description }}</p>
-                                        <div class="mt-2 flex items-center text-sm text-gray-500">
+                                        <h4 class="font-semibold text-body truncate">{{ group.name }}</h4>
+                                        <p class="text-sm text-muted mt-1 line-clamp-2">{{ group.description }}</p>
+                                        <div class="mt-2 flex items-center text-sm text-subtle">
                                             <span>{{ group.users_count }} members</span>
                                             <span class="mx-2">•</span>
                                             <span class="font-mono text-xs">{{ group.code }}</span>
@@ -93,11 +93,11 @@ const joinGroup = () => {
                 </div>
 
                 <!-- Public Groups -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Public Groups</h3>
+                        <h3 class="text-lg font-semibold text-body mb-4">Public Groups</h3>
 
-                        <div v-if="publicGroups.length === 0" class="text-center py-8 text-gray-500">
+                        <div v-if="publicGroups.length === 0" class="text-center py-8 text-muted">
                             No public groups available.
                         </div>
 
@@ -105,14 +105,14 @@ const joinGroup = () => {
                             <div
                                 v-for="group in publicGroups"
                                 :key="group.id"
-                                class="border rounded-lg p-4 hover:shadow-md transition"
+                                class="border border-border rounded-lg p-4 hover:shadow-md hover:bg-surface-elevated transition"
                             >
                                 <div class="flex items-start gap-3">
-                                    <UserGroupIcon class="w-8 h-8 text-gray-400 flex-shrink-0" />
+                                    <UserGroupIcon class="w-8 h-8 text-muted flex-shrink-0" />
                                     <div class="flex-1 min-w-0">
-                                        <h4 class="font-semibold text-gray-900 truncate">{{ group.name }}</h4>
-                                        <p class="text-sm text-gray-600 mt-1 line-clamp-2">{{ group.description }}</p>
-                                        <div class="mt-2 text-sm text-gray-500">
+                                        <h4 class="font-semibold text-body truncate">{{ group.name }}</h4>
+                                        <p class="text-sm text-muted mt-1 line-clamp-2">{{ group.description }}</p>
+                                        <div class="mt-2 text-sm text-subtle">
                                             {{ group.users_count }} members
                                         </div>
                                         <Link
@@ -133,11 +133,11 @@ const joinGroup = () => {
         <!-- Join Group Modal -->
         <div
             v-if="showJoinModal"
-            class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50"
+            class="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
             @click.self="showJoinModal = false"
         >
-            <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Join a Group</h3>
+            <div class="bg-surface-elevated rounded-lg p-6 max-w-md w-full mx-4 border border-border">
+                <h3 class="text-lg font-semibold text-body mb-4">Join a Group</h3>
                 <form @submit.prevent="joinGroup">
                     <div class="mb-4">
                         <TextField
@@ -149,7 +149,7 @@ const joinGroup = () => {
                             required
                             autofocus
                         />
-                        <p class="mt-1 text-sm text-gray-500">
+                        <p class="mt-1 text-sm text-muted">
                             Enter the group code provided by the group creator
                         </p>
                     </div>
@@ -157,7 +157,7 @@ const joinGroup = () => {
                         <button
                             type="button"
                             @click="showJoinModal = false"
-                            class="px-4 py-2 text-gray-700 hover:text-gray-900"
+                            class="px-4 py-2 text-muted hover:text-body"
                         >
                             Cancel
                         </button>

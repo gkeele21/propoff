@@ -23,15 +23,15 @@
         <div class="py-12">
             <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
                 <!-- Success Message -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border mb-6">
                     <div class="p-6 text-center">
-                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div class="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
                             <CheckCircleIcon class="w-10 h-10 text-success" />
                         </div>
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">
+                        <h3 class="text-2xl font-bold text-body mb-2">
                             Entry Complete!
                         </h3>
-                        <p class="text-gray-600 mb-4">
+                        <p class="text-muted mb-4">
                             Your answers for <strong>{{ event.name }}</strong> have been submitted successfully.
                         </p>
 
@@ -41,7 +41,7 @@
                                 <div class="text-4xl font-bold text-primary">
                                     {{ entry.percentage }}%
                                 </div>
-                                <div class="text-sm text-gray-600">
+                                <div class="text-sm text-muted">
                                     {{ entry.total_score }} {{ entry.total_score === 1 ? 'point' : 'points' }}
                                 </div>
                             </div>
@@ -62,12 +62,12 @@
                                     This is your personal results link. Save it now to view your results anytime without logging in!
                                 </p>
                                 
-                                <div class="bg-white border-2 border-yellow-400 rounded-lg p-4">
+                                <div class="bg-surface-elevated border-2 border-warning rounded-lg p-4">
                                     <div class="flex items-center gap-2 mb-2">
                                         <input
                                             :value="personalLink"
                                             readonly
-                                            class="flex-1 text-sm bg-gray-50 border border-gray-300 rounded px-3 py-2 font-mono"
+                                            class="flex-1 text-sm bg-surface border border-border rounded px-3 py-2 font-mono text-body"
                                         />
                                         <button
                                             @click="copyPersonalLink"
@@ -77,8 +77,8 @@
                                             {{ linkCopied ? 'Copied!' : 'Copy Link' }}
                                         </button>
                                     </div>
-                                    
-                                    <div class="text-xs text-gray-600 space-y-1">
+
+                                    <div class="text-xs text-muted space-y-1">
                                         <p>📧 Email this link to yourself</p>
                                         <p>📋 Save it in your notes</p>
                                         <p>🔖 Bookmark this page</p>
@@ -90,10 +90,10 @@
                 </div>
 
                 <!-- Actions -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-6">
-                        <h4 class="font-semibold text-gray-900 mb-4">What's Next?</h4>
-                        
+                        <h4 class="font-semibold text-body mb-4">What's Next?</h4>
+
                         <div class="space-y-3">
                             <Link
                                 v-if="personalLink"
@@ -102,17 +102,17 @@
                             >
                                 View My Results
                             </Link>
-                            
+
                             <Link
                                 :href="route('groups.leaderboard', group.id)"
                                 class="block w-full px-4 py-3 bg-success text-white text-center rounded-lg hover:bg-success/80 font-semibold"
                             >
                                 View {{ group.name }} Leaderboard
                             </Link>
-                            
+
                             <Link
                                 :href="route('dashboard')"
-                                class="block w-full px-4 py-3 bg-gray-600 text-white text-center rounded-lg hover:bg-gray-700 font-semibold"
+                                class="block w-full px-4 py-3 bg-surface-elevated text-body text-center rounded-lg hover:bg-surface-overlay font-semibold border border-border"
                             >
                                 Back to Dashboard
                             </Link>
@@ -121,7 +121,7 @@
                 </div>
 
                 <!-- Reminder -->
-                <div v-if="personalLink" class="mt-6 text-center text-sm text-gray-600">
+                <div v-if="personalLink" class="mt-6 text-center text-sm text-muted">
                     <p>💡 Don't forget to save your personal results link above!</p>
                 </div>
             </div>

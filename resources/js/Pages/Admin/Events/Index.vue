@@ -36,25 +36,15 @@ const formatDate = (dateString) => {
 
 const getStatusVariant = (status) => {
     const variants = {
-        'draft': 'secondary',
-        'open': 'success',
-        'locked': 'warning',
-        'in_progress': 'info',
-        'completed': 'success',
+        'draft': 'default',
+        'open': 'success-soft',
+        'locked': 'warning-soft',
+        'in_progress': 'primary-soft',
+        'completed': 'success-soft',
     };
-    return variants[status] || 'secondary';
+    return variants[status] || 'default';
 };
 
-const getBorderColor = (status) => {
-    const colors = {
-        'draft': 'border-gray-dark',
-        'open': 'border-success',
-        'locked': 'border-warning',
-        'in_progress': 'border-primary',
-        'completed': 'border-success',
-    };
-    return colors[status] || 'border-gray-light';
-};
 </script>
 
 <template>
@@ -83,7 +73,7 @@ const getBorderColor = (status) => {
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <!-- Filters -->
-                <div class="bg-white shadow-sm sm:rounded-lg mb-6">
+                <div class="bg-surface shadow-sm sm:rounded-lg mb-6 border border-border">
                     <div class="p-6">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div class="col-span-2">
@@ -96,7 +86,7 @@ const getBorderColor = (status) => {
                                     @input="filterEvents"
                                     type="text"
                                     placeholder="Search events..."
-                                    class="w-full border-border rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
+                                    class="w-full bg-surface-elevated border-border text-body placeholder-subtle rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
                                 />
                             </div>
                             <div>
@@ -107,7 +97,7 @@ const getBorderColor = (status) => {
                                 <select
                                     v-model="statusFilter"
                                     @change="filterEvents"
-                                    class="w-full border-border rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
+                                    class="w-full bg-surface-elevated border-border text-body rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
                                 >
                                     <option value="all">All Statuses</option>
                                     <option value="draft">Draft</option>
@@ -121,29 +111,38 @@ const getBorderColor = (status) => {
                 </div>
 
                 <!-- Events List -->
-                <div v-if="events.data.length === 0" class="text-center py-12 bg-white rounded-lg shadow-sm">
-                    <p class="text-gray-500">No events found.</p>
+                <div v-if="events.data.length === 0" class="text-center py-12 bg-surface rounded-lg shadow-sm border border-border">
+                    <p class="text-muted">No events found.</p>
                 </div>
 
-                <div v-else class="space-y-4">
+                <div v-else class="bg-surface rounded-lg border border-border shadow-sm overflow-hidden">
                             <Link
-                                v-for="event in events.data"
+                                v-for="(event, index) in events.data"
                                 :key="event.id"
                                 :href="route('admin.events.show', event.id)"
                                 class="block"
                             >
                                 <div
-                                    class="bg-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer border-l-4 shadow-sm"
-                                    :class="getBorderColor(event.status)"
+                                    class="hover:bg-surface-elevated transition-all duration-200 cursor-pointer"
+                                    :class="index !== events.data.length - 1 ? 'border-b border-border' : ''"
                                 >
                                     <div class="p-6">
-                                        <div class="flex items-start gap-3 mb-3">
-                                            <h3 class="text-xl font-semibold text-body flex-1">
-                                                {{ event.name }}
-                                            </h3>
-                                            <Badge :variant="getStatusVariant(event.status)">
-                                                {{ event.status }}
-                                            </Badge>
+                                        <div class="flex items-start justify-between gap-3 mb-3">
+                                            <div class="flex items-center gap-3">
+                                                <h3 class="text-xl font-semibold text-body">
+                                                    {{ event.name }}
+                                                </h3>
+                                                <Badge :variant="getStatusVariant(event.status)">
+                                                    {{ event.status }}
+                                                </Badge>
+                                            </div>
+                                            <Link
+                                                :href="route('admin.events.edit', event.id)"
+                                                class="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                                                @click.stop
+                                            >
+                                                Edit
+                                            </Link>
                                         </div>
 
                                         <p v-if="event.description" class="text-subtle mb-4 line-clamp-2">
@@ -184,8 +183,8 @@ const getBorderColor = (status) => {
                             class="relative inline-flex items-center px-4 py-2 border border-border text-sm font-medium"
                             :class="{
                                 'bg-primary/10 border-primary text-primary': link.active,
-                                'bg-white text-body hover:bg-surface': !link.active && link.url,
-                                'bg-surface text-muted cursor-not-allowed': !link.url,
+                                'bg-surface text-body hover:bg-surface-elevated': !link.active && link.url,
+                                'bg-surface-elevated text-muted cursor-not-allowed': !link.url,
                                 'rounded-l-md': index === 0,
                                 'rounded-r-md': index === events.links.length - 1,
                             }"

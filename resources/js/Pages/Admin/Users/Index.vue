@@ -104,7 +104,7 @@ const formatDate = (dateString) => {
                     </button>
                     <button
                         @click="exportCSV"
-                        class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50"
+                        class="inline-flex items-center px-4 py-2 bg-surface-elevated border border-border rounded-md font-semibold text-xs text-body uppercase tracking-widest hover:bg-surface-overlay"
                     >
                         <DocumentArrowDownIcon class="w-4 h-4 mr-2" />
                         Export CSV
@@ -116,11 +116,11 @@ const formatDate = (dateString) => {
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <!-- Filters -->
-                <div class="bg-white shadow-sm sm:rounded-lg mb-6">
+                <div class="bg-surface shadow-sm sm:rounded-lg mb-6 border border-border">
                     <div class="p-6">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div class="col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <label class="block text-sm font-medium text-body mb-2">
                                     <MagnifyingGlassIcon class="w-4 h-4 inline mr-1" />
                                     Search
                                 </label>
@@ -129,18 +129,18 @@ const formatDate = (dateString) => {
                                     @input="filterUsers"
                                     type="text"
                                     placeholder="Search by name or email..."
-                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
+                                    class="w-full bg-surface-elevated border-border text-body placeholder-muted rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
                                 />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <label class="block text-sm font-medium text-body mb-2">
                                     <FunnelIcon class="w-4 h-4 inline mr-1" />
                                     Role
                                 </label>
                                 <select
                                     v-model="roleFilter"
                                     @change="filterUsers"
-                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
+                                    class="w-full bg-surface-elevated border-border text-body rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
                                 >
                                     <option value="all">All Roles</option>
                                     <option value="admin">Admin</option>
@@ -152,80 +152,80 @@ const formatDate = (dateString) => {
                 </div>
 
                 <!-- Users Table -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                        <table class="min-w-full divide-y divide-border">
+                            <thead class="bg-surface-elevated">
                                 <tr>
                                     <th class="px-6 py-3 text-left">
                                         <input
                                             type="checkbox"
                                             @change="toggleSelectAll"
                                             :checked="selectedUsers.length === users.data.length && users.data.length > 0"
-                                            class="rounded border-gray-300 text-primary shadow-sm focus:border-primary focus:ring focus:ring-primary/50 focus:ring-opacity-50"
+                                            class="rounded border-border text-primary shadow-sm focus:border-primary focus:ring focus:ring-primary/50 focus:ring-opacity-50"
                                         />
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-subtle uppercase tracking-wider">
                                         Name
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-subtle uppercase tracking-wider">
                                         Email
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-subtle uppercase tracking-wider">
                                         Role
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-subtle uppercase tracking-wider">
                                         Entries
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-subtle uppercase tracking-wider">
                                         Groups
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-subtle uppercase tracking-wider">
                                         Joined
                                     </th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-subtle uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="user in users.data" :key="user.id" class="hover:bg-gray-50">
+                            <tbody class="bg-surface divide-y divide-border">
+                                <tr v-for="user in users.data" :key="user.id" class="hover:bg-surface-elevated">
                                     <td class="px-6 py-4">
                                         <input
                                             v-model="selectedUsers"
                                             :value="user.id"
                                             type="checkbox"
-                                            class="rounded border-gray-300 text-primary shadow-sm focus:border-primary focus:ring focus:ring-primary/50 focus:ring-opacity-50"
+                                            class="rounded border-border text-primary shadow-sm focus:border-primary focus:ring focus:ring-primary/50 focus:ring-opacity-50"
                                         />
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <Link
                                             :href="route('admin.users.show', user.id)"
-                                            class="text-sm font-medium text-gray-900 hover:text-primary/80"
+                                            class="text-sm font-medium text-body hover:text-primary/80"
                                         >
                                             {{ user.name }}
                                         </Link>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">
                                         {{ user.email }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <select
                                             :value="user.role"
                                             @change="updateRole(user, $event.target.value)"
-                                            class="text-sm border-gray-300 rounded-md"
+                                            class="text-sm bg-surface-elevated border-border text-body rounded-md"
                                         >
                                             <option value="user">User</option>
                                             <option value="admin">Admin</option>
                                         </select>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">
                                         {{ user.entries_count }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">
                                         {{ user.groups_count }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">
                                         {{ formatDate(user.created_at) }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -244,7 +244,7 @@ const formatDate = (dateString) => {
                                     </td>
                                 </tr>
                                 <tr v-if="users.data.length === 0">
-                                    <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+                                    <td colspan="8" class="px-6 py-12 text-center text-muted">
                                         No users found
                                     </td>
                                 </tr>
@@ -253,7 +253,7 @@ const formatDate = (dateString) => {
                     </div>
 
                     <!-- Pagination -->
-                    <div v-if="users.links.length > 3" class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                    <div v-if="users.links.length > 3" class="bg-surface px-4 py-3 border-t border-border sm:px-6">
                         <div class="flex justify-center">
                             <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                                 <component
@@ -261,11 +261,11 @@ const formatDate = (dateString) => {
                                     :key="index"
                                     :is="link.url ? Link : 'span'"
                                     :href="link.url"
-                                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium"
+                                    class="relative inline-flex items-center px-4 py-2 border border-border text-sm font-medium"
                                     :class="{
                                         'bg-primary/10 border-primary text-primary': link.active,
-                                        'bg-white text-gray-700 hover:bg-gray-50': !link.active && link.url,
-                                        'bg-gray-100 text-gray-400 cursor-not-allowed': !link.url,
+                                        'bg-surface text-body hover:bg-surface-elevated': !link.active && link.url,
+                                        'bg-surface-elevated text-muted cursor-not-allowed': !link.url,
                                         'rounded-l-md': index === 0,
                                         'rounded-r-md': index === users.links.length - 1,
                                     }"

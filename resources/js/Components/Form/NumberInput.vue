@@ -49,16 +49,17 @@ function handleInput(event) {
             :aria-describedby="descriptionId"
             :aria-invalid="!!error"
             :class="[
-                'w-full px-3 py-2 border rounded transition-colors',
+                'w-full px-4 py-2 border rounded-lg transition-colors',
                 'focus:outline-none focus:ring-1',
+                'bg-surface-inset text-body placeholder:text-muted',
                 error
                     ? 'border-danger focus:border-danger focus:ring-danger'
                     : 'border-border focus:border-primary focus:ring-primary',
-                disabled ? 'bg-surface cursor-not-allowed text-muted' : 'bg-white text-body'
+                disabled ? 'opacity-50 cursor-not-allowed' : ''
             ]"
         />
 
         <p v-if="errorMessage" :id="descriptionId" class="mt-1 text-sm text-danger">{{ errorMessage }}</p>
-        <p v-else-if="hint" :id="descriptionId" class="mt-1 text-sm text-subtle">{{ hint }}</p>
+        <p v-else-if="hint" :id="descriptionId" class="mt-1 text-sm text-muted">{{ hint }}</p>
     </div>
 </template>

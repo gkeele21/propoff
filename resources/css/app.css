@@ -1,3 +1,129 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    /*
+     * PropOff Theme System
+     *
+     * Colors are defined as RGB triplets (e.g., "87 208 37") so they work with
+     * Tailwind's opacity modifiers: bg-primary/50, text-primary/80, etc.
+     *
+     * Usage in Tailwind: rgb(var(--color-primary) / <alpha-value>)
+     */
+
+    :root {
+        /* ========================================
+         * Dark Mode Base Colors (Slate + Black Accents)
+         * ======================================== */
+
+        /* Backgrounds - layered surface hierarchy */
+        --color-bg: 64 64 64;              /* #404040 - page background (slate) */
+        --color-surface: 31 31 31;         /* #1f1f1f - cards, panels */
+        --color-surface-elevated: 38 38 38; /* #262626 - question items, elevated content */
+        --color-surface-overlay: 51 51 51;  /* #333333 - hover states on surfaces */
+        --color-surface-inset: 15 15 15;   /* #0f0f0f - stats, answers, buttons (black accent) */
+        --color-surface-header: 23 23 23;  /* #171717 - card headers */
+
+        /* Text */
+        --color-text: 245 245 245;         /* #f5f5f5 - primary text */
+        --color-text-muted: 163 163 163;   /* #a3a3a3 - secondary text */
+        --color-text-subtle: 115 115 115;  /* #737373 - disabled, hints */
+
+        /* Borders */
+        --color-border: 64 64 64;          /* #404040 - default borders */
+        --color-border-strong: 82 82 82;   /* #525252 - emphasized borders */
+
+        /* ========================================
+         * Semantic Colors (consistent across themes)
+         * ======================================== */
+        --color-success: 87 208 37;        /* #57d025 - positive states */
+        --color-warning: 244 118 18;       /* #f47612 - caution states */
+        --color-danger: 239 68 68;         /* #ef4444 - errors, destructive */
+        --color-info: 59 130 246;          /* #3b82f6 - informational, templates */
+
+        /* ========================================
+         * Theme-Adaptive Primary Color
+         * Default: Green (can be overridden by theme classes)
+         * ======================================== */
+        --color-primary: 87 208 37;        /* #57d025 */
+        --color-primary-hover: 77 184 32;  /* slightly darker for hover */
+    }
+
+    /* ========================================
+     * Base Styles
+     * ======================================== */
+
+    html {
+        background-color: rgb(var(--color-bg));
+        color: rgb(var(--color-text));
+    }
+
+    body {
+        background-color: rgb(var(--color-bg));
+    }
+}
+
+@layer components {
+    /*
+     * Component-level utility classes that use theme variables
+     * These provide semantic shortcuts for common patterns
+     */
+
+    .bg-surface-base {
+        background-color: rgb(var(--color-bg));
+    }
+
+    .bg-surface-card {
+        background-color: rgb(var(--color-surface));
+    }
+
+    .bg-surface-elevated {
+        background-color: rgb(var(--color-surface-elevated));
+    }
+
+    .border-themed {
+        border-color: rgb(var(--color-border));
+    }
+
+    .text-themed {
+        color: rgb(var(--color-text));
+    }
+
+    .text-themed-muted {
+        color: rgb(var(--color-text-muted));
+    }
+}
+
+/* ========================================
+ * Theme Variants (outside @layer for proper cascade)
+ * Apply to <html> element via useTheme composable
+ * ======================================== */
+
+.theme-green {
+    --color-primary: 87 208 37;        /* #57d025 */
+    --color-primary-hover: 77 184 32;
+}
+
+.theme-blue {
+    --color-primary: 59 130 246;       /* #3b82f6 */
+    --color-primary-hover: 37 99 235;  /* #2563eb */
+}
+
+.theme-orange {
+    --color-primary: 244 118 18;       /* #f47612 */
+    --color-primary-hover: 234 88 12;  /* #ea580c */
+}
+
+/* ========================================
+ * Background Mode Variants
+ * Apply to <html> element via useTheme composable
+ * ======================================== */
+
+.bg-mode-slate {
+    /* Default - no overrides needed, uses :root values */
+}
+
+.bg-mode-cream {
+    --color-bg: 245 243 239;           /* #f5f3ef - warm off-white */
+}

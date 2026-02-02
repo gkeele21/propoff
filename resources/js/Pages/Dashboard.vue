@@ -55,12 +55,12 @@ const getOrdinal = (num) => {
 
 const getStatusColor = (status) => {
     const colors = {
-        'draft': 'bg-gray-100 text-gray-800',
+        'draft': 'bg-surface-overlay text-muted',
         'open': 'bg-success/20 text-success',
         'locked': 'bg-warning/20 text-warning',
         'completed': 'bg-success/20 text-success',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'bg-surface-overlay text-muted';
 };
 
 const copyJoinCode = (code) => {
@@ -85,7 +85,7 @@ const copyMagicLink = (link) => {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            <h2 class="font-semibold text-xl text-body leading-tight">
                 Dashboard
             </h2>
         </template>
@@ -94,14 +94,14 @@ const copyMagicLink = (link) => {
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
                 <!-- Welcome Message -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-6">
-                        <h3 class="text-2xl font-bold text-gray-900">
+                        <h3 class="text-2xl font-bold text-body">
                             Welcome back, {{ $page.props.auth.user.name }}!
                             <span v-if="isAdmin" class="ml-2 text-sm bg-danger/20 text-danger px-3 py-1 rounded-full">Admin</span>
                             <span v-else-if="isCaptain" class="ml-2 text-sm bg-warning/20 text-warning px-3 py-1 rounded-full">Captain</span>
                         </h3>
-                        <p class="mt-2 text-gray-600">
+                        <p class="mt-2 text-muted">
                             <span v-if="isAdmin">Manage your system and play events</span>
                             <span v-else-if="isCaptain">Manage your groups and play events</span>
                             <span v-else>Here's what's happening with your events</span>
@@ -231,10 +231,10 @@ const copyMagicLink = (link) => {
 
 
                 <!-- My Groups Section -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-6">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-semibold text-gray-900">
+                            <h3 class="text-lg font-semibold text-body">
                                 My Groups
                             </h3>
                             <button
@@ -246,8 +246,8 @@ const copyMagicLink = (link) => {
                         </div>
 
                         <div v-if="userGroups.length === 0" class="text-center py-12">
-                            <UserGroupIcon class="mx-auto h-12 w-12 text-gray-400" />
-                            <p class="mt-2 text-sm text-gray-500">You haven't joined any groups yet</p>
+                            <UserGroupIcon class="mx-auto h-12 w-12 text-subtle" />
+                            <p class="mt-2 text-sm text-muted">You haven't joined any groups yet</p>
                             <button
                                 @click="showJoinGroupModal = true"
                                 class="mt-4 text-sm text-primary hover:text-primary/80 font-semibold"
@@ -260,7 +260,7 @@ const copyMagicLink = (link) => {
                             <div
                                 v-for="group in userGroups"
                                 :key="group.id"
-                                class="border border-gray-200 p-4 rounded-lg hover:shadow-md transition"
+                                class="border border-border bg-surface-elevated p-4 rounded-lg hover:shadow-md transition"
                             >
                                 <!-- Group Header -->
                                 <div class="flex justify-between items-start mb-3">
@@ -274,21 +274,21 @@ const copyMagicLink = (link) => {
                                                 CAPTAIN
                                             </span>
                                         </h4>
-                                        <p class="text-sm text-gray-600">{{ group.event.name }}</p>
+                                        <p class="text-sm text-muted">{{ group.event.name }}</p>
                                         <div class="flex items-center gap-4 mt-1">
                                             <span :class="getStatusColor(group.event.status)" class="text-xs px-2 py-1 rounded">
                                                 {{ group.event.status }}
                                             </span>
-                                            <span class="text-xs text-gray-500">
+                                            <span class="text-xs text-muted">
                                                 {{ group.members_count }} members
                                             </span>
                                         </div>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-xs text-gray-500">Join Code</p>
+                                        <p class="text-xs text-muted">Join Code</p>
                                         <button
                                             @click="copyJoinCode(group.code)"
-                                            class="font-mono text-sm font-semibold text-gray-900 hover:text-primary"
+                                            class="font-mono text-sm font-semibold text-body hover:text-primary"
                                         >
                                             {{ group.code }}
                                         </button>
@@ -296,7 +296,7 @@ const copyMagicLink = (link) => {
                                 </div>
 
                                 <!-- Group Actions -->
-                                <div class="mt-3 pt-3 border-t border-gray-200 flex gap-3 flex-wrap">
+                                <div class="mt-3 pt-3 border-t border-border flex gap-3 flex-wrap">
                                     <!-- Smart button based on entry status -->
                                     <button
                                         v-if="group.user_entry && group.user_entry.status === 'in_progress'"
@@ -402,10 +402,10 @@ const copyMagicLink = (link) => {
                 </div> -->
 
                 <!-- Recent Entries Section -->
-                <div v-if="recentResults.length > 0" class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div v-if="recentResults.length > 0" class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-6">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-semibold text-gray-900">Recent Entries</h3>
+                            <h3 class="text-lg font-semibold text-body">Recent Entries</h3>
                             <Link
                                 :href="route('entries.index')"
                                 class="text-sm text-primary hover:text-primary/80"
@@ -415,20 +415,20 @@ const copyMagicLink = (link) => {
                         </div>
 
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                            <table class="min-w-full divide-y divide-border">
+                                <thead class="bg-surface-elevated">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Event</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Group</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rank</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Score</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Max</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pct</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Event</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Group</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Rank</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Score</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Max</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Pct</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Submitted</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="result in recentResults" :key="result.id" class="hover:bg-gray-50">
+                                <tbody class="bg-surface divide-y divide-border">
+                                    <tr v-for="result in recentResults" :key="result.id" class="hover:bg-surface-elevated">
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <Link
                                                 :href="route('entries.show', result.id)"
@@ -437,22 +437,22 @@ const copyMagicLink = (link) => {
                                                 {{ result.event.name }}
                                             </Link>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">
                                             {{ result.group.name }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-body">
                                             {{ result.rank ? getOrdinal(result.rank) : '-' }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-body">
                                             {{ result.total_score }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">
                                             {{ result.possible_points }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-body">
                                             {{ result.percentage }}%
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">
                                             {{ formatDate(result.submitted_at) }}
                                         </td>
                                     </tr>
@@ -471,22 +471,22 @@ const copyMagicLink = (link) => {
         <!-- Join Group Modal -->
         <div
             v-if="showJoinGroupModal"
-            class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+            class="fixed inset-0 bg-black/80 overflow-y-auto h-full w-full z-50"
             @click.self="showJoinGroupModal = false"
         >
-            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="relative top-20 mx-auto p-5 border border-border w-96 shadow-lg rounded-md bg-surface-elevated">
                 <div class="mt-3">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Join a Group</h3>
+                    <h3 class="text-lg font-semibold text-body mb-4">Join a Group</h3>
                     <form @submit.prevent="joinGroup">
                         <div class="mb-4">
-                            <label for="join-code" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="join-code" class="block text-sm font-medium text-body mb-2">
                                 Enter Join Code
                             </label>
                             <input
                                 id="join-code"
                                 v-model="joinGroupForm.code"
                                 type="text"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary/50 focus:border-primary uppercase font-mono"
+                                class="w-full px-3 py-2 bg-surface border border-border text-body rounded-md shadow-sm focus:outline-none focus:ring-primary/50 focus:border-primary uppercase font-mono"
                                 placeholder="ABCD1234"
                                 required
                                 autofocus
@@ -499,7 +499,7 @@ const copyMagicLink = (link) => {
                             <button
                                 type="button"
                                 @click="showJoinGroupModal = false"
-                                class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+                                class="px-4 py-2 bg-surface-overlay text-body rounded-md hover:bg-surface"
                             >
                                 Cancel
                             </button>

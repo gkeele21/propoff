@@ -1,10 +1,10 @@
 <template>
-    <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-3">
+    <nav class="flex items-center space-x-2 text-sm text-muted mb-3">
         <template v-for="(crumb, index) in crumbs" :key="index">
             <!-- Separator (not shown for first item) -->
             <svg
                 v-if="index > 0"
-                class="w-4 h-4 text-gray-400"
+                class="w-4 h-4 text-subtle"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -21,14 +21,14 @@
             <Link
                 v-if="crumb.href && index < crumbs.length - 1"
                 :href="crumb.href"
-                class="hover:text-gray-900 transition-colors duration-150"
+                class="hover:text-body transition-colors duration-150"
             >
                 {{ crumb.label }}
             </Link>
             <span
                 v-else
                 class="font-medium"
-                :class="index === crumbs.length - 1 ? 'text-gray-900' : 'text-gray-600'"
+                :class="index === crumbs.length - 1 ? 'text-body' : 'text-muted'"
             >
                 {{ crumb.label }}
             </span>

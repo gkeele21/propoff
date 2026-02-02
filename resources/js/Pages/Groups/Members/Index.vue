@@ -186,7 +186,7 @@ const submitEntryFor = (userId) => {
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span
                                                 v-if="member.is_captain"
-                                                class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-propoff-orange/10 text-propoff-orange"
+                                                class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-warning/10 text-warning"
                                             >
                                                 Captain
                                             </span>
@@ -220,13 +220,13 @@ const submitEntryFor = (userId) => {
                                             <button
                                                 v-if="member.is_captain"
                                                 @click="demoteFromCaptain(member.id)"
-                                                class="text-propoff-orange hover:text-propoff-orange/80 font-semibold"
+                                                class="text-warning hover:text-warning/80 font-semibold"
                                             >
                                                 Demote
                                             </button>
                                             <button
                                                 @click="removeMember(member.id)"
-                                                class="text-propoff-red hover:text-propoff-red/80 font-semibold"
+                                                class="text-danger hover:text-danger/80 font-semibold"
                                             >
                                                 Remove
                                             </button>
@@ -240,16 +240,16 @@ const submitEntryFor = (userId) => {
 
                 <!-- Info Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-propoff-orange/10 border border-propoff-orange/30 rounded-lg p-4">
-                        <h4 class="font-semibold text-propoff-orange mb-2">About Captains</h4>
-                        <p class="text-sm text-propoff-orange">
+                    <div class="bg-warning/10 border border-warning/30 rounded-lg p-4">
+                        <h4 class="font-semibold text-warning mb-2">About Captains</h4>
+                        <p class="text-sm text-warning">
                             Captains have full control over the group, including managing questions, grading, and member management.
                             You can promote multiple members to captain.
                         </p>
                     </div>
-                    <div class="bg-propoff-orange/10 border border-propoff-orange/30 rounded-lg p-4">
-                        <h4 class="font-semibold text-propoff-orange mb-2">⚠️ Note</h4>
-                        <p class="text-sm text-propoff-orange">
+                    <div class="bg-warning/10 border border-warning/30 rounded-lg p-4">
+                        <h4 class="font-semibold text-warning mb-2">⚠️ Note</h4>
+                        <p class="text-sm text-warning">
                             You cannot remove members who have already submitted answers. You also cannot demote the last captain.
                         </p>
                     </div>

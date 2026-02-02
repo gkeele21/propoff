@@ -15,10 +15,11 @@
                 :class="[
                     'flex items-center justify-between w-full rounded border transition-colors text-left',
                     'focus:outline-none focus:ring-1',
+                    'bg-surface-elevated text-body',
                     error
                         ? 'border-danger focus:border-danger focus:ring-danger'
                         : 'border-border focus:border-primary focus:ring-primary',
-                    disabled ? 'bg-surface cursor-not-allowed text-muted' : 'bg-white cursor-pointer',
+                    disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
                     sizes[size]
                 ]"
             >
@@ -45,7 +46,7 @@
                     <div
                         v-if="isOpen"
                         ref="dropdownRef"
-                        class="fixed z-[9999] bg-white border border-border rounded shadow-lg max-h-60 overflow-auto"
+                        class="fixed z-[9999] bg-surface-elevated border border-border rounded shadow-lg max-h-60 overflow-auto"
                         :style="dropdownStyle"
                         @click.stop
                     >
@@ -55,7 +56,7 @@
                                 v-model="searchQuery"
                                 type="text"
                                 placeholder="Search..."
-                                class="w-full px-2 py-1 text-sm border border-border rounded focus:outline-none focus:border-primary bg-white"
+                                class="w-full px-2 py-1 text-sm border border-border rounded focus:outline-none focus:border-primary bg-surface text-body placeholder:text-subtle"
                             />
                         </div>
 

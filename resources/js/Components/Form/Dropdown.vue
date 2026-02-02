@@ -13,7 +13,7 @@
             <div
                 v-if="open"
                 ref="dropdownRef"
-                class="fixed z-[9999] rounded-md shadow-lg bg-white border border-border"
+                class="fixed z-[9999] rounded-md shadow-lg bg-surface-elevated border border-border"
                 :class="widthClass"
                 :style="dropdownStyle"
                 @click="open = false"

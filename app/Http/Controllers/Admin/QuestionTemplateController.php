@@ -55,15 +55,7 @@ class QuestionTemplateController extends Controller
      */
     public function create()
     {
-        // Get existing categories for suggestions
-        $categories = QuestionTemplate::distinct('category')
-            ->pluck('category')
-            ->filter()
-            ->values();
-
-        return Inertia::render('Admin/QuestionTemplates/Create', [
-            'categories' => $categories,
-        ]);
+        return Inertia::render('Admin/QuestionTemplates/TemplateForm');
     }
 
     /**
@@ -134,15 +126,8 @@ class QuestionTemplateController extends Controller
         // Load template answers
         $question_template->load('templateAnswers');
 
-        // Get existing categories for suggestions
-        $categories = QuestionTemplate::distinct('category')
-            ->pluck('category')
-            ->filter()
-            ->values();
-
-        return Inertia::render('Admin/QuestionTemplates/Edit', [
+        return Inertia::render('Admin/QuestionTemplates/TemplateForm', [
             'template' => $question_template,
-            'categories' => $categories,
         ]);
     }
 

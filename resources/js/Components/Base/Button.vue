@@ -33,9 +33,10 @@ const props = defineProps({
 
 const variants = {
     primary: 'bg-primary hover:bg-white text-white hover:text-primary border-2 border-transparent hover:border-primary',  // Blue - main actions
-    secondary: 'bg-secondary hover:bg-white text-white hover:text-secondary border-2 border-transparent hover:border-secondary',  // Gray - secondary actions
+    success: 'bg-success hover:bg-white text-white hover:text-success border-2 border-transparent hover:border-success',  // Green - positive/CTA actions
+    secondary: 'bg-surface-inset hover:bg-surface-header text-body border-2 border-border hover:border-border-strong',  // Dark inset - secondary actions
     accent: 'bg-warning hover:bg-white text-white hover:text-warning border-2 border-transparent hover:border-warning',  // Orange - accent/highlight actions
-    outline: 'bg-white hover:bg-surface text-primary border-2 border-primary',  // White with blue border - cancel/neutral
+    outline: 'bg-transparent hover:bg-surface-elevated text-body border-2 border-border hover:border-border-strong',  // Outline - cancel/neutral
     danger: 'bg-danger hover:bg-white text-white hover:text-danger border-2 border-transparent hover:border-danger',
     neutral: 'bg-black hover:bg-white text-white hover:text-black border-2 border-black hover:border-black',
     ghost: 'bg-transparent hover:bg-surface text-primary border-2 border-transparent',

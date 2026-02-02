@@ -7,17 +7,17 @@
         <div class="flex justify-between items-start">
             <!-- Left side: Title and optional subtitle/metadata -->
             <div class="flex-1 min-w-0">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                <h2 class="font-semibold text-xl text-body leading-tight">
                     {{ title }}
                 </h2>
 
                 <!-- Subtitle text (if provided as prop) -->
-                <p v-if="subtitle" class="text-sm text-gray-600 mt-1">
+                <p v-if="subtitle" class="text-sm text-muted mt-1">
                     {{ subtitle }}
                 </p>
 
                 <!-- Metadata slot for custom content like event status, date, etc. -->
-                <div v-if="$slots.metadata" class="mt-2 text-sm text-gray-600">
+                <div v-if="$slots.metadata" class="mt-2 text-sm text-muted">
                     <slot name="metadata" />
                 </div>
             </div>

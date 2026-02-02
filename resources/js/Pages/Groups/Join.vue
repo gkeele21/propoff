@@ -33,11 +33,11 @@ const formatDate = (dateString) => {
     <Head title="Join Group" />
 
     <GuestLayout>
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div class="w-full sm:max-w-2xl mt-6 px-6 py-8 bg-white shadow-md overflow-hidden sm:rounded-lg">
+        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-bg">
+            <div class="w-full sm:max-w-2xl mt-6 px-6 py-8 bg-surface shadow-md overflow-hidden sm:rounded-lg border border-border">
                 <!-- Group Info -->
-                <div class="mb-8 pb-6 border-b">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Join {{ group.name }}</h2>
+                <div class="mb-8 pb-6 border-b border-border">
+                    <h2 class="text-2xl font-bold text-body mb-2">Join {{ group.name }}</h2>
                     <div class="bg-primary/10 border border-primary/30 rounded-lg p-4 mt-4">
                         <p class="text-sm text-primary font-semibold mb-1">Event</p>
                         <p class="text-lg font-bold text-primary">{{ group.event.name }}</p>
@@ -49,7 +49,7 @@ const formatDate = (dateString) => {
 
                 <!-- Join Form -->
                 <form @submit.prevent="submit">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Your Information</h3>
+                    <h3 class="text-lg font-semibold text-body mb-4">Your Information</h3>
 
                     <div class="mb-4">
                         <TextField

@@ -4,39 +4,76 @@ This file contains project-specific guidance for Claude Code when working on thi
 
 ## Design System
 
+### Theme System
+
+PropOff uses a **dark mode** design with **user-selectable accent colors** (themes) and **background modes**. Colors are defined as CSS variables with RGB triplets to support Tailwind's opacity modifiers.
+
+**Available Themes (accent colors):**
+- `green` (default) - Primary: #57d025
+- `blue` - Primary: #3b82f6
+- `orange` - Primary: #f47612
+
+**Available Background Modes:**
+- `slate` (default) - Page background: #404040
+- `cream` - Page background: #f5f3ef
+
+Classes are applied to `<html>`: `.theme-green`, `.theme-blue`, `.theme-orange`, `.bg-mode-slate`, `.bg-mode-cream`
+
 ### Color Palette (STRICT)
 
 **DO NOT add new colors without explicit user approval.** Use only the following defined colors:
 
-| Name | Hex | Usage |
-|------|-----|-------|
-| `primary` | #1a3490 | Main actions, links, focus states |
-| `secondary` | #525252 | Secondary actions, neutral emphasis |
-| `success` | #57d025 | Positive states, confirmations |
-| `warning` | #f47612 | Caution, attention, accent highlights |
-| `danger` | #af1919 | Errors, destructive actions |
-| `info` | #1a3490 | Informational (same as primary) |
-| `white` | #ffffff | Backgrounds, cards |
-| `black` | #171717 | Primary text, headings |
-| `gray-light` | #a3a3a3 | Borders, disabled states, placeholder text |
-| `gray-dark` | #525252 | Secondary text, icons |
+**Theme-Adaptive Colors** (change with user's theme):
+| Tailwind Class | Usage |
+|----------------|-------|
+| `primary` | Main actions, links, focus states, accent color |
+| `primary-hover` | Hover state for primary |
 
-**UI Semantic Colors:**
-| Name | Hex | Usage |
-|------|-----|-------|
-| `surface` | #f5f5f5 | Subtle backgrounds for forms/sections |
-| `border` | #d4d4d4 | Default border color |
-| `body` | #171717 | Body text |
-| `subtle` | #525252 | Subtle/secondary text |
-| `muted` | #a3a3a3 | Muted elements |
+**Semantic Colors** (consistent across themes):
+| Tailwind Class | Hex | Usage |
+|----------------|-----|-------|
+| `success` | #57d025 | Positive states, confirmations |
+| `warning` | #f47612 | Caution, attention states |
+| `danger` | #ef4444 | Errors, destructive actions |
+| `info` | #3b82f6 | Informational, templates, imports |
+
+**Surface Colors** (dark mode hierarchy - "Slate + Black Accents"):
+| Tailwind Class | Hex | Usage |
+|----------------|-----|-------|
+| `bg` | #404040 | Page background (slate, user-selectable) |
+| `surface` | #1f1f1f | Cards, panels |
+| `surface-elevated` | #262626 | Question items, elevated content |
+| `surface-overlay` | #333333 | Hover states on surfaces |
+| `surface-inset` | #0f0f0f | Stats, answers, buttons (black accent) |
+| `surface-header` | #171717 | Card headers |
+
+**Text Colors:**
+| Tailwind Class | Hex | Usage |
+|----------------|-----|-------|
+| `body` | #f5f5f5 | Primary text |
+| `muted` | #a3a3a3 | Secondary text |
+| `subtle` | #737373 | Disabled, hints |
+
+**Border Colors:**
+| Tailwind Class | Hex | Usage |
+|----------------|-----|-------|
+| `border` | #2e2e2e | Default borders |
+| `border-strong` | #404040 | Emphasized borders |
+
+**Static Colors:**
+| Tailwind Class | Hex | Usage |
+|----------------|-----|-------|
+| `white` | #ffffff | Static white |
+| `black` | #171717 | Static black |
+| `secondary` | #525252 | Neutral gray |
 
 ### Using Color Variations
 
-Use Tailwind's opacity modifiers instead of defining new color variants:
+Use Tailwind's opacity modifiers:
 
 ```html
 <!-- Hover states -->
-<button class="bg-primary hover:bg-primary/80">
+<button class="bg-primary hover:bg-primary-hover">
 
 <!-- Light backgrounds/tints -->
 <div class="bg-primary/10">
@@ -45,7 +82,34 @@ Use Tailwind's opacity modifiers instead of defining new color variants:
 <span class="text-danger/80">
 
 <!-- Borders -->
-<div class="border border-gray-light/50">
+<div class="border border-border">
+```
+
+### Theme Management
+
+Use the `useTheme` composable to manage themes and background modes:
+
+```vue
+<script setup>
+import { useTheme } from '@/composables/useTheme';
+
+const { theme, setTheme, themes, cycleTheme, bgMode, setBgMode, bgModes } = useTheme();
+</script>
+
+<template>
+    <!-- Theme selector -->
+    <select v-model="theme" @change="setTheme($event.target.value)">
+        <option v-for="t in themes" :key="t" :value="t">{{ t }}</option>
+    </select>
+
+    <!-- Background mode selector -->
+    <select v-model="bgMode" @change="setBgMode($event.target.value)">
+        <option v-for="m in bgModes" :key="m" :value="m">{{ m }}</option>
+    </select>
+
+    <!-- Or cycle through themes -->
+    <button @click="cycleTheme">Change Theme</button>
+</template>
 ```
 
 ### Legacy Colors
@@ -112,7 +176,22 @@ PropOff-specific business components:
 
 | Component | Usage |
 |-----------|-------|
+| `Logo` | PropOff logo with diamond icon + wordmark, theme-aware |
 | `QuestionCard` | Multiple choice question with card-style options, results mode |
+
+**Logo usage:**
+```vue
+<Logo />                           <!-- Full logo (icon + wordmark), medium size -->
+<Logo variant="icon" />            <!-- Diamond icon only -->
+<Logo variant="wordmark" />        <!-- PROPOFF text only -->
+<Logo size="lg" />                 <!-- Large size for hero sections -->
+<Logo size="sm" link-to="/" />     <!-- Small clickable logo for nav -->
+```
+
+Props:
+- `variant` - Logo variant: `full` (default), `icon`, `wordmark`
+- `size` - Size preset: `sm`, `md` (default), `lg`, `xl`
+- `linkTo` - Optional href to make logo clickable
 
 **QuestionCard usage:**
 ```vue

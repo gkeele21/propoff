@@ -1,28 +1,28 @@
 <template>
     <Head title="Invitation Expired" />
 
-    <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-bg flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div class="sm:mx-auto sm:w-full sm:max-w-md">
             <div class="flex justify-center">
                 <div class="bg-danger/10 rounded-full p-3">
                     <ExclamationTriangleIcon class="h-12 w-12 text-danger" />
                 </div>
             </div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-body">
                 Invitation Expired
             </h2>
-            <p class="mt-2 text-center text-sm text-gray-600">
+            <p class="mt-2 text-center text-sm text-muted">
                 This captain invitation is no longer valid
             </p>
         </div>
 
         <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-            <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+            <div class="bg-surface py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-border">
                 <div class="space-y-6">
                     <!-- Event Info -->
                     <div class="border-l-4 border-primary pl-4">
-                        <h3 class="text-lg font-semibold text-gray-900">{{ event.name }}</h3>
-                        <p class="text-xs text-gray-500 mt-1">
+                        <h3 class="text-lg font-semibold text-body">{{ event.name }}</h3>
+                        <p class="text-xs text-subtle mt-1">
                             Event Date: {{ formatDate(event.event_date) }}
                         </p>
                     </div>
@@ -48,7 +48,7 @@
 
                     <!-- Actions -->
                     <div class="space-y-3">
-                        <p class="text-sm text-gray-600 text-center">
+                        <p class="text-sm text-muted text-center">
                             Please contact the event administrator for a new invitation link.
                         </p>
                         <Link

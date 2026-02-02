@@ -18,13 +18,14 @@
                 :readonly="readonly"
                 :rows="rows"
                 :class="[
-                    'block w-full rounded border transition-colors resize-y',
+                    'block w-full rounded-lg border transition-colors resize-y',
                     'focus:outline-none focus:ring-1',
+                    'bg-surface-inset text-body placeholder:text-muted',
                     error
                         ? 'border-danger focus:border-danger focus:ring-danger'
                         : 'border-border focus:border-primary focus:ring-primary',
-                    disabled ? 'bg-surface cursor-not-allowed' : 'bg-white',
-                    'px-3',
+                    disabled ? 'opacity-50 cursor-not-allowed' : '',
+                    'px-4',
                     sizes[size]
                 ]"
             />
@@ -40,14 +41,15 @@
                 :disabled="disabled"
                 :readonly="readonly"
                 :class="[
-                    'block w-full rounded border transition-colors',
+                    'block w-full rounded-lg border transition-colors',
                     'focus:outline-none focus:ring-1',
+                    'bg-surface-inset text-body placeholder:text-muted',
                     error
                         ? 'border-danger focus:border-danger focus:ring-danger'
                         : 'border-border focus:border-primary focus:ring-primary',
-                    disabled ? 'bg-surface cursor-not-allowed' : 'bg-white',
-                    iconLeft ? 'pl-10' : 'pl-3',
-                    iconRight ? 'pr-10' : 'pr-3',
+                    disabled ? 'opacity-50 cursor-not-allowed' : '',
+                    iconLeft ? 'pl-10' : 'px-4',
+                    iconRight ? 'pr-10' : '',
                     sizes[size]
                 ]"
             />

@@ -177,7 +177,7 @@ const handleClose = () => {
                             class="flex items-start gap-2"
                         >
                             <!-- Option Letter -->
-                            <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-gray-light text-white font-medium rounded-full text-sm mt-2">
+                            <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-primary/15 text-primary font-medium rounded-full text-sm mt-2">
                                 {{ String.fromCharCode(65 + index) }}
                             </div>
 

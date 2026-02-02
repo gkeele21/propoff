@@ -24,12 +24,12 @@
         <div class="py-12">
             <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
                 <!-- Event Context -->
-                <div class="bg-propoff-blue/10 border border-propoff-blue/30 rounded-lg p-4 mb-6">
+                <div class="bg-primary/10 border border-primary/30 rounded-lg p-4 mb-6">
                     <div class="flex items-start gap-3">
-                        <InformationCircleIcon class="w-5 h-5 text-propoff-blue mt-0.5" />
+                        <InformationCircleIcon class="w-5 h-5 text-primary mt-0.5" />
                         <div>
-                            <h3 class="font-semibold text-propoff-blue">{{ event.name }}</h3>
-                            <p class="text-sm text-propoff-blue mt-1">
+                            <h3 class="font-semibold text-primary">{{ event.name }}</h3>
+                            <p class="text-sm text-primary mt-1">
                                 Current Questions: {{ currentQuestions.length }} | Event Date: {{ formatDate(event?.event_date) }}
                             </p>
                         </div>
@@ -57,13 +57,13 @@
                                             type="text"
                                             v-model="categorySearch"
                                             @keyup.enter="findTemplatesByCategory"
-                                            class="flex-1 border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                            class="flex-1 border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                             placeholder="Enter category (e.g., football, nfl, sports)"
                                         />
                                         <button
                                             @click="findTemplatesByCategory"
                                             :disabled="!categorySearch.trim() || isSearching"
-                                            class="px-4 py-2 bg-propoff-blue text-white rounded-md hover:bg-propoff-blue/80 disabled:bg-propoff-blue/50 disabled:cursor-not-allowed"
+                                            class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-hover disabled:bg-primary/50 disabled:cursor-not-allowed"
                                         >
                                             {{ isSearching ? 'Searching...' : 'Find' }}
                                         </button>
@@ -84,7 +84,7 @@
                                         <!-- Select All / Deselect All -->
                                         <div class="flex gap-2 pb-4 border-b">
                                             <button @click="selectAllTemplates"
-                                                    class="px-3 py-1 text-sm bg-propoff-blue text-white rounded hover:bg-propoff-blue/80">
+                                                    class="px-3 py-1 text-sm bg-primary text-white rounded hover:bg-primary-hover">
                                                 Select All
                                             </button>
                                             <button @click="deselectAllTemplates"
@@ -93,7 +93,7 @@
                                             </button>
                                             <button @click="bulkCreateSelected"
                                                     :disabled="selectedTemplates.length === 0"
-                                                    class="ml-auto px-4 py-1 text-sm bg-propoff-green text-white rounded hover:bg-propoff-dark-green disabled:bg-propoff-green/50">
+                                                    class="ml-auto px-4 py-1 text-sm bg-success text-white rounded hover:bg-success/80 disabled:bg-success/50">
                                                 Import {{ selectedTemplates.length }} Selected
                                             </button>
                                         </div>
@@ -123,7 +123,7 @@
 
                                                     <!-- Variables Badge -->
                                                     <div v-if="template.variables?.length" class="text-xs">
-                                                        <span class="bg-propoff-orange/10 text-propoff-orange px-2 py-1 rounded">
+                                                        <span class="bg-warning/10 text-warning px-2 py-1 rounded">
                                                             {{ template.variables.length }} variable{{ template.variables.length !== 1 ? 's' : '' }}:
                                                             {{ template.variables.join(', ') }}
                                                         </span>
@@ -131,9 +131,9 @@
 
                                                     <!-- Template Answers Preview -->
                                                     <div v-if="template.template_answers?.length" class="mt-2 text-xs">
-                                                        <div class="bg-propoff-blue/10 border border-propoff-blue/30 rounded p-2">
-                                                            <p class="font-semibold text-propoff-blue mb-1">Ranked Answers ({{ template.template_answers.length }}):</p>
-                                                            <ol class="list-decimal list-inside text-propoff-blue space-y-0.5">
+                                                        <div class="bg-primary/10 border border-primary/30 rounded p-2">
+                                                            <p class="font-semibold text-primary mb-1">Ranked Answers ({{ template.template_answers.length }}):</p>
+                                                            <ol class="list-decimal list-inside text-primary space-y-0.5">
                                                                 <li v-for="answer in template.template_answers" :key="answer.id">
                                                                     {{ answer.answer_text }}
                                                                 </li>
@@ -181,7 +181,7 @@
                                                 </p>
                                             </div>
                                             <button @click="deleteQuestion(question.id)"
-                                                    class="text-propoff-red hover:text-propoff-red/80 flex-shrink-0">
+                                                    class="text-danger hover:text-danger/80 flex-shrink-0">
                                                 <TrashIcon class="w-4 h-4" />
                                             </button>
                                         </div>
@@ -239,7 +239,7 @@
                                             type="text"
                                             v-model="consolidatedVariables[variable]"
                                             :placeholder="`Enter value for ${variable}`"
-                                            class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                            class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                         />
                                     </div>
                                 </div>
@@ -264,7 +264,7 @@
                                     @click="submitConsolidatedImport"
                                     type="button"
                                     :disabled="!allVariablesFilled"
-                                    class="px-4 py-2 bg-propoff-blue border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-propoff-blue/80 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    class="px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     Import {{ selectedTemplates.length }} Question{{ selectedTemplates.length !== 1 ? 's' : '' }}
                                 </button>
@@ -546,11 +546,11 @@ const formatDate = (date) => {
 const typeClass = (type) => {
     if (!type) return 'bg-gray-100 text-gray-800';
     const classes = {
-        multiple_choice: 'bg-propoff-blue/10 text-propoff-blue',
-        yes_no: 'bg-propoff-green/10 text-propoff-dark-green',
-        numeric: 'bg-propoff-orange/10 text-propoff-orange',
+        multiple_choice: 'bg-primary/10 text-primary',
+        yes_no: 'bg-success/10 text-success',
+        numeric: 'bg-warning/10 text-warning',
         text: 'bg-gray-100 text-gray-800',
-        ranked_answers: 'bg-propoff-orange/10 text-propoff-orange',
+        ranked_answers: 'bg-warning/10 text-warning',
     };
     return classes[type] || 'bg-gray-100 text-gray-800';
 };

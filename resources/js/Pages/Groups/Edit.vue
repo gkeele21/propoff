@@ -17,11 +17,11 @@
 
         <div class="py-12">
             <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <form @submit.prevent="submit" class="p-6">
                         <!-- Group Name -->
                         <div class="mb-6">
-                            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="name" class="block text-sm font-medium text-body mb-2">
                                 Group Name <span class="text-danger">*</span>
                             </label>
                             <input
@@ -29,7 +29,7 @@
                                 type="text"
                                 id="name"
                                 placeholder="My Awesome Group"
-                                class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
+                                class="w-full bg-surface-elevated border-border text-body placeholder-muted focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                 required
                                 autofocus
                             />
@@ -38,13 +38,13 @@
 
                         <!-- Description -->
                         <div class="mb-6">
-                            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="description" class="block text-sm font-medium text-body mb-2">
                                 Description (Optional)
                             </label>
                             <textarea
                                 id="description"
                                 v-model="form.description"
-                                class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
+                                class="w-full bg-surface-elevated border-border text-body placeholder-muted focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                 rows="3"
                                 placeholder="Enter a description for your group"
                             ></textarea>
@@ -53,11 +53,11 @@
 
                         <!-- Grading Source (conditionally editable) -->
                         <div v-if="canChangeGradingSource" class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <label class="block text-sm font-medium text-body mb-2">
                                 Grading Source <span class="text-danger">*</span>
                             </label>
                             <div class="space-y-3">
-                                <label class="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition"
+                                <label class="flex items-start p-4 border border-border rounded-lg cursor-pointer hover:bg-surface-elevated transition"
                                        :class="{ 'border-primary bg-primary/10': form.grading_source === 'captain' }">
                                     <input
                                         type="radio"
@@ -66,14 +66,14 @@
                                         class="mt-1 mr-3"
                                     />
                                     <div>
-                                        <div class="font-semibold">Captain Grading</div>
-                                        <div class="text-sm text-gray-600">
+                                        <div class="font-semibold text-body">Captain Grading</div>
+                                        <div class="text-sm text-muted">
                                             You set the correct answers and grade entries in real-time.
                                         </div>
                                     </div>
                                 </label>
 
-                                <label class="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition"
+                                <label class="flex items-start p-4 border border-border rounded-lg cursor-pointer hover:bg-surface-elevated transition"
                                        :class="{ 'border-primary bg-primary/10': form.grading_source === 'admin' }">
                                     <input
                                         type="radio"
@@ -82,8 +82,8 @@
                                         class="mt-1 mr-3"
                                     />
                                     <div>
-                                        <div class="font-semibold">Admin Grading</div>
-                                        <div class="text-sm text-gray-600">
+                                        <div class="font-semibold text-body">Admin Grading</div>
+                                        <div class="text-sm text-muted">
                                             The admin sets answers after the event ends. Your group will be graded based on admin answers.
                                         </div>
                                     </div>
@@ -94,17 +94,17 @@
 
                         <!-- Entry Cutoff -->
                         <div class="mb-6">
-                            <label for="entry_cutoff" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="entry_cutoff" class="block text-sm font-medium text-body mb-2">
                                 Entry Cutoff (Optional)
                             </label>
                             <input
                                 v-model="form.entry_cutoff"
                                 type="datetime-local"
                                 id="entry_cutoff"
-                                class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
+                                class="w-full bg-surface-elevated border-border text-body focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                             />
                             <p v-if="form.errors.entry_cutoff" class="mt-1 text-sm text-danger">{{ form.errors.entry_cutoff }}</p>
-                            <p class="mt-1 text-sm text-gray-500">
+                            <p class="mt-1 text-sm text-muted">
                                 Set a deadline for when members can no longer submit or edit entries.
                                 Leave blank to use the event's lock date.
                             </p>
@@ -116,15 +116,15 @@
                                 <input
                                     type="checkbox"
                                     v-model="form.is_public"
-                                    class="rounded border-gray-300 text-primary focus:ring-primary/50"
+                                    class="rounded border-border text-primary focus:ring-primary/50"
                                 />
-                                <span class="ml-2 text-sm text-gray-700">Make this group public (others can find and join)</span>
+                                <span class="ml-2 text-sm text-body">Make this group public (others can find and join)</span>
                             </label>
                         </div>
 
                         <!-- Info Note -->
-                        <div class="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                            <p class="text-sm text-blue-800">
+                        <div class="mb-6 bg-info/10 border border-info/30 rounded-lg p-4">
+                            <p class="text-sm text-info">
                                 <strong>Note:</strong> You cannot change the event after creating a group.
                                 <span v-if="!canChangeGradingSource">
                                     Grading source cannot be changed once answers are set or entries are submitted.
@@ -133,10 +133,10 @@
                         </div>
 
                         <!-- Actions -->
-                        <div class="flex items-center justify-end gap-3 pt-4 border-t">
+                        <div class="flex items-center justify-end gap-3 pt-4 border-t border-border">
                             <Link
                                 :href="route('groups.show', group.id)"
-                                class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                class="px-4 py-2 border border-border rounded-md text-sm font-medium text-body hover:bg-surface-elevated"
                             >
                                 Cancel
                             </Link>

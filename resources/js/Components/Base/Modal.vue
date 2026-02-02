@@ -27,7 +27,7 @@
                 >
                     <div
                         v-show="show"
-                        class="mb-6 bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:mx-auto"
+                        class="mb-6 bg-surface rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:mx-auto border border-border"
                         :class="maxWidthClass"
                     >
                         <!-- Close button -->

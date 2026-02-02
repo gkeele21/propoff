@@ -22,7 +22,9 @@ const submit = () => {
     <GuestLayout>
         <Head title="Register" />
 
-        <form @submit.prevent="submit">
+        <h1 class="text-2xl font-bold text-body mb-6 text-center">Create your account</h1>
+
+        <form @submit.prevent="submit" class="space-y-4">
             <TextField
                 id="name"
                 v-model="form.name"
@@ -42,7 +44,6 @@ const submit = () => {
                 :error="form.errors.email"
                 required
                 autocomplete="username"
-                class="mt-4"
             />
 
             <TextField
@@ -53,7 +54,6 @@ const submit = () => {
                 :error="form.errors.password"
                 required
                 autocomplete="new-password"
-                class="mt-4"
             />
 
             <TextField
@@ -64,21 +64,18 @@ const submit = () => {
                 :error="form.errors.password_confirmation"
                 required
                 autocomplete="new-password"
-                class="mt-4"
             />
 
-            <div class="flex items-center justify-end mt-4">
-                <Link
-                    :href="route('login')"
-                    class="underline text-sm text-primary hover:text-warning rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-warning"
-                >
-                    Already registered?
-                </Link>
-
-                <Button variant="primary" class="ms-4" :disabled="form.processing">
-                    Register
-                </Button>
-            </div>
+            <Button type="submit" variant="primary" size="lg" class="w-full" :disabled="form.processing">
+                Register
+            </Button>
         </form>
+
+        <p class="mt-6 text-center text-sm text-muted">
+            Already have an account?
+            <Link :href="route('login')" class="text-warning hover:text-body transition-colors font-medium">
+                Log in
+            </Link>
+        </p>
     </GuestLayout>
 </template>

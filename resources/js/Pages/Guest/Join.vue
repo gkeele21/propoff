@@ -1,17 +1,17 @@
 <template>
     <Head title="Join Event" />
 
-    <div class="min-h-screen bg-gradient-to-r from-primary to-success border-b border-propoff-green/20 shadow-lg flex items-center justify-center p-4">
-        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
+    <div class="min-h-screen bg-bg flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-surface rounded-2xl shadow-2xl p-8 border border-border">
             <!-- Event Info -->
             <div class="text-center mb-8">
                 <div class="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-4">
                     <TrophyIcon class="w-10 h-10 text-warning" />
                 </div>
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                <h1 class="text-3xl font-bold text-body mb-2">
                     {{ invitation.event.name }}
                 </h1>
-                <p class="text-sm text-gray-500 mt-2">
+                <p class="text-sm text-muted mt-2">
                     Event Date: {{ formatDate(invitation.event.event_date) }}
                 </p>
             </div>
@@ -29,14 +29,14 @@
             <!-- Registration Form -->
             <form @submit.prevent="submit">
                 <div class="mb-4">
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="name" class="block text-sm font-medium text-body mb-2">
                         Enter Your Name <span class="text-danger">*</span>
                     </label>
                     <input
                         id="name"
                         v-model="form.name"
                         type="text"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                        class="w-full px-4 py-3 bg-surface-elevated border border-border text-body placeholder-muted rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                         placeholder="Your name"
                         required
                         autofocus
@@ -47,17 +47,17 @@
                 </div>
 
                 <div class="mb-6">
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="email" class="block text-sm font-medium text-body mb-2">
                         Email (Optional - for future features)
                     </label>
                     <input
                         id="email"
                         v-model="form.email"
                         type="email"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                        class="w-full px-4 py-3 bg-surface-elevated border border-border text-body placeholder-muted rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                         placeholder="your.email@example.com"
                     />
-                    <p class="mt-1 text-xs text-gray-500">
+                    <p class="mt-1 text-xs text-muted">
                         Optional: We'll send you a link to view your results later (coming soon)
                     </p>
                     <p v-if="form.errors.email" class="mt-1 text-sm text-danger">
@@ -76,7 +76,7 @@
             </form>
 
             <!-- Info Box -->
-            <div class="mt-6 text-center text-sm text-gray-600">
+            <div class="mt-6 text-center text-sm text-muted">
                 <p>No account required! Just enter your name to get started.</p>
             </div>
         </div>

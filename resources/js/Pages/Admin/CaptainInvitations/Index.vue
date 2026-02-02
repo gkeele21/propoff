@@ -77,9 +77,9 @@ const copyUrl = (url) => {
                 ]"
             >
                 <template #metadata>
-                    <span class="font-medium text-gray-900">{{ event.name }}</span>
-                    <span class="text-gray-400 mx-2">•</span>
-                    <span>{{ invitations.length }} invitation{{ invitations.length !== 1 ? 's' : '' }}</span>
+                    <span class="font-medium text-body">{{ event.name }}</span>
+                    <span class="text-subtle mx-2">•</span>
+                    <span class="text-muted">{{ invitations.length }} invitation{{ invitations.length !== 1 ? 's' : '' }}</span>
                 </template>
             </PageHeader>
         </template>
@@ -96,40 +96,40 @@ const copyUrl = (url) => {
                 </div>
 
                 <!-- Create Invitation -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-6">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-semibold">Create New Captain Invitation Link</h3>
+                            <h3 class="text-lg font-semibold text-body">Create New Captain Invitation Link</h3>
                         </div>
 
                         <form @submit.prevent="submitCreate" class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <label class="block text-sm font-semibold text-muted mb-2">
                                         Max Uses (Optional)
                                     </label>
                                     <input
                                         v-model="createForm.max_uses"
                                         type="number"
                                         min="1"
-                                        class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
+                                        class="w-full border-border bg-surface-inset text-body focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                         placeholder="Unlimited"
                                     />
-                                    <p class="text-xs text-gray-500 mt-1">
+                                    <p class="text-xs text-subtle mt-1">
                                         Leave empty for unlimited uses
                                     </p>
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <label class="block text-sm font-semibold text-muted mb-2">
                                         Expires At (Optional)
                                     </label>
                                     <input
                                         v-model="createForm.expires_at"
                                         type="datetime-local"
-                                        class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
+                                        class="w-full border-border bg-surface-inset text-body focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                     />
-                                    <p class="text-xs text-gray-500 mt-1">
+                                    <p class="text-xs text-subtle mt-1">
                                         Leave empty for no expiration
                                     </p>
                                 </div>
@@ -149,12 +149,12 @@ const copyUrl = (url) => {
                 </div>
 
                 <!-- Invitations List -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold mb-4">Active Invitations ({{ invitations.length }})</h3>
+                        <h3 class="text-lg font-semibold text-body mb-4">Active Invitations ({{ invitations.length }})</h3>
 
                         <div v-if="invitations.length === 0" class="text-center py-12">
-                            <p class="text-gray-500">No captain invitations yet.</p>
+                            <p class="text-muted">No captain invitations yet.</p>
                         </div>
 
                         <div v-else class="space-y-4">
@@ -162,7 +162,7 @@ const copyUrl = (url) => {
                                 v-for="invitation in invitations"
                                 :key="invitation.id"
                                 class="border rounded-lg p-4"
-                                :class="invitation.can_be_used ? 'border-success/30 bg-success/10' : 'border-gray-200 bg-gray-50'"
+                                :class="invitation.can_be_used ? 'border-success/30 bg-success/10' : 'border-border bg-surface-elevated'"
                             >
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
@@ -196,16 +196,16 @@ const copyUrl = (url) => {
 
                                         <!-- Invitation URL -->
                                         <div class="mb-3">
-                                            <label class="text-xs text-gray-600 block mb-1">Invitation URL</label>
+                                            <label class="text-xs text-muted block mb-1">Invitation URL</label>
                                             <div class="flex gap-2">
                                                 <input
                                                     :value="invitation.url"
                                                     readonly
-                                                    class="flex-1 text-sm border-gray-300 rounded-md bg-gray-50 font-mono"
+                                                    class="flex-1 text-sm border-border rounded-md bg-surface-inset text-body font-mono"
                                                 />
                                                 <button
                                                     @click="copyUrl(invitation.url)"
-                                                    class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm font-semibold"
+                                                    class="bg-surface-overlay hover:bg-surface-elevated text-body px-3 py-1 rounded text-sm font-semibold border border-border"
                                                 >
                                                     Copy
                                                 </button>
@@ -215,16 +215,16 @@ const copyUrl = (url) => {
                                         <!-- Details -->
                                         <div class="grid grid-cols-2 gap-4 text-sm">
                                             <div>
-                                                <span class="text-gray-600">Created by:</span>
-                                                <span class="font-semibold ml-2">{{ invitation.creator.name }}</span>
+                                                <span class="text-muted">Created by:</span>
+                                                <span class="font-semibold text-body ml-2">{{ invitation.creator.name }}</span>
                                             </div>
                                             <div>
-                                                <span class="text-gray-600">Created:</span>
-                                                <span class="ml-2">{{ new Date(invitation.created_at).toLocaleDateString() }}</span>
+                                                <span class="text-muted">Created:</span>
+                                                <span class="text-body ml-2">{{ new Date(invitation.created_at).toLocaleDateString() }}</span>
                                             </div>
                                             <div v-if="invitation.expires_at">
-                                                <span class="text-gray-600">Expires:</span>
-                                                <span class="ml-2">{{ new Date(invitation.expires_at).toLocaleString() }}</span>
+                                                <span class="text-muted">Expires:</span>
+                                                <span class="text-body ml-2">{{ new Date(invitation.expires_at).toLocaleString() }}</span>
                                             </div>
                                         </div>
                                     </div>

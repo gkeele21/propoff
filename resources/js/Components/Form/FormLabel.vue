@@ -22,8 +22,9 @@ const props = defineProps({
 });
 
 const variantClasses = {
-    default: 'text-gray-dark',
+    default: 'text-body',
     inverse: 'text-white',
+    muted: 'text-muted',
 };
 
 const spacingClass = computed(() => props.noMargin ? '' : 'mb-1');

@@ -19,11 +19,13 @@ const submit = () => {
     <GuestLayout>
         <Head title="Confirm Password" />
 
-        <div class="mb-4 text-sm text-gray-600">
-            This is a secure area of the application. Please confirm your password before continuing.
-        </div>
+        <h1 class="text-2xl font-bold text-body mb-4 text-center">Confirm your password</h1>
 
-        <form @submit.prevent="submit">
+        <p class="mb-6 text-sm text-muted text-center">
+            This is a secure area. Please confirm your password before continuing.
+        </p>
+
+        <form @submit.prevent="submit" class="space-y-4">
             <TextField
                 id="password"
                 v-model="form.password"
@@ -35,11 +37,9 @@ const submit = () => {
                 autofocus
             />
 
-            <div class="flex justify-end mt-4">
-                <Button variant="primary" class="ms-4" :disabled="form.processing">
-                    Confirm
-                </Button>
-            </div>
+            <Button type="submit" variant="primary" size="lg" class="w-full" :disabled="form.processing">
+                Confirm
+            </Button>
         </form>
     </GuestLayout>
 </template>

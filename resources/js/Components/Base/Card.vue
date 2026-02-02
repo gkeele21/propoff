@@ -12,7 +12,7 @@
         ]"
     >
         <!-- Header -->
-        <div v-if="$slots.header || title" :class="['border-b border-border', headerPadding ? 'px-6 py-4' : '']">
+        <div v-if="$slots.header || title" :class="['border-b border-border', headerPadding ? 'px-6 py-4' : '', headerBgClass]">
             <slot name="header">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
@@ -49,9 +49,10 @@ const props = defineProps({
     hover: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     borderColor: { type: String, default: 'none' },
-    bgClass: { type: String, default: 'bg-white' },
+    bgClass: { type: String, default: 'bg-surface border border-border' },
     padding: { type: Boolean, default: false },
     headerPadding: { type: Boolean, default: true },
+    headerBgClass: { type: String, default: '' },
     bodyPadding: { type: Boolean, default: true },
     footerPadding: { type: Boolean, default: true },
 });

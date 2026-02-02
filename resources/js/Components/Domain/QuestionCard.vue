@@ -3,10 +3,10 @@
         <!-- Question Header -->
         <div v-if="showHeader" class="flex items-start justify-between mb-4">
             <div class="flex items-start gap-2">
-                <span v-if="questionNumber" class="text-lg font-bold text-black">
+                <span v-if="questionNumber" class="text-lg font-bold text-body">
                     Q{{ questionNumber }}.
                 </span>
-                <p class="text-lg text-black">{{ question }}</p>
+                <p class="text-lg text-body">{{ question }}</p>
             </div>
             <span v-if="points" class="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded flex-shrink-0">
                 {{ points }} {{ points === 1 ? 'pt' : 'pts' }}
@@ -15,7 +15,7 @@
 
         <!-- Options -->
         <div class="space-y-3">
-            <label
+            <div
                 v-for="(option, index) in normalizedOptions"
                 :key="index"
                 class="flex items-center justify-between p-4 border-2 rounded-lg transition"
@@ -23,6 +23,7 @@
                     getOptionClasses(option),
                     disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
                 ]"
+                @click="!disabled && $emit('update:modelValue', option.value)"
             >
                 <div class="flex items-center flex-1 gap-3">
                     <!-- Result Icon (results mode only) -->
@@ -36,7 +37,7 @@
                         <Icon
                             v-else-if="isCorrect(option) && !isSelected(option)"
                             name="arrow-right"
-                            class="text-muted"
+                            class="text-success"
                             size="sm"
                         />
                         <Icon
@@ -47,26 +48,30 @@
                         />
                     </div>
 
-                    <!-- Radio Input -->
-                    <input
-                        type="radio"
-                        :name="inputName"
-                        :value="option.value"
-                        :checked="modelValue === option.value"
-                        @change="$emit('update:modelValue', option.value)"
-                        :disabled="disabled"
-                        class="h-4 w-4 text-primary focus:ring-primary/50 border-border"
-                        :class="disabled ? 'cursor-not-allowed' : 'cursor-pointer'"
-                    />
+                    <!-- Custom Radio Button -->
+                    <div
+                        class="w-[18px] h-[18px] rounded-full border-2 flex-shrink-0 relative transition-colors"
+                        :class="[
+                            isSelected(option)
+                                ? 'border-primary bg-primary'
+                                : 'border-border-strong bg-transparent'
+                        ]"
+                    >
+                        <!-- Inner dot when selected -->
+                        <div
+                            v-if="isSelected(option)"
+                            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-bg"
+                        ></div>
+                    </div>
 
                     <!-- Letter Prefix (optional) -->
-                    <span v-if="showLetters" class="font-semibold text-gray-dark w-6">
+                    <span v-if="showLetters" class="font-semibold text-muted w-6">
                         {{ getLetter(index) }})
                     </span>
 
                     <!-- Option Label -->
                     <span :class="[
-                        'text-black',
+                        'text-body',
                         showResults && isCorrect(option) ? 'font-semibold text-success' : ''
                     ]">
                         {{ option.label }}
@@ -75,11 +80,11 @@
 
                 <!-- Bonus Points -->
                 <div v-if="option.points && option.points > 0" class="ml-4 flex-shrink-0">
-                    <span class="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded">
+                    <span class="text-xs font-semibold text-primary bg-primary/15 px-2 py-1 rounded">
                         +{{ option.points }} bonus {{ option.points === 1 ? 'pt' : 'pts' }}
                     </span>
                 </div>
-            </label>
+            </div>
         </div>
 
         <!-- Points Hint -->
@@ -166,13 +171,13 @@ function getOptionClasses(option) {
         if (!isCorrect(option) && isSelected(option)) {
             return 'border-danger bg-danger/10';
         }
-        return 'border-border bg-white';
+        return 'border-border bg-surface-inset';
     }
 
     // Normal mode styling
     if (isSelected(option)) {
         return 'border-primary bg-primary/10';
     }
-    return 'border-border hover:border-gray-light';
+    return 'border-border bg-surface-inset hover:border-border-strong hover:bg-surface-header';
 }
 </script>

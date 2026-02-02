@@ -44,8 +44,8 @@ const getOptionPoints = (option) => {
                 ]"
             >
                 <template #metadata>
-                    <span class="font-medium text-gray-900">{{ entry.event.name }}</span>
-                    <span class="text-gray-400 mx-2">•</span>
+                    <span class="font-medium text-body">{{ entry.event.name }}</span>
+                    <span class="text-subtle mx-2">•</span>
                     <span v-if="entry.group">{{ entry.group.name }}</span>
                 </template>
                 <template #actions>
@@ -61,7 +61,7 @@ const getOptionPoints = (option) => {
         <div class="py-12">
             <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 <!-- Score Card -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-8">
                         <div class="text-center">
                             <div class="inline-flex items-center justify-center w-24 h-24 rounded-full mb-4 bg-warning">
@@ -70,11 +70,11 @@ const getOptionPoints = (option) => {
                                 </span>
                             </div>
 
-                            <h3 class="text-2xl font-bold text-gray-900 mb-2">
+                            <h3 class="text-2xl font-bold text-body mb-2">
                                 {{ entry.total_score }} {{ entry.total_score === 1 ? 'Point' : 'Points' }}
                             </h3>
 
-                            <div class="flex items-center justify-center gap-6 text-sm text-gray-600">
+                            <div class="flex items-center justify-center gap-6 text-sm text-muted">
                                 <span>Submitted: {{ new Date(entry.submitted_at).toLocaleDateString() }}</span>
                                 <span>Max Possible: {{ entry.possible_points }} {{ entry.possible_points === 1 ? 'point' : 'points' }}</span>
                                 <span v-if="entry.group">Group: {{ entry.group.name }}</span>
@@ -84,9 +84,9 @@ const getOptionPoints = (option) => {
                 </div>
 
                 <!-- Question Results -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Your Answers</h3>
+                        <h3 class="text-lg font-semibold text-body mb-4">Your Answers</h3>
 
                         <div class="space-y-6">
                             <div
@@ -96,7 +96,7 @@ const getOptionPoints = (option) => {
                                 :class="{
                                     'border-success/30 bg-success/10': entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
                                     'border-danger/30 bg-danger/10': entry.user_answers.find(a => a.group_question_id === question.id) && !entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
-                                    'border-gray-200': !entry.user_answers.find(a => a.group_question_id === question.id),
+                                    'border-border': !entry.user_answers.find(a => a.group_question_id === question.id),
                                 }"
                             >
                                 <div class="flex items-start gap-4">
@@ -110,20 +110,20 @@ const getOptionPoints = (option) => {
                                             v-else-if="entry.user_answers.find(a => a.group_question_id === question.id)"
                                             class="w-6 h-6 text-danger"
                                         />
-                                        <div v-else class="w-6 h-6 rounded-full bg-gray-300"></div>
+                                        <div v-else class="w-6 h-6 rounded-full bg-surface-elevated"></div>
                                     </div>
 
                                     <!-- Content -->
                                     <div class="flex-1">
                                         <div class="flex items-start justify-between mb-3">
-                                            <h4 class="font-semibold text-gray-900">
+                                            <h4 class="font-semibold text-body">
                                                 Question {{ index + 1 }}
                                             </h4>
                                             <span class="text-sm font-medium"
                                                 :class="{
                                                     'text-success': entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
                                                     'text-danger': entry.user_answers.find(a => a.group_question_id === question.id) && !entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
-                                                    'text-gray-600': !entry.user_answers.find(a => a.group_question_id === question.id),
+                                                    'text-muted': !entry.user_answers.find(a => a.group_question_id === question.id),
                                                 }"
                                             >
                                                 {{
@@ -132,13 +132,13 @@ const getOptionPoints = (option) => {
                                             </span>
                                         </div>
 
-                                        <p class="text-gray-700 mb-4">{{ question.question_text }}</p>
+                                        <p class="text-body mb-4">{{ question.question_text }}</p>
 
                                         <!-- Multiple Choice Options -->
                                         <div v-if="question.question_type === 'multiple_choice' && question.options" class="space-y-2 mb-3">
                                             <!-- No correct answer set yet -->
-                                            <div v-if="!question.correct_answer" class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg mb-3">
-                                                <p class="text-sm text-yellow-800">
+                                            <div v-if="!question.correct_answer" class="p-3 bg-warning/10 border border-warning/30 rounded-lg mb-3">
+                                                <p class="text-sm text-warning">
                                                     <strong>Note:</strong> Correct answer not set yet. Results will be updated once grading is complete.
                                                 </p>
                                             </div>
@@ -150,18 +150,18 @@ const getOptionPoints = (option) => {
                                                 :class="{
                                                     'border-success bg-success/10': question.correct_answer && getOptionValue(option) === question.correct_answer,
                                                     'border-danger bg-danger/10': question.correct_answer && getOptionValue(option) === entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text && getOptionValue(option) !== question.correct_answer,
-                                                    'border-gray-200': !question.correct_answer || (getOptionValue(option) !== question.correct_answer && getOptionValue(option) !== entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text),
+                                                    'border-border': !question.correct_answer || (getOptionValue(option) !== question.correct_answer && getOptionValue(option) !== entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text),
                                                 }"
                                             >
                                                 <div class="flex items-center gap-3">
-                                                    <span class="text-gray-900">{{ getOptionLabel(option) }}</span>
+                                                    <span class="text-body">{{ getOptionLabel(option) }}</span>
                                                     <span
                                                         v-if="getOptionValue(option) === entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text"
                                                         class="text-xs font-semibold px-2 py-1 rounded"
                                                         :class="{
                                                             'bg-success/20 text-success': question.correct_answer && getOptionValue(option) === question.correct_answer,
                                                             'bg-danger/20 text-danger': question.correct_answer && getOptionValue(option) !== question.correct_answer,
-                                                            'bg-gray-200 text-gray-700': !question.correct_answer,
+                                                            'bg-surface-elevated text-body': !question.correct_answer,
                                                         }"
                                                     >
                                                         Your Answer
@@ -182,8 +182,8 @@ const getOptionPoints = (option) => {
                                         <!-- Yes/No or True/False -->
                                         <div v-else-if="question.question_type === 'yes_no' || question.question_type === 'true_false'" class="space-y-2 mb-3">
                                             <!-- No correct answer set yet -->
-                                            <div v-if="!question.correct_answer" class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg mb-3">
-                                                <p class="text-sm text-yellow-800">
+                                            <div v-if="!question.correct_answer" class="p-3 bg-warning/10 border border-warning/30 rounded-lg mb-3">
+                                                <p class="text-sm text-warning">
                                                     <strong>Note:</strong> Correct answer not set yet. Results will be updated once grading is complete.
                                                 </p>
                                             </div>
@@ -195,17 +195,17 @@ const getOptionPoints = (option) => {
                                                 :class="{
                                                     'border-success bg-success/10': question.correct_answer && option === question.correct_answer,
                                                     'border-danger bg-danger/10': question.correct_answer && option === entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text && option !== question.correct_answer,
-                                                    'border-gray-200': !question.correct_answer || (option !== question.correct_answer && option !== entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text),
+                                                    'border-border': !question.correct_answer || (option !== question.correct_answer && option !== entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text),
                                                 }"
                                             >
-                                                <span class="text-gray-900">{{ option }}</span>
+                                                <span class="text-body">{{ option }}</span>
                                                 <span
                                                     v-if="option === entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text"
                                                     class="text-xs font-semibold px-2 py-1 rounded"
                                                     :class="{
                                                         'bg-success/20 text-success': question.correct_answer && option === question.correct_answer,
                                                         'bg-danger/20 text-danger': question.correct_answer && option !== question.correct_answer,
-                                                        'bg-gray-200 text-gray-700': !question.correct_answer,
+                                                        'bg-surface-elevated text-body': !question.correct_answer,
                                                     }"
                                                 >
                                                     Your Answer
@@ -222,8 +222,8 @@ const getOptionPoints = (option) => {
                                         <!-- Text/Numeric answers -->
                                         <div v-else class="space-y-2">
                                             <!-- No correct answer set yet -->
-                                            <div v-if="!question.correct_answer" class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg mb-3">
-                                                <p class="text-sm text-yellow-800">
+                                            <div v-if="!question.correct_answer" class="p-3 bg-warning/10 border border-warning/30 rounded-lg mb-3">
+                                                <p class="text-sm text-warning">
                                                     <strong>Note:</strong> Correct answer not set yet. Results will be updated once grading is complete.
                                                 </p>
                                             </div>
@@ -232,11 +232,11 @@ const getOptionPoints = (option) => {
                                                 :class="{
                                                     'bg-success/10 border-success': entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
                                                     'bg-danger/10 border-danger': question.correct_answer && entry.user_answers.find(a => a.group_question_id === question.id) && !entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
-                                                    'bg-gray-50 border-gray-200': !question.correct_answer,
+                                                    'bg-surface-elevated border-border': !question.correct_answer,
                                                 }"
                                             >
                                                 <div class="flex items-center gap-2 mb-1">
-                                                    <span class="text-sm font-medium text-gray-600">Your Answer:</span>
+                                                    <span class="text-sm font-medium text-muted">Your Answer:</span>
                                                     <span
                                                         v-if="entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct"
                                                         class="text-xs font-semibold px-2 py-1 rounded bg-success/20 text-success"
@@ -250,7 +250,7 @@ const getOptionPoints = (option) => {
                                                         Incorrect
                                                     </span>
                                                 </div>
-                                                <span class="text-gray-900 font-medium">
+                                                <span class="text-body font-medium">
                                                     {{
                                                         entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text ||
                                                         'No answer provided'

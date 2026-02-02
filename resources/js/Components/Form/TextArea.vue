@@ -14,12 +14,13 @@
             :aria-describedby="descriptionId"
             :aria-invalid="!!error"
             :class="[
-                'block w-full rounded border transition-colors resize-y text-body',
+                'block w-full rounded border transition-colors resize-y',
                 'focus:outline-none focus:ring-1',
+                'bg-surface-elevated text-body placeholder:text-subtle',
                 error
                     ? 'border-danger focus:border-danger focus:ring-danger'
                     : 'border-border focus:border-primary focus:ring-primary',
-                disabled ? 'bg-surface cursor-not-allowed text-muted' : 'bg-white',
+                disabled ? 'opacity-50 cursor-not-allowed' : '',
                 sizes[size]
             ]"
         />

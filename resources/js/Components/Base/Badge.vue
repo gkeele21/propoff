@@ -24,11 +24,13 @@ const props = defineProps({
 });
 
 const roundedClass = computed(() => {
-    if (!props.rounded) return 'rounded';
+    if (!props.rounded) return 'rounded-full';  // Pill shape by default (matches mockup)
+    if (props.rounded === 'none') return '';
     return `rounded-${props.rounded}`;
 });
 
 const variants = {
+    // Solid variants
     primary: 'bg-primary text-white',
     secondary: 'bg-secondary text-white',
     accent: 'bg-warning text-white',
@@ -38,14 +40,16 @@ const variants = {
     info: 'bg-info text-white',
     outline: 'bg-transparent border border-primary text-primary',
     dark: 'bg-black text-white',
-    light: 'bg-white/20 text-white border border-white/30',           // For dark backgrounds
-    'outline-light': 'bg-transparent border border-white/50 text-white', // Outline on dark backgrounds
-    // Soft variants with low opacity backgrounds (per spec)
-    'danger-soft': 'bg-danger/20 text-danger',
-    'warning-soft': 'bg-warning/30 text-warning',
-    'success-soft': 'bg-success/20 text-primary',
-    'info-soft': 'bg-info/20 text-primary',
+    light: 'bg-white/20 text-white border border-white/30',
+    'outline-light': 'bg-transparent border border-white/50 text-white',
+    // Soft variants - 15% opacity bg, solid text (matches dark mode mockup)
     'primary-soft': 'bg-primary/15 text-primary',
+    'success-soft': 'bg-success/15 text-success',
+    'warning-soft': 'bg-warning/15 text-warning',
+    'danger-soft': 'bg-danger/15 text-danger',
+    'info-soft': 'bg-info/15 text-info',
+    // Default/muted for draft, inactive states
+    'default': 'bg-surface-elevated text-muted',
 };
 
 const sizes = {

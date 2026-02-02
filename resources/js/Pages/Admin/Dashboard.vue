@@ -35,8 +35,8 @@ const groupsSubtitle = () => {
     <AuthenticatedLayout>
         <template #header>
             <div class="flex items-center gap-3">
-                <CogIcon class="h-6 w-6 text-gray-dark" />
-                <h2 class="font-semibold text-xl text-black leading-tight">
+                <CogIcon class="h-6 w-6 text-muted" />
+                <h2 class="font-semibold text-xl text-body leading-tight">
                     Admin Dashboard
                 </h2>
                 <span class="ml-2 text-sm bg-danger text-white px-3 py-1 rounded-full font-bold">

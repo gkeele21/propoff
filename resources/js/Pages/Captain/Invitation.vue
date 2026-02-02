@@ -13,8 +13,8 @@
                 ]"
             >
                 <template #metadata>
-                    <span class="font-medium text-gray-900">{{ group.name }}</span>
-                    <span class="text-gray-400 mx-2">•</span>
+                    <span class="font-medium text-body">{{ group.name }}</span>
+                    <span class="text-subtle mx-2">•</span>
                     <span :class="invitation.is_active ? 'text-success' : 'text-danger'">
                         {{ invitation.is_active ? 'Active' : 'Inactive' }}
                     </span>
@@ -25,17 +25,17 @@
         <div class="py-12">
             <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 <!-- Group Info -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg p-6 border border-border">
                     <div class="flex items-start gap-4">
                         <div class="flex-shrink-0 w-12 h-12 bg-warning/10 rounded-full flex items-center justify-center">
                             <UserGroupIcon class="w-6 h-6 text-warning" />
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900">{{ group.name }}</h3>
-                            <p class="text-sm text-gray-600 mt-1">
+                            <h3 class="text-lg font-semibold text-body">{{ group.name }}</h3>
+                            <p class="text-sm text-muted mt-1">
                                 Event: {{ group.event.name }}
                             </p>
-                            <p class="text-xs text-gray-500 mt-1">
+                            <p class="text-xs text-subtle mt-1">
                                 {{ formatDate(group.event.event_date) }}
                             </p>
                         </div>
@@ -43,9 +43,9 @@
                 </div>
 
                 <!-- Invitation Link Section -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg p-6 border border-border">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-900">Invitation Link</h3>
+                        <h3 class="text-lg font-semibold text-body">Invitation Link</h3>
                         <span
                             :class="[
                                 'px-3 py-1 rounded-full text-xs font-semibold',
@@ -59,8 +59,8 @@
                     </div>
 
                     <!-- URL Display and Copy -->
-                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <div class="bg-surface-elevated rounded-lg p-4 mb-4">
+                        <label class="block text-sm font-medium text-muted mb-2">
                             Share this link with members
                         </label>
                         <div class="flex gap-2">
@@ -68,7 +68,7 @@
                                 type="text"
                                 :value="invitation.url"
                                 readonly
-                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-sm font-mono"
+                                class="flex-1 px-3 py-2 border border-border rounded-md bg-surface-inset text-body text-sm font-mono"
                             />
                             <button
                                 @click="copyToClipboard"
@@ -81,8 +81,8 @@
                     </div>
 
                     <!-- QR Code -->
-                    <div class="text-center py-6 border-t border-b border-gray-200 my-6">
-                        <p class="text-sm text-gray-600 mb-4">Scan QR Code to Join</p>
+                    <div class="text-center py-6 border-t border-b border-border my-6">
+                        <p class="text-sm text-muted mb-4">Scan QR Code to Join</p>
                         <div class="inline-block bg-white p-4 rounded-lg shadow-sm">
                             <div ref="qrcode" class="w-64 h-64"></div>
                         </div>
@@ -125,7 +125,7 @@
                         </button>
                         <button
                             @click="showSettingsModal = true"
-                            class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700"
+                            class="inline-flex items-center px-4 py-2 bg-surface-overlay border border-border rounded-md font-semibold text-xs text-body uppercase tracking-widest hover:bg-surface-elevated"
                         >
                             <Cog6ToothIcon class="w-4 h-4 mr-2" />
                             Settings
@@ -156,15 +156,15 @@
             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
             @click.self="showRegenerateModal = false"
         >
-            <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Regenerate Invitation Link?</h3>
-                <p class="text-sm text-gray-600 mb-6">
+            <div class="bg-surface rounded-lg shadow-xl max-w-md w-full p-6 border border-border">
+                <h3 class="text-lg font-semibold text-body mb-4">Regenerate Invitation Link?</h3>
+                <p class="text-sm text-muted mb-6">
                     This will create a new invitation link and reset the usage counter. The old link will no longer work.
                 </p>
                 <div class="flex gap-3 justify-end">
                     <button
                         @click="showRegenerateModal = false"
-                        class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        class="px-4 py-2 border border-border rounded-md text-sm font-medium text-body hover:bg-surface-overlay"
                     >
                         Cancel
                     </button>
@@ -187,12 +187,12 @@
             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
             @click.self="showSettingsModal = false"
         >
-            <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Invitation Settings</h3>
+            <div class="bg-surface rounded-lg shadow-xl max-w-md w-full p-6 border border-border">
+                <h3 class="text-lg font-semibold text-body mb-4">Invitation Settings</h3>
 
                 <form @submit.prevent="updateSettings" class="space-y-4">
                     <div>
-                        <label for="max_uses" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="max_uses" class="block text-sm font-medium text-muted mb-2">
                             Maximum Uses (leave empty for unlimited)
                         </label>
                         <input
@@ -200,7 +200,7 @@
                             type="number"
                             v-model.number="settingsForm.max_uses"
                             min="1"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            class="w-full px-3 py-2 border border-border rounded-md bg-surface-inset text-body"
                             placeholder="Unlimited"
                         />
                         <p v-if="settingsForm.errors.max_uses" class="mt-1 text-sm text-danger">
@@ -209,14 +209,14 @@
                     </div>
 
                     <div>
-                        <label for="expires_at" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="expires_at" class="block text-sm font-medium text-muted mb-2">
                             Expiration Date (leave empty for no expiration)
                         </label>
                         <input
                             id="expires_at"
                             type="datetime-local"
                             v-model="settingsForm.expires_at"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            class="w-full px-3 py-2 border border-border rounded-md bg-surface-inset text-body"
                         />
                         <p v-if="settingsForm.errors.expires_at" class="mt-1 text-sm text-danger">
                             {{ settingsForm.errors.expires_at }}
@@ -227,7 +227,7 @@
                         <button
                             type="button"
                             @click="showSettingsModal = false"
-                            class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                            class="px-4 py-2 border border-border rounded-md text-sm font-medium text-body hover:bg-surface-overlay"
                         >
                             Cancel
                         </button>

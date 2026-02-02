@@ -14,7 +14,7 @@
                 ]"
             >
                 <template #metadata>
-                    <span class="text-sm text-gray-600">{{ group.event.name }}</span>
+                    <span class="text-sm text-muted">{{ group.event.name }}</span>
                 </template>
             </PageHeader>
         </template>
@@ -23,41 +23,41 @@
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <!-- Statistics -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <div class="text-sm text-gray-600">Total Participants</div>
-                        <div class="text-2xl font-bold text-gray-900">{{ leaderboard.data.length }}</div>
+                    <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg p-6 border border-border">
+                        <div class="text-sm text-muted">Total Participants</div>
+                        <div class="text-2xl font-bold text-body">{{ leaderboard.data.length }}</div>
                     </div>
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <div class="text-sm text-gray-600">Average Score</div>
-                        <div class="text-2xl font-bold text-gray-900">{{ averagePercentage }}%</div>
+                    <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg p-6 border border-border">
+                        <div class="text-sm text-muted">Average Score</div>
+                        <div class="text-2xl font-bold text-body">{{ averagePercentage }}%</div>
                     </div>
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <div class="text-sm text-gray-600">Highest Score</div>
-                        <div class="text-2xl font-bold text-gray-900">{{ highestPercentage }}%</div>
+                    <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg p-6 border border-border">
+                        <div class="text-sm text-muted">Highest Score</div>
+                        <div class="text-2xl font-bold text-body">{{ highestPercentage }}%</div>
                     </div>
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <div class="text-sm text-gray-600">Max Possible Points</div>
-                        <div class="text-2xl font-bold text-gray-900">{{ totalPossiblePoints }}</div>
+                    <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg p-6 border border-border">
+                        <div class="text-sm text-muted">Max Possible Points</div>
+                        <div class="text-2xl font-bold text-body">{{ totalPossiblePoints }}</div>
                     </div>
                 </div>
 
                 <!-- Leaderboard -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Rankings</h3>
+                        <h3 class="text-lg font-semibold text-body mb-4">Rankings</h3>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                            <table class="min-w-full divide-y divide-border">
+                                <thead class="bg-surface-elevated">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Player</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Percentage</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Answered</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-subtle uppercase tracking-wider">Rank</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-subtle uppercase tracking-wider">Player</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-subtle uppercase tracking-wider">Score</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-subtle uppercase tracking-wider">Percentage</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-subtle uppercase tracking-wider">Answered</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-subtle uppercase tracking-wider">Submitted</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
+                                <tbody class="bg-surface divide-y divide-border">
                                     <tr
                                         v-for="entry in leaderboard.data"
                                         :key="entry.id"
@@ -79,7 +79,7 @@
                                                     <span class="text-xs font-bold -mt-1">{{ entry.rank }}rd</span>
                                                 </span>
                                                 <!-- Ordinal numbers for 4th and below -->
-                                                <span v-else class="text-lg font-bold text-gray-900">
+                                                <span v-else class="text-lg font-bold text-body">
                                                     {{ entry.rank }}{{ entry.rank === 1 ? 'st' : entry.rank === 2 ? 'nd' : entry.rank === 3 ? 'rd' : 'th' }}
                                                 </span>
                                             </div>
@@ -87,26 +87,26 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
                                                 <div>
-                                                    <div class="text-sm font-medium text-gray-900">
+                                                    <div class="text-sm font-medium text-body">
                                                         {{ entry.user.name }}
                                                         <span v-if="entry.user_id === $page.props.auth.user?.id" class="ml-2 text-xs text-primary">(You)</span>
                                                     </div>
-                                                    <div v-if="entry.user.email" class="text-sm text-gray-500">{{ entry.user.email }}</div>
+                                                    <div v-if="entry.user.email" class="text-sm text-muted">{{ entry.user.email }}</div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-semibold text-gray-900">{{ entry.total_score }}</div>
+                                            <div class="text-sm font-semibold text-body">{{ entry.total_score }}</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
-                                                <span class="text-sm font-medium text-gray-900">{{ parseFloat(entry.percentage).toFixed(1) }}%</span>
+                                                <span class="text-sm font-medium text-body">{{ parseFloat(entry.percentage).toFixed(1) }}%</span>
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900">{{ entry.answered_count }}</div>
+                                            <div class="text-sm text-body">{{ entry.answered_count }}</div>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">
                                             {{ entry.created_at ? formatDate(entry.created_at) : 'N/A' }}
                                         </td>
                                     </tr>
@@ -116,8 +116,8 @@
 
                         <div v-if="leaderboard.data.length === 0" class="text-center py-12">
                             <TrophyIcon class="mx-auto h-12 w-12 text-warning" />
-                            <h3 class="mt-2 text-sm font-medium text-gray-900">No entries yet</h3>
-                            <p class="mt-1 text-sm text-gray-500">Be the first to complete this event!</p>
+                            <h3 class="mt-2 text-sm font-medium text-body">No entries yet</h3>
+                            <p class="mt-1 text-sm text-muted">Be the first to complete this event!</p>
                         </div>
                     </div>
                 </div>

@@ -5,13 +5,13 @@
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <!-- Welcome -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border mb-6">
                     <div class="p-6">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-2">
+                        <h2 class="text-2xl font-bold text-body mb-2">
                             Welcome back, {{ user.name }}!
                         </h2>
-                        <p class="text-gray-600">Here are your game results</p>
-                        
+                        <p class="text-muted">Here are your game results</p>
+
                         <!-- Save This Link Notice -->
                         <div class="mt-4 bg-primary/10 border border-primary/30 rounded-lg p-4">
                             <div class="flex items-start gap-3">
@@ -25,7 +25,7 @@
                                         <input
                                             :value="currentUrl"
                                             readonly
-                                            class="flex-1 text-xs bg-white border border-primary/30 rounded px-2 py-1"
+                                            class="flex-1 text-xs bg-surface-elevated border border-primary/30 rounded px-2 py-1 text-body"
                                         />
                                         <button
                                             @click="copyLink"
@@ -41,36 +41,36 @@
                 </div>
 
                 <!-- Entries -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">My Entries</h3>
-                        
+                        <h3 class="text-lg font-semibold text-body mb-4">My Entries</h3>
+
                         <div v-if="entries.length === 0" class="text-center py-12">
                             <TrophyIcon class="w-16 h-16 text-warning mx-auto mb-4" />
-                            <p class="text-gray-600">No entries yet</p>
+                            <p class="text-muted">No entries yet</p>
                         </div>
 
                         <div v-else class="space-y-4">
                             <div
                                 v-for="entry in entries"
                                 :key="entry.id"
-                                class="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition"
+                                class="border border-border rounded-lg p-4 hover:border-muted hover:bg-surface-elevated transition"
                             >
                                 <div class="flex items-start justify-between">
                                     <div class="flex-1">
-                                        <h4 class="font-semibold text-gray-900">{{ entry.event_name }}</h4>
-                                        <p class="text-sm text-gray-600">{{ entry.group_name }}</p>
-                                        
+                                        <h4 class="font-semibold text-body">{{ entry.event_name }}</h4>
+                                        <p class="text-sm text-muted">{{ entry.group_name }}</p>
+
                                         <div class="mt-2 flex items-center gap-4">
                                             <div>
                                                 <span class="text-2xl font-bold text-success">{{ entry.percentage }}%</span>
-                                                <span class="text-sm text-gray-600 ml-1">
+                                                <span class="text-sm text-muted ml-1">
                                                     ({{ entry.total_score }}/{{ entry.possible_points }} {{ entry.possible_points === 1 ? 'point' : 'points' }})
                                                 </span>
                                             </div>
                                         </div>
 
-                                        <p v-if="entry.submitted_at" class="text-xs text-gray-500 mt-2">
+                                        <p v-if="entry.submitted_at" class="text-xs text-subtle mt-2">
                                             Submitted: {{ formatDate(entry.submitted_at) }}
                                         </p>
                                     </div>

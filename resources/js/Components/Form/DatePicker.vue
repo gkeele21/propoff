@@ -115,7 +115,7 @@ const descriptionId = computed(() => (props.error || props.hint) ? `${inputId.va
 <style>
 /* Custom styling to match our design system */
 .dp__input {
-    @apply rounded border border-border bg-white text-body pr-3;
+    @apply rounded border border-border bg-surface-elevated text-body pr-3;
     @apply focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none;
     padding-left: 2.5rem; /* Make room for the calendar icon */
 }
@@ -138,15 +138,19 @@ const descriptionId = computed(() => (props.error || props.hint) ? `${inputId.va
 }
 
 .dp-disabled .dp__input {
-    @apply bg-surface cursor-not-allowed text-muted;
+    @apply opacity-50 cursor-not-allowed;
 }
 
+/* Dark mode theme for date picker popup */
 .dp__theme_light {
-    --dp-primary-color: theme('colors.primary');
-    --dp-primary-text-color: theme('colors.white');
-    --dp-secondary-color: theme('colors.secondary');
-    --dp-border-color: theme('colors.border');
-    --dp-background-color: theme('colors.surface');
-    --dp-text-color: theme('colors.body');
+    --dp-primary-color: rgb(var(--color-primary));
+    --dp-primary-text-color: #ffffff;
+    --dp-secondary-color: rgb(var(--color-border));
+    --dp-border-color: rgb(var(--color-border));
+    --dp-background-color: rgb(var(--color-surface-elevated));
+    --dp-text-color: rgb(var(--color-text));
+    --dp-hover-color: rgb(var(--color-surface-overlay));
+    --dp-hover-text-color: rgb(var(--color-text));
+    --dp-disabled-color: rgb(var(--color-text-subtle));
 }
 </style>

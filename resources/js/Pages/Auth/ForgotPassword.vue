@@ -2,7 +2,7 @@
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import Button from '@/Components/Base/Button.vue';
 import TextField from '@/Components/Form/TextField.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 
 defineProps({
     status: {
@@ -23,16 +23,17 @@ const submit = () => {
     <GuestLayout>
         <Head title="Forgot Password" />
 
-        <div class="mb-4 text-sm text-gray-600">
-            Forgot your password? No problem. Just let us know your email address and we will email you a password reset
-            link that will allow you to choose a new one.
-        </div>
+        <h1 class="text-2xl font-bold text-body mb-4 text-center">Forgot password?</h1>
 
-        <div v-if="status" class="mb-4 font-medium text-sm text-success">
+        <p class="mb-6 text-sm text-muted text-center">
+            No problem. Enter your email and we'll send you a reset link.
+        </p>
+
+        <div v-if="status" class="mb-4 font-medium text-sm text-success text-center">
             {{ status }}
         </div>
 
-        <form @submit.prevent="submit">
+        <form @submit.prevent="submit" class="space-y-4">
             <TextField
                 id="email"
                 v-model="form.email"
@@ -44,11 +45,16 @@ const submit = () => {
                 autocomplete="username"
             />
 
-            <div class="flex items-center justify-end mt-4">
-                <Button variant="primary" :disabled="form.processing">
-                    Email Password Reset Link
-                </Button>
-            </div>
+            <Button type="submit" variant="primary" size="lg" class="w-full" :disabled="form.processing">
+                Email Password Reset Link
+            </Button>
         </form>
+
+        <p class="mt-6 text-center text-sm text-muted">
+            Remember your password?
+            <Link :href="route('login')" class="text-warning hover:text-body transition-colors font-medium">
+                Log in
+            </Link>
+        </p>
     </GuestLayout>
 </template>

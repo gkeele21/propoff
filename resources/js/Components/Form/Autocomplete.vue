@@ -28,12 +28,13 @@
                     aria-autocomplete="list"
                     autocomplete="off"
                     :class="[
-                        'w-full rounded border transition-colors text-body',
+                        'w-full rounded border transition-colors',
                         'focus:outline-none focus:ring-1',
+                        'bg-surface-elevated text-body placeholder:text-subtle',
                         error
                             ? 'border-danger focus:border-danger focus:ring-danger'
                             : 'border-border focus:border-primary focus:ring-primary',
-                        disabled ? 'bg-surface cursor-not-allowed text-muted' : 'bg-white',
+                        disabled ? 'opacity-50 cursor-not-allowed' : '',
                         sizes[size],
                         'pr-10'
                     ]"
@@ -63,7 +64,7 @@
                 ref="dropdownRef"
                 :id="listboxId"
                 role="listbox"
-                class="absolute top-full left-0 right-0 mt-1 z-50 bg-white border border-border rounded shadow-lg max-h-60 overflow-auto"
+                class="absolute top-full left-0 right-0 mt-1 z-50 bg-surface-elevated border border-border rounded shadow-lg max-h-60 overflow-auto"
             >
                         <!-- Loading state -->
                         <div v-if="isLoading" class="px-4 py-3 text-sm text-muted">

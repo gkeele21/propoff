@@ -27,17 +27,17 @@ defineProps({
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-6">
                         <div v-if="entries.data.length === 0" class="text-center py-12">
-                            <p class="text-gray-500">You haven't submitted any events yet.</p>
+                            <p class="text-muted">You haven't submitted any events yet.</p>
                         </div>
 
                         <div v-else class="space-y-4">
                             <div
                                 v-for="entry in entries.data"
                                 :key="entry.id"
-                                class="border rounded-lg p-6 hover:shadow-md transition"
+                                class="border border-border rounded-lg p-6 hover:shadow-md hover:bg-surface-elevated transition"
                             >
                                 <div class="flex items-start justify-between">
                                     <div class="flex-1">
@@ -46,7 +46,7 @@ defineProps({
                                                 :href="entry.is_complete
                                                     ? route('entries.show', entry.id)
                                                     : route('entries.continue', entry.id)"
-                                                class="text-xl font-semibold text-gray-900 hover:text-primary/80"
+                                                class="text-xl font-semibold text-body hover:text-primary/80"
                                             >
                                                 {{ entry.event.name }}
                                             </Link>
@@ -60,26 +60,26 @@ defineProps({
                                             </span>
                                         </div>
 
-                                        <div v-if="entry.group" class="mt-2 text-sm text-gray-500">
+                                        <div v-if="entry.group" class="mt-2 text-sm text-muted">
                                             Group: {{ entry.group.name }}
                                         </div>
 
                                         <div v-if="entry.is_complete" class="mt-4">
                                             <div class="flex items-center gap-6 text-sm">
                                                 <div>
-                                                    <span class="text-gray-500">Score:</span>
-                                                    <span class="ml-2 font-semibold text-gray-900">
+                                                    <span class="text-muted">Score:</span>
+                                                    <span class="ml-2 font-semibold text-body">
                                                         {{ entry.total_score }}
                                                     </span>
                                                 </div>
                                                 <div>
-                                                    <span class="text-gray-500">Max:</span>
-                                                    <span class="ml-2 font-semibold text-gray-900">
+                                                    <span class="text-muted">Max:</span>
+                                                    <span class="ml-2 font-semibold text-body">
                                                         {{ entry.possible_points }}
                                                     </span>
                                                 </div>
                                                 <div>
-                                                    <span class="text-gray-500">Percentage:</span>
+                                                    <span class="text-muted">Percentage:</span>
                                                     <span class="ml-2 font-semibold"
                                                         :class="{
                                                             'text-success': entry.percentage >= 80,
@@ -90,7 +90,7 @@ defineProps({
                                                         {{ entry.percentage.toFixed(1) }}%
                                                     </span>
                                                 </div>
-                                                <div class="text-gray-500">
+                                                <div class="text-muted">
                                                     Submitted: {{ new Date(entry.submitted_at).toLocaleDateString() }}
                                                 </div>
                                             </div>
@@ -117,11 +117,11 @@ defineProps({
                                     :key="index"
                                     :is="link.url ? Link : 'span'"
                                     :href="link.url"
-                                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium"
+                                    class="relative inline-flex items-center px-4 py-2 border border-border text-sm font-medium"
                                     :class="{
                                         'bg-primary/10 border-primary text-primary': link.active,
-                                        'bg-white text-gray-700 hover:bg-gray-50': !link.active && link.url,
-                                        'bg-gray-100 text-gray-400 cursor-not-allowed': !link.url,
+                                        'bg-surface text-body hover:bg-surface-elevated': !link.active && link.url,
+                                        'bg-surface-elevated text-muted cursor-not-allowed': !link.url,
                                         'rounded-l-md': index === 0,
                                         'rounded-r-md': index === entries.links.length - 1,
                                     }"
