@@ -2,10 +2,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import InputError from '@/Components/InputError.vue';
+import Button from '@/Components/Base/Button.vue';
+import TextField from '@/Components/Form/TextField.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 import { ArrowUpIcon, ArrowDownIcon, TrashIcon } from '@heroicons/vue/24/outline';
 
@@ -124,35 +122,23 @@ const submit = () => {
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <form @submit.prevent="submit" class="p-6 space-y-6">
                         <!-- Template Name -->
-                        <div>
-                            <InputLabel for="title" value="Template Name" />
-                            <TextInput
-                                id="title"
-                                v-model="form.title"
-                                type="text"
-                                class="mt-1 block w-full"
-                                required
-                            />
-                            <InputError :message="form.errors.title" class="mt-2" />
-                            <p class="mt-1 text-sm text-gray-500">
-                                A descriptive name for this template
-                            </p>
-                        </div>
+                        <TextField
+                            v-model="form.title"
+                            label="Template Name"
+                            :error="form.errors.title"
+                            hint="A descriptive name for this template"
+                            required
+                        />
 
                         <!-- Category -->
                         <div>
-                            <InputLabel for="category" value="Categories" />
-                            <TextInput
-                                id="category"
+                            <TextField
                                 v-model="form.category"
-                                type="text"
-                                class="mt-1 block w-full"
+                                label="Categories"
+                                :error="form.errors.category"
+                                hint="Enter one or more categories separated by commas (e.g., &quot;football,nfl,sports&quot;)"
                                 placeholder="e.g., football,nfl,sports"
                             />
-                            <InputError :message="form.errors.category" class="mt-2" />
-                            <p class="mt-1 text-sm text-gray-500">
-                                Enter one or more categories separated by commas (e.g., "football,nfl,sports")
-                            </p>
                             <!-- Category tags preview -->
                             <div v-if="categoryTags.length > 0" class="mt-2 flex gap-2 flex-wrap">
                                 <span
@@ -166,30 +152,24 @@ const submit = () => {
                         </div>
 
                         <!-- Base Points -->
-                        <div>
-                            <InputLabel for="default_points" value="Base Points" />
-                            <TextInput
-                                id="default_points"
-                                v-model="form.default_points"
-                                type="number"
-                                min="1"
-                                step="1"
-                                class="mt-1 block w-full"
-                                required
-                            />
-                            <InputError :message="form.errors.default_points" class="mt-2" />
-                            <p class="mt-1 text-sm text-gray-500">
-                                Points awarded for answering correctly (+ any option bonus)
-                            </p>
-                        </div>
+                        <TextField
+                            v-model="form.default_points"
+                            label="Base Points"
+                            type="number"
+                            :error="form.errors.default_points"
+                            hint="Points awarded for answering correctly (+ any option bonus)"
+                            min="1"
+                            step="1"
+                            required
+                        />
 
                         <!-- Question Type -->
                         <div>
-                            <InputLabel for="question_type" value="Question Type" />
+                            <label for="question_type" class="block text-sm font-medium text-gray-700 mb-1">Question Type</label>
                             <select
                                 id="question_type"
                                 v-model="form.question_type"
-                                class="mt-1 block w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                class="mt-1 block w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                             >
                                 <option value="multiple_choice">Multiple Choice</option>
                                 <option value="yes_no">Yes/No</option>
@@ -197,20 +177,20 @@ const submit = () => {
                                 <option value="text">Text</option>
                                 <option value="ranked_answers">Ranked Answers</option>
                             </select>
-                            <InputError :message="form.errors.question_type" class="mt-2" />
+                            <p v-if="form.errors.question_type" class="text-danger text-sm mt-1">{{ form.errors.question_type }}</p>
                         </div>
 
                         <!-- Question Text -->
                         <div>
-                            <InputLabel for="question_text" value="Question Text" />
+                            <label for="question_text" class="block text-sm font-medium text-gray-700 mb-1">Question Text</label>
                             <textarea
                                 id="question_text"
                                 v-model="form.question_text"
                                 rows="3"
-                                class="mt-1 block w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                class="mt-1 block w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                 required
                             ></textarea>
-                            <InputError :message="form.errors.question_text" class="mt-2" />
+                            <p v-if="form.errors.question_text" class="text-danger text-sm mt-1">{{ form.errors.question_text }}</p>
                             <p class="mt-1 text-sm text-gray-500">
                                 Use {variable} syntax for dynamic content (e.g., "Who will win {team1} vs {team2}?")
                             </p>
@@ -218,7 +198,7 @@ const submit = () => {
 
                         <!-- Variables -->
                         <div>
-                            <InputLabel value="Variables" />
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Variables</label>
                             <div class="mt-2 space-y-2">
                                 <div
                                     v-for="(variable, index) in form.variables"
@@ -229,17 +209,17 @@ const submit = () => {
                                     <button
                                         type="button"
                                         @click="removeVariable(index)"
-                                        class="px-3 py-2 text-sm text-propoff-red hover:text-propoff-red/80"
+                                        class="px-3 py-2 text-sm text-danger hover:text-danger/80"
                                     >
                                         Remove
                                     </button>
                                 </div>
                             </div>
                             <div class="mt-2 flex gap-2">
-                                <TextInput
+                                <input
                                     v-model="newVariable"
                                     type="text"
-                                    class="flex-1"
+                                    class="flex-1 border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                     placeholder="Variable name (e.g., team1)"
                                     @keyup.enter="addVariable"
                                 />
@@ -276,7 +256,7 @@ const submit = () => {
                                             <input
                                                 type="text"
                                                 v-model="form.default_options[index].label"
-                                                class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                                class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                                 :placeholder="`Option ${String.fromCharCode(65 + index)}`"
                                             />
                                             <div class="flex items-center gap-2">
@@ -286,7 +266,7 @@ const submit = () => {
                                                     v-model.number="form.default_options[index].points"
                                                     min="0"
                                                     step="1"
-                                                    class="w-20 text-sm border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                                    class="w-20 text-sm border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                                     placeholder="0"
                                                 />
                                                 <span class="text-xs text-gray-400">+bonus pts (optional)</span>
@@ -296,7 +276,7 @@ const submit = () => {
                                             v-if="form.default_options.length > 2"
                                             type="button"
                                             @click="removeOption(index)"
-                                            class="flex-shrink-0 px-3 py-2 text-sm text-propoff-red hover:text-propoff-red/80"
+                                            class="flex-shrink-0 px-3 py-2 text-sm text-danger hover:text-danger/80"
                                         >
                                             Remove
                                         </button>
@@ -329,7 +309,7 @@ const submit = () => {
                                     class="flex items-center gap-3 p-4 border border-gray-200 rounded-lg"
                                 >
                                     <!-- Rank Number -->
-                                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-propoff-orange text-white flex items-center justify-center font-bold">
+                                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-warning text-white flex items-center justify-center font-bold">
                                         #{{ answer.display_order }}
                                     </div>
 
@@ -349,7 +329,7 @@ const submit = () => {
                                             type="button"
                                             @click="moveAnswerUp(index)"
                                             :disabled="index === 0"
-                                            class="p-1 text-gray-600 hover:text-propoff-blue disabled:opacity-30 disabled:cursor-not-allowed"
+                                            class="p-1 text-gray-600 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed"
                                             title="Move up (higher rank)"
                                         >
                                             <ArrowUpIcon class="w-5 h-5" />
@@ -358,7 +338,7 @@ const submit = () => {
                                             type="button"
                                             @click="moveAnswerDown(index)"
                                             :disabled="index === form.template_answers.length - 1"
-                                            class="p-1 text-gray-600 hover:text-propoff-blue disabled:opacity-30 disabled:cursor-not-allowed"
+                                            class="p-1 text-gray-600 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed"
                                             title="Move down (lower rank)"
                                         >
                                             <ArrowDownIcon class="w-5 h-5" />
@@ -381,31 +361,31 @@ const submit = () => {
                                 v-if="form.template_answers.length < 7"
                                 type="button"
                                 @click="addTemplateAnswer"
-                                class="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-propoff-blue hover:text-propoff-blue transition"
+                                class="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-primary hover:text-primary transition"
                             >
                                 + Add Answer ({{ form.template_answers.length }}/7)
                             </button>
 
-                            <div v-if="form.template_answers.length > 0" class="mt-3 bg-propoff-blue/10 border border-propoff-blue/30 rounded-lg p-3">
-                                <p class="text-xs text-propoff-blue">
+                            <div v-if="form.template_answers.length > 0" class="mt-3 bg-primary/10 border border-primary/30 rounded-lg p-3">
+                                <p class="text-xs text-primary">
                                     <strong>Tip:</strong> Answer #1 should be the most popular/common response, #7 the least popular.
                                 </p>
                             </div>
                         </div>
 
                         <!-- Example Preview -->
-                        <div class="bg-propoff-blue/10 rounded-lg p-4">
-                            <h4 class="font-medium text-propoff-blue mb-2">Template Example</h4>
-                            <p class="text-sm text-propoff-blue">
+                        <div class="bg-primary/10 rounded-lg p-4">
+                            <h4 class="font-medium text-primary mb-2">Template Example</h4>
+                            <p class="text-sm text-primary">
                                 Question: {{ form.question_text || 'Enter question text...' }}
                             </p>
                             <div v-if="form.variables.length > 0" class="mt-2">
-                                <p class="text-xs text-propoff-blue font-medium">Variables:</p>
+                                <p class="text-xs text-primary font-medium">Variables:</p>
                                 <div class="flex flex-wrap gap-1 mt-1">
                                     <span
                                         v-for="variable in form.variables"
                                         :key="variable"
-                                        class="px-2 py-1 bg-propoff-blue/20 text-propoff-blue text-xs rounded"
+                                        class="px-2 py-1 bg-primary/20 text-primary text-xs rounded"
                                     >
                                         {{ variable }}
                                     </span>
@@ -421,12 +401,13 @@ const submit = () => {
                             >
                                 Cancel
                             </Link>
-                            <PrimaryButton
+                            <Button
+                                variant="primary"
                                 type="submit"
                                 :disabled="form.processing"
                             >
                                 Create Template
-                            </PrimaryButton>
+                            </Button>
                         </div>
                     </form>
                 </div>

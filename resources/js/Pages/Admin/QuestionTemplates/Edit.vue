@@ -28,10 +28,10 @@
                                 type="text"
                                 id="title"
                                 v-model="form.title"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary/50"
                                 required
                             />
-                            <div v-if="form.errors.title" class="text-propoff-red text-sm mt-1">{{ form.errors.title }}</div>
+                            <div v-if="form.errors.title" class="text-danger text-sm mt-1">{{ form.errors.title }}</div>
                         </div>
 
                         <!-- Category -->
@@ -42,9 +42,9 @@
                                 id="category"
                                 v-model="form.category"
                                 placeholder="e.g., football,nfl,sports"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary/50"
                             />
-                            <div v-if="form.errors.category" class="text-propoff-red text-sm mt-1">{{ form.errors.category }}</div>
+                            <div v-if="form.errors.category" class="text-danger text-sm mt-1">{{ form.errors.category }}</div>
                             <p class="mt-1 text-sm text-gray-500">
                                 Enter one or more categories separated by commas (e.g., "football,nfl,sports")
                             </p>
@@ -69,13 +69,13 @@
                                 v-model.number="form.default_points"
                                 min="1"
                                 step="1"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary/50"
                                 required
                             />
                             <p class="mt-1 text-sm text-gray-500">
                                 Points awarded for answering correctly (+ any option bonus)
                             </p>
-                            <div v-if="form.errors.default_points" class="text-propoff-red text-sm mt-1">{{ form.errors.default_points }}</div>
+                            <div v-if="form.errors.default_points" class="text-danger text-sm mt-1">{{ form.errors.default_points }}</div>
                         </div>
 
                         <!-- Question Type -->
@@ -84,7 +84,7 @@
                             <select
                                 id="question_type"
                                 v-model="form.question_type"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary/50"
                                 required
                             >
                                 <option value="multiple_choice">Multiple Choice</option>
@@ -93,7 +93,7 @@
                                 <option value="text">Text</option>
                                 <option value="ranked_answers">Ranked Answers (AmericaSays)</option>
                             </select>
-                            <div v-if="form.errors.question_type" class="text-propoff-red text-sm mt-1">{{ form.errors.question_type }}</div>
+                            <div v-if="form.errors.question_type" class="text-danger text-sm mt-1">{{ form.errors.question_type }}</div>
                         </div>
 
                         <!-- Question Text -->
@@ -103,12 +103,12 @@
                                 id="question_text"
                                 v-model="form.question_text" 
                                 rows="4"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary/50"
                                 placeholder="Use {variable} syntax for dynamic content"
                                 required
                             ></textarea>
                             <p class="mt-1 text-sm text-gray-500">Use curly braces for variables, e.g., {team1}, {player1}</p>
-                            <div v-if="form.errors.question_text" class="text-propoff-red text-sm mt-1">{{ form.errors.question_text }}</div>
+                            <div v-if="form.errors.question_text" class="text-danger text-sm mt-1">{{ form.errors.question_text }}</div>
                         </div>
 
                         <!-- Variables -->
@@ -120,14 +120,14 @@
                                     <input 
                                         type="text" 
                                         v-model="form.variables[index]" 
-                                        class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                        class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary/50"
                                         placeholder="variable_name"
                                     />
                                     <span class="text-gray-600">}</span>
                                     <button 
                                         type="button" 
                                         @click="removeVariable(index)" 
-                                        class="px-3 py-2 bg-propoff-red text-white rounded-md hover:bg-propoff-red/80"
+                                        class="px-3 py-2 bg-danger text-white rounded-md hover:bg-danger/80"
                                     >
                                         Remove
                                     </button>
@@ -162,7 +162,7 @@
                                             <input
                                                 type="text"
                                                 v-model="form.default_options[index].label"
-                                                class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                                class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                                 :placeholder="`Option ${String.fromCharCode(65 + index)}`"
                                             />
                                             <div class="flex items-center gap-2">
@@ -172,7 +172,7 @@
                                                     v-model.number="form.default_options[index].points"
                                                     min="0"
                                                     step="1"
-                                                    class="w-20 text-sm border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                                    class="w-20 text-sm border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                                     placeholder="0"
                                                 />
                                                 <span class="text-xs text-gray-400">+bonus pts (optional)</span>
@@ -182,7 +182,7 @@
                                             v-if="form.default_options.length > 2"
                                             type="button"
                                             @click="removeOption(index)"
-                                            class="flex-shrink-0 px-3 py-2 text-sm text-propoff-red hover:text-propoff-red/80"
+                                            class="flex-shrink-0 px-3 py-2 text-sm text-danger hover:text-danger/80"
                                         >
                                             Remove
                                         </button>
@@ -215,7 +215,7 @@
                                     class="flex items-center gap-3 p-4 border border-gray-200 rounded-lg"
                                 >
                                     <!-- Rank Number -->
-                                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-propoff-orange text-white flex items-center justify-center font-bold">
+                                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-warning text-white flex items-center justify-center font-bold">
                                         #{{ answer.display_order }}
                                     </div>
 
@@ -224,7 +224,7 @@
                                         <input
                                             v-model="answer.answer_text"
                                             type="text"
-                                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary/50"
                                             placeholder="Enter answer..."
                                         />
                                     </div>
@@ -235,7 +235,7 @@
                                             type="button"
                                             @click="moveAnswerUp(index)"
                                             :disabled="index === 0"
-                                            class="p-1 text-gray-600 hover:text-propoff-blue disabled:opacity-30 disabled:cursor-not-allowed"
+                                            class="p-1 text-gray-600 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed"
                                             title="Move up (higher rank)"
                                         >
                                             <ArrowUpIcon class="w-5 h-5" />
@@ -244,7 +244,7 @@
                                             type="button"
                                             @click="moveAnswerDown(index)"
                                             :disabled="index === form.template_answers.length - 1"
-                                            class="p-1 text-gray-600 hover:text-propoff-blue disabled:opacity-30 disabled:cursor-not-allowed"
+                                            class="p-1 text-gray-600 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed"
                                             title="Move down (lower rank)"
                                         >
                                             <ArrowDownIcon class="w-5 h-5" />
@@ -267,21 +267,21 @@
                                 v-if="form.template_answers.length < 7"
                                 type="button"
                                 @click="addTemplateAnswer"
-                                class="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-propoff-blue hover:text-propoff-blue transition"
+                                class="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-primary hover:text-primary transition"
                             >
                                 + Add Answer ({{ form.template_answers.length }}/7)
                             </button>
 
-                            <div v-if="form.template_answers.length > 0" class="mt-3 bg-propoff-blue/10 border border-propoff-blue/30 rounded-lg p-3">
-                                <p class="text-xs text-propoff-blue">
+                            <div v-if="form.template_answers.length > 0" class="mt-3 bg-primary/10 border border-primary/30 rounded-lg p-3">
+                                <p class="text-xs text-primary">
                                     <strong>Tip:</strong> Answer #1 should be the most popular/common response, #7 the least popular.
                                 </p>
                             </div>
                         </div>
 
                         <!-- Preview -->
-                        <div class="bg-propoff-blue/10 border border-propoff-blue/30 rounded-lg p-4">
-                            <h4 class="text-sm font-semibold text-propoff-blue mb-2">Preview</h4>
+                        <div class="bg-primary/10 border border-primary/30 rounded-lg p-4">
+                            <h4 class="text-sm font-semibold text-primary mb-2">Preview</h4>
                             <p class="text-sm text-gray-700 mb-2">{{ form.question_text }}</p>
                             <div v-if="form.variables.length > 0" class="text-xs text-gray-600">
                                 <strong>Variables:</strong> 
@@ -299,7 +299,7 @@
                             <button 
                                 type="submit" 
                                 :disabled="form.processing"
-                                class="px-4 py-2 bg-propoff-blue text-white rounded-md hover:bg-propoff-blue/80 disabled:opacity-50"
+                                class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80 disabled:opacity-50"
                             >
                                 {{ form.processing ? 'Updating...' : 'Update Template' }}
                             </button>

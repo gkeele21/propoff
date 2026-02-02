@@ -1,127 +1,205 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import {
-    PencilIcon,
-    DocumentDuplicateIcon,
-    TrashIcon,
-    ChartBarIcon,
-    DocumentTextIcon,
-    ClipboardDocumentCheckIcon,
-} from '@heroicons/vue/24/outline';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import PageHeader from '@/Components/PageHeader.vue';
-import ToastNotification from '@/Components/ToastNotification.vue';
+import { Head, Link, router } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import Button from '@/Components/Base/Button.vue';
+import Badge from '@/Components/Base/Badge.vue';
+import Card from '@/Components/Base/Card.vue';
+import Icon from '@/Components/Base/Icon.vue';
+import Dropdown from '@/Components/Form/Dropdown.vue';
+import QuestionCard from '@/Components/Domain/QuestionCard.vue';
+import QuestionModal from '@/Components/Domain/QuestionModal.vue';
+import Confirm from '@/Components/Feedback/Confirm.vue';
+import Toast from '@/Components/Feedback/Toast.vue';
 
 const props = defineProps({
-    event: Object,
-    stats: Object,
-    invitations: {
-        type: Array,
-        default: () => []
+    event: {
+        type: Object,
+        required: true,
     },
-    availableGroups: {
+    questions: {
         type: Array,
-        default: () => []
+        default: () => [],
+    },
+    stats: {
+        type: Object,
+        default: () => ({}),
     },
 });
 
-const showDeleteModal = ref(false);
-const statusUpdating = ref(false);
-const showCopiedToast = ref(false);
-
+// Format date helper
 const formatDate = (dateString) => {
+    if (!dateString) return '';
     return new Date(dateString).toLocaleDateString('en-US', {
         year: 'numeric',
-        month: 'long',
+        month: 'short',
         day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+        hour: 'numeric',
+        minute: '2-digit',
     });
 };
 
-const updateStatus = (newStatus) => {
-    if (confirm(`Are you sure you want to change the event status to "${newStatus}"?`)) {
-        statusUpdating.value = true;
-        router.post(
-            route('admin.events.updateStatus', props.event.id),
-            { status: newStatus },
-            {
-                onFinish: () => {
-                    statusUpdating.value = false;
-                },
-            }
-        );
-    }
+// Question management
+const showAddEditModal = ref(false);
+const editingQuestion = ref(null);
+const selectedAnswers = ref({}); // Track selected answers per question
+const showDeleteConfirm = ref(false);
+const questionToDelete = ref(null);
+const toastMessage = ref('');
+const showToast = ref(false);
+
+// Open modal for adding new question
+const openAddModal = () => {
+    editingQuestion.value = null;
+    showAddEditModal.value = true;
 };
 
-const duplicateEvent = () => {
-    if (confirm('Are you sure you want to duplicate this event?')) {
-        router.post(route('admin.events.duplicate', props.event.id), {}, {
-            onSuccess: () => {
-                router.visit(route('admin.events.index'));
-            }
-        });
-    }
+// Open modal for editing question
+const openEditModal = (question) => {
+    editingQuestion.value = question;
+    showAddEditModal.value = true;
 };
 
-const deleteEvent = () => {
-    if (confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
-        router.delete(route('admin.events.destroy', props.event.id), {
-            onSuccess: () => {
-                router.visit(route('admin.events.index'));
-            }
-        });
-    }
+// Close modal
+const closeModal = () => {
+    showAddEditModal.value = false;
+    editingQuestion.value = null;
 };
 
-const getStatusClass = (status) => {
-    const classes = {
-        'draft': 'bg-gray-100 text-gray-800',
-        'open': 'bg-propoff-green/20 text-propoff-dark-green',
-        'locked': 'bg-propoff-orange/20 text-propoff-orange',
-        'completed': 'bg-propoff-dark-green/20 text-propoff-dark-green',
-    };
-    return classes[status] || 'bg-gray-100 text-gray-800';
+// Navigate to import page
+const navigateToImport = () => {
+    router.visit(route('admin.events.import-questions', props.event.id));
 };
 
-// Invitation management
-const selectedGroupId = ref('');
-const generatingInvitation = ref(false);
+// Handle answer selection
+const selectAnswer = (questionId, answerValue) => {
+    selectedAnswers.value[questionId] = answerValue;
+};
 
-const generateInvitation = () => {
-    if (!selectedGroupId.value) return;
-    
-    generatingInvitation.value = true;
+// Check if answer is selected for question
+const hasSelectedAnswer = (questionId) => {
+    return selectedAnswers.value[questionId] !== undefined;
+};
+
+// Save answer for question
+const saveAnswer = (question) => {
+    const answer = selectedAnswers.value[question.id];
+    if (!answer) return;
+
     router.post(
-        route('admin.events.generateInvitation', props.event.id),
-        { group_id: selectedGroupId.value },
+        route('admin.events.questions.set-answer', [props.event.id, question.id]),
+        { answer },
         {
-            onFinish: () => {
-                generatingInvitation.value = false;
-                selectedGroupId.value = '';
-            }
+            onSuccess: () => {
+                delete selectedAnswers.value[question.id];
+                showToastMessage('Answer saved and scores calculated');
+            },
+            onError: () => {
+                showToastMessage('Error saving answer');
+            },
         }
     );
 };
 
-const copyInvitationLink = (token) => {
-    const url = route('guest.join', token);
-    navigator.clipboard.writeText(url).then(() => {
-        showCopiedToast.value = true;
-        setTimeout(() => {
-            showCopiedToast.value = false;
-        }, 3000);
-    });
+// Duplicate question
+const duplicateQuestion = (question) => {
+    router.post(
+        route('admin.events.event-questions.duplicate', [props.event.id, question.id]),
+        {},
+        {
+            onSuccess: () => {
+                showToastMessage('Question duplicated successfully');
+            },
+        }
+    );
 };
 
-const deactivateInvitation = (invitationId) => {
-    if (!confirm('Deactivate this invitation? Guests will no longer be able to use this link.')) {
+// Toggle void for question
+const toggleVoid = (question) => {
+    router.post(
+        route('admin.events.event-answers.toggleVoid', [props.event.id, question.id]),
+        {},
+        {
+            onSuccess: () => {
+                showToastMessage(question.is_void ? 'Question unvoided' : 'Question voided');
+            },
+        }
+    );
+};
+
+// Delete question (show confirmation)
+const confirmDelete = (question) => {
+    questionToDelete.value = question;
+    showDeleteConfirm.value = true;
+};
+
+// Execute delete
+const deleteQuestion = () => {
+    if (!questionToDelete.value) return;
+
+    router.delete(
+        route('admin.events.event-questions.destroy', [props.event.id, questionToDelete.value.id]),
+        {
+            onSuccess: () => {
+                showToastMessage('Question deleted successfully');
+                questionToDelete.value = null;
+                showDeleteConfirm.value = false;
+            },
+        }
+    );
+};
+
+// Drag and drop reordering
+const draggedQuestion = ref(null);
+
+const handleDragStart = (question) => {
+    draggedQuestion.value = question;
+};
+
+const handleDragOver = (e) => {
+    e.preventDefault();
+};
+
+const handleDrop = (targetQuestion) => {
+    if (!draggedQuestion.value || draggedQuestion.value.id === targetQuestion.id) {
         return;
     }
-    
-    router.post(route('admin.events.deactivateInvitation', [props.event.id, invitationId]));
+
+    // Reorder on backend
+    router.post(
+        route('admin.events.event-questions.reorder', props.event.id),
+        {
+            question_id: draggedQuestion.value.id,
+            new_order: targetQuestion.display_order,
+        },
+        {
+            onSuccess: () => {
+                showToastMessage('Questions reordered');
+            },
+        }
+    );
+
+    draggedQuestion.value = null;
+};
+
+// Toast helper
+const showToastMessage = (message) => {
+    toastMessage.value = message;
+    showToast.value = true;
+    setTimeout(() => {
+        showToast.value = false;
+    }, 3000);
+};
+
+// Get status badge variant
+const getStatusVariant = (status) => {
+    const variants = {
+        draft: 'default',
+        open: 'success',
+        locked: 'warning',
+        completed: 'success',
+    };
+    return variants[status] || 'default';
 };
 </script>
 
@@ -129,347 +207,209 @@ const deactivateInvitation = (invitationId) => {
     <Head :title="event.name" />
 
     <AuthenticatedLayout>
-        <template #header>
-            <PageHeader
-                :title="event.name"
-                :crumbs="[
-                    { label: 'Admin Dashboard', href: route('admin.dashboard') },
-                    { label: 'Events', href: route('admin.events.index') },
-                    { label: event.name }
-                ]"
-            >
-                <template #metadata>
-                    <span
-                        class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
-                        :class="getStatusClass(event.status)"
-                    >
-                        {{ event.status }}
-                    </span>
-                    <span class="text-gray-400 mx-2">•</span>
-                    <span>{{ formatDate(event.event_date) }}</span>
-                </template>
-                <template #actions>
-                    <Link :href="route('admin.events.edit', event.id)">
-                        <PrimaryButton>
-                            <PencilIcon class="w-4 h-4 mr-2" />
-                            Edit
-                        </PrimaryButton>
-                    </Link>
-                </template>
-            </PageHeader>
-        </template>
-
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-
-                <!-- Quick Actions -->
-                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <!-- Manage Questions (Always show) -->
-                            <Link
-                                :href="route('admin.events.event-questions.index', event.id)"
-                                class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md border-2 border-gray-200 rounded-lg hover:border-propoff-blue hover:bg-propoff-blue/10 transition"
-                            >
-                                <div class="p-6 flex items-center">
-                                    <DocumentTextIcon class="w-10 h-10 text-propoff-blue mr-4" />
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500">Manage Event</p>
-                                        <p class="text-lg font-semibold text-gray-900">Questions</p>
-                                    </div>
-                                </div>
-                            </Link>
-
-                            <!-- Set Event Answers (GameQuiz only) -->
-                            <Link
-                                v-if="event.event_type === 'GameQuiz'"
-                                :href="route('admin.events.event-answers.index', event.id)"
-                                class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md border-2 border-gray-200 rounded-lg hover:border-propoff-green hover:bg-propoff-green/10 transition"
-                            >
-                                <div class="p-6 flex items-center">
-                                    <ClipboardDocumentCheckIcon class="w-10 h-10 text-propoff-green mr-4" />
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500">
-                                            Set Event
-                                        </p>
-                                        <p class="text-lg font-semibold text-gray-900">Answers</p>
-                                    </div>
-                                </div>
-                            </Link>
-
-                            <!-- Captain Invitations (GameQuiz only) -->
-                            <Link
-                                v-if="event.event_type === 'GameQuiz'"
-                                :href="route('admin.events.captain-invitations.index', event.id)"
-                                class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md border-2 border-gray-200 rounded-lg hover:border-propoff-blue hover:bg-propoff-blue/10 transition"
-                            >
-                                <div class="p-6 flex items-center">
-                                    <svg class="w-10 h-10 text-propoff-blue mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                    </svg>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500">Manage Captain</p>
-                                        <p class="text-lg font-semibold text-gray-900">Invitations</p>
-                                    </div>
-                                </div>
-                            </Link>
-
-                            <!-- Host Game (AmericaSays only) -->
-                            <Link
-                                v-if="event.event_type === 'AmericaSays'"
-                                :href="route('admin.america-says.host-game', event.id)"
-                                class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md border-2 border-gray-200 rounded-lg hover:border-propoff-blue hover:bg-propoff-blue/10 transition"
-                            >
-                                <div class="p-6 flex items-center">
-                                    <svg class="w-10 h-10 text-propoff-blue mr-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M8 5v14l11-7z"/>
-                                    </svg>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500">Run</p>
-                                        <p class="text-lg font-semibold text-gray-900">Host Game</p>
-                                    </div>
-                                </div>
-                            </Link>
-
-                            <!-- Launch Game Board (AmericaSays only) -->
-                            <Link
-                                v-if="event.event_type === 'AmericaSays'"
-                                :href="route('america-says.game-board', event.id)"
-                                target="_blank"
-                                class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md border-2 border-gray-200 rounded-lg hover:border-propoff-orange hover:bg-propoff-orange/10 transition"
-                            >
-                                <div class="p-6 flex items-center">
-                                    <svg class="w-10 h-10 text-propoff-orange mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                    </svg>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500">Launch</p>
-                                        <p class="text-lg font-semibold text-gray-900">Game Board</p>
-                                    </div>
-                                </div>
-                            </Link>
+        <!-- Compact Event Header -->
+        <div class="bg-white shadow-sm mb-8">
+            <div class="max-w-7xl mx-auto px-6 py-6">
+                <div class="flex justify-between items-start gap-6">
+                    <!-- Left: Title, Status, Meta Info -->
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 flex-wrap mb-2">
+                            <h1 class="text-2xl font-bold text-body">{{ event.name }}</h1>
+                            <Badge :variant="getStatusVariant(event.status)">
+                                {{ event.status }}
+                            </Badge>
+                            <span class="text-subtle">
+                                📅 {{ formatDate(event.event_date) }}
+                            </span>
+                            <span class="text-subtle">
+                                👥 {{ stats.total_entries || 0 }} entries
+                            </span>
                         </div>
-
-                            <!-- <Link
-                                :href="route('admin.events.grading.index', event.id)"
-                                class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md transition"
-                            >
-                                <div class="p-6 flex items-center">
-                                    <ChartBarIcon class="w-10 h-10 text-propoff-dark-green mr-4" />
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500">View</p>
-                                        <p class="text-lg font-semibold text-gray-900">Grading Overview</p>
-                                    </div>
-                                </div>
-                            </Link>
-
-                            <Link
-                                :href="route('admin.events.statistics', event.id)"
-                                class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md transition"
-                            >
-                                <div class="p-6 flex items-center">
-                                    <ChartBarIcon class="w-10 h-10 text-propoff-dark-green mr-4" />
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500">View</p>
-                                        <p class="text-lg font-semibold text-gray-900">Statistics</p>
-                                    </div>
-                                </div>
-                            </Link> -->
+                        <p class="text-muted">{{ event.description }}</p>
                     </div>
-                </div>
-                
-                <!-- Event Info -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900">Event Information</h3>
-                                <span
-                                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mt-2"
-                                    :class="getStatusClass(event.status)"
-                                >
-                                    {{ event.status }}
-                                </span>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button
-                                    @click="duplicateEvent"
-                                    class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                                >
-                                    <DocumentDuplicateIcon class="w-4 h-4 mr-2" />
-                                    Duplicate
-                                </button>
-                                <button
-                                    @click="deleteEvent"
-                                    class="inline-flex items-center px-3 py-2 border border-propoff-red/30 shadow-sm text-sm leading-4 font-medium rounded-md text-propoff-red bg-white hover:bg-propoff-red/10"
-                                >
-                                    <TrashIcon class="w-4 h-4 mr-2" />
-                                    Delete
-                                </button>
-                            </div>
-                        </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">Description</p>
-                                <p class="mt-1 text-gray-900">{{ event.description || 'No description' }}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">Event Date</p>
-                                <p class="mt-1 text-gray-900">{{ formatDate(event.event_date) }}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">Lock Date</p>
-                                <p class="mt-1 text-gray-900">
-                                    {{ event.lock_date ? formatDate(event.lock_date) : 'Not set' }}
-                                </p>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">Created</p>
-                                <p class="mt-1 text-gray-900">{{ formatDate(event.created_at) }}</p>
-                            </div>
-                        </div>
-
-                        <!-- Status Actions -->
-                        <div class="mt-6 border-t pt-6">
-                            <p class="text-sm font-medium text-gray-700 mb-3">Change Status</p>
-                            <div class="flex space-x-2">
-                                <button
-                                    v-for="status in ['draft', 'open', 'locked', 'completed']"
-                                    :key="status"
-                                    @click="updateStatus(status)"
-                                    :disabled="event.status === status || statusUpdating"
-                                    class="px-4 py-2 text-sm font-medium rounded-md capitalize"
-                                    :class="
-                                        event.status === status
-                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                            : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                                    "
-                                >
-                                    {{ status }}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Statistics -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Statistics</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div class="bg-propoff-blue/10 rounded-lg p-4">
-                                <p class="text-sm text-propoff-blue font-medium">Total Questions</p>
-                                <p class="text-2xl font-bold text-propoff-blue">{{ stats.total_questions }}</p>
-                            </div>
-                            <div class="bg-propoff-green/10 rounded-lg p-4">
-                                <p class="text-sm text-propoff-green font-medium">Total Entries</p>
-                                <p class="text-2xl font-bold text-propoff-dark-green">{{ stats.total_entries }}</p>
-                            </div>
-                            <div class="bg-propoff-dark-green/10 rounded-lg p-4">
-                                <p class="text-sm text-propoff-dark-green font-medium">Completed</p>
-                                <p class="text-2xl font-bold text-propoff-dark-green">{{ stats.completed_entries }}</p>
-                            </div>
-                            <div class="bg-propoff-orange/10 rounded-lg p-4">
-                                <p class="text-sm text-propoff-orange font-medium">Average Score</p>
-                                <p class="text-2xl font-bold text-propoff-orange">{{ stats.average_score?.toFixed(1) || 0 }}%</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event Invitations (GameQuiz only) -->
-                <div v-if="event.event_type === 'GameQuiz'" class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Event Invitations</h3>
-                        
-                        <!-- Generate Invitation Form -->
-                        <div class="mb-6 bg-gray-50 p-4 rounded-lg">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Generate invitation link for group:
-                            </label>
-                            <div class="flex gap-2">
-                                <select 
-                                    v-model="selectedGroupId" 
-                                    class="flex-1 border-gray-300 rounded-md shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
-                                >
-                                    <option value="">Select a group...</option>
-                                    <option 
-                                        v-for="group in availableGroups" 
-                                        :key="group.id" 
-                                        :value="group.id"
-                                    >
-                                        {{ group.name }}
-                                    </option>
-                                </select>
-                                <button
-                                    @click="generateInvitation"
-                                    :disabled="!selectedGroupId || generatingInvitation"
-                                    class="px-4 py-2 bg-propoff-blue text-white rounded-md hover:bg-propoff-blue/80 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
-                                >
-                                    {{ generatingInvitation ? 'Generating...' : 'Generate Link' }}
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Existing Invitations List -->
-                        <div v-if="invitations && invitations.length > 0" class="space-y-3">
-                            <div
-                                v-for="invitation in invitations"
-                                :key="invitation.id"
-                                class="border border-gray-200 rounded-lg p-4"
-                            >
-                                <div class="flex items-center justify-between mb-2">
-                                    <div class="flex items-center gap-2">
-                                        <span class="font-medium text-gray-900">{{ invitation.group.name }}</span>
-                                        <span
-                                            :class="invitation.is_active ? 'bg-propoff-green/20 text-propoff-dark-green' : 'bg-gray-100 text-gray-800'"
-                                            class="px-2 py-1 text-xs rounded-full font-medium"
-                                        >
-                                            {{ invitation.is_active ? 'Active' : 'Inactive' }}
-                                        </span>
-                                    </div>
-                                    <button
-                                        v-if="invitation.is_active"
-                                        @click="deactivateInvitation(invitation.id)"
-                                        class="px-3 py-1 bg-propoff-red text-white text-sm rounded hover:bg-propoff-red/80 font-semibold"
-                                    >
-                                        Deactivate
-                                    </button>
-                                </div>
-                                
-                                <div class="flex items-center gap-2 mb-2">
-                                    <input
-                                        :value="route('guest.join', invitation.token)"
-                                        readonly
-                                        class="flex-1 text-sm bg-gray-50 border border-gray-300 rounded px-3 py-2 font-mono"
-                                    />
-                                    <button
-                                        @click="copyInvitationLink(invitation.token)"
-                                        class="px-4 py-2 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 font-semibold"
-                                    >
-                                        Copy Link
-                                    </button>
-                                </div>
-                                
-                                <p class="text-xs text-gray-500">
-                                    Used {{ invitation.times_used }} {{ invitation.times_used === 1 ? 'time' : 'times' }}
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div v-else class="text-center py-8 text-gray-500">
-                            <p>No invitations generated yet</p>
-                            <p class="text-sm mt-1">Select a group above to create an invitation link</p>
-                        </div>
+                    <!-- Right: Action Buttons -->
+                    <div class="flex gap-2">
+                        <Link :href="route('admin.events.captain-invitations.index', event.id)">
+                            <Button variant="accent" size="sm">
+                                Manage Invitations
+                            </Button>
+                        </Link>
+                        <Link :href="route('admin.events.edit', event.id)">
+                            <Button variant="primary">
+                                <Icon name="pencil" class="mr-2" size="sm" />
+                                Edit Event
+                            </Button>
+                        </Link>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-6 pb-12">
+            <!-- Questions Section -->
+            <Card :header-padding="false">
+                <template #header>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <h2 class="text-xl font-bold text-body">Questions</h2>
+                                <Badge variant="primary-soft" size="sm">{{ questions.length }}</Badge>
+                            </div>
+                            <div class="flex gap-2">
+                                <Button variant="secondary" size="sm" @click="navigateToImport">
+                                    <Icon name="file-import" class="mr-2" size="sm" />
+                                    Import from Template
+                                </Button>
+                                <Button variant="primary" size="sm" @click="openAddModal">
+                                    <Icon name="plus" class="mr-2" size="sm" />
+                                    Add Custom Question
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Questions List -->
+                <div class="space-y-6 p-6">
+                    <div
+                        v-for="(question, index) in questions"
+                        :key="question.id"
+                        class="bg-white border-2 border-border rounded-lg p-6 transition-opacity"
+                        :class="{ 'opacity-50': draggedQuestion?.id === question.id }"
+                        draggable="true"
+                        @dragstart="handleDragStart(question)"
+                        @dragover="handleDragOver"
+                        @drop="handleDrop(question)"
+                    >
+                        <!-- Question Header -->
+                        <div class="flex items-start gap-4 mb-4">
+                            <!-- Drag Handle -->
+                            <div class="flex-shrink-0 cursor-move text-muted hover:text-body" title="Drag to reorder">
+                                <Icon name="grip-vertical" size="lg" />
+                            </div>
+
+                            <!-- Question Info -->
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h3 class="text-lg font-semibold text-body">{{ index + 1 }}. {{ question.question_text }}</h3>
+                                    <Badge variant="primary-soft" size="sm">Multiple Choice</Badge>
+                                    <Badge v-if="question.is_void" variant="danger" size="sm">Voided</Badge>
+                                    <span class="text-sm text-subtle">{{ question.points }} pts</span>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex items-center gap-2">
+                                <Button variant="ghost" size="sm" @click="openEditModal(question)">
+                                    <Icon name="pencil" />
+                                </Button>
+                                <Dropdown>
+                                    <template #trigger>
+                                        <Button variant="ghost" size="sm">
+                                            <Icon name="ellipsis-vertical" />
+                                        </Button>
+                                    </template>
+                                    <template #content>
+                                        <button
+                                            @click="duplicateQuestion(question)"
+                                            class="w-full text-left px-4 py-2 text-sm hover:bg-surface flex items-center gap-2"
+                                        >
+                                            <Icon name="copy" size="sm" />
+                                            Duplicate
+                                        </button>
+                                        <button
+                                            @click="toggleVoid(question)"
+                                            class="w-full text-left px-4 py-2 text-sm hover:bg-surface flex items-center gap-2"
+                                            :class="question.is_void ? 'text-success' : 'text-warning'"
+                                        >
+                                            <Icon :name="question.is_void ? 'check-circle' : 'ban'" size="sm" />
+                                            {{ question.is_void ? 'Unvoid' : 'Void' }} Question
+                                        </button>
+                                        <button
+                                            @click="confirmDelete(question)"
+                                            class="w-full text-left px-4 py-2 text-sm hover:bg-surface text-danger flex items-center gap-2"
+                                        >
+                                            <Icon name="trash" size="sm" />
+                                            Delete
+                                        </button>
+                                    </template>
+                                </Dropdown>
+                            </div>
+                        </div>
+
+                        <!-- Question Card (User View) -->
+                        <div class="mb-4">
+                            <QuestionCard
+                                :model-value="selectedAnswers[question.id]"
+                                @update:model-value="selectAnswer(question.id, $event)"
+                                :question="question.question_text"
+                                :options="question.options"
+                                :points="question.points"
+                                :correct-answer="question.correct_answer"
+                                :show-results="false"
+                                :show-header="false"
+                            />
+                        </div>
+
+                        <!-- Current Answer Display -->
+                        <div v-if="question.correct_answer" class="mb-4 text-sm text-success flex items-center gap-2">
+                            <Icon name="check" size="sm" />
+                            Current Answer: {{ question.correct_answer }}
+                        </div>
+
+                        <!-- Save Answer Button (conditional) -->
+                        <div v-if="hasSelectedAnswer(question.id)" class="flex justify-end">
+                            <Button variant="success" @click="saveAnswer(question)">
+                                Save Answer
+                            </Button>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div v-if="questions.length === 0" class="text-center py-12 text-muted">
+                        <Icon name="circle-question" size="3x" class="mb-4 text-gray-light" />
+                        <p class="text-lg mb-2">No questions yet</p>
+                        <p class="text-sm mb-4">Get started by adding a custom question or importing from a template</p>
+                        <div class="flex justify-center gap-2">
+                            <Button variant="secondary" @click="navigateToImport">
+                                Import from Template
+                            </Button>
+                            <Button variant="primary" @click="openAddModal">
+                                Add Custom Question
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </Card>
+        </div>
+
+        <!-- Add/Edit Question Modal -->
+        <QuestionModal
+            :show="showAddEditModal"
+            :question="editingQuestion"
+            :event-id="event.id"
+            @close="closeModal"
+            @success="showToastMessage('Question saved successfully')"
+        />
+
+        <!-- Delete Confirmation Modal -->
+        <Confirm
+            :show="showDeleteConfirm"
+            title="Delete Question?"
+            message="This action cannot be undone. The question will be removed from the event."
+            variant="danger"
+            icon="triangle-exclamation"
+            @confirm="deleteQuestion"
+            @close="showDeleteConfirm = false"
+        />
+
         <!-- Toast Notification -->
-        <ToastNotification :show="showCopiedToast" message="Invitation link copied to clipboard!" />
+        <Toast
+            :show="showToast"
+            :message="toastMessage"
+            @close="showToast = false"
+        />
     </AuthenticatedLayout>
 </template>

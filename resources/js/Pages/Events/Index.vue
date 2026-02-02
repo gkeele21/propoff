@@ -2,7 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { PlusIcon } from '@heroicons/vue/24/outline';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Button from '@/Components/Base/Button.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 
 defineProps({
@@ -25,10 +25,10 @@ defineProps({
             >
                 <template #actions>
                     <Link :href="route('events.create')" v-if="$page.props.auth.user.role === 'admin'">
-                        <PrimaryButton>
+                        <Button variant="primary">
                             <PlusIcon class="w-5 h-5 mr-2" />
                             Create Event
-                        </PrimaryButton>
+                        </Button>
                     </Link>
                 </template>
             </PageHeader>
@@ -52,7 +52,7 @@ defineProps({
                                     <div class="flex-1">
                                         <Link
                                             :href="route('events.show', event.id)"
-                                            class="text-xl font-semibold text-gray-900 hover:text-propoff-blue/80"
+                                            class="text-xl font-semibold text-gray-900 hover:text-primary/80"
                                         >
                                             {{ event.name }}
                                         </Link>
@@ -74,9 +74,9 @@ defineProps({
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                                                 :class="{
                                                     'bg-gray-100 text-gray-800': event.status === 'draft',
-                                                    'bg-propoff-green/20 text-propoff-dark-green': event.status === 'active',
-                                                    'bg-propoff-orange/20 text-propoff-orange': event.status === 'locked',
-                                                    'bg-propoff-dark-green/20 text-propoff-dark-green': event.status === 'completed',
+                                                    'bg-success/20 text-success': event.status === 'active',
+                                                    'bg-warning/20 text-warning': event.status === 'locked',
+                                                    'bg-success/20 text-success': event.status === 'completed',
                                                 }"
                                             >
                                                 {{ event.status }}
@@ -94,7 +94,7 @@ defineProps({
                                     <div class="ml-4 flex space-x-2">
                                         <Link
                                             :href="route('events.show', event.id)"
-                                            class="text-propoff-blue hover:text-propoff-blue/80"
+                                            class="text-primary hover:text-primary/80"
                                         >
                                             View
                                         </Link>
@@ -120,7 +120,7 @@ defineProps({
                                     :href="link.url"
                                     class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium"
                                     :class="{
-                                        'bg-propoff-blue/10 border-propoff-blue text-propoff-blue': link.active,
+                                        'bg-primary/10 border-primary text-primary': link.active,
                                         'bg-white text-gray-700 hover:bg-gray-50': !link.active && link.url,
                                         'bg-gray-100 text-gray-400 cursor-not-allowed': !link.url,
                                         'rounded-l-md': index === 0,

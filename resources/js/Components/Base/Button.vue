@@ -32,9 +32,10 @@ const props = defineProps({
 });
 
 const variants = {
-    primary: 'bg-warning hover:bg-white text-white hover:text-warning border-2 border-transparent hover:border-warning',  // Orange - default for CTAs
-    accent: 'bg-primary hover:bg-white text-white hover:text-primary border-2 border-transparent hover:border-primary',  // Blue - secondary emphasis
-    secondary: 'bg-white hover:bg-surface text-primary border-2 border-primary',
+    primary: 'bg-primary hover:bg-white text-white hover:text-primary border-2 border-transparent hover:border-primary',  // Blue - main actions
+    secondary: 'bg-secondary hover:bg-white text-white hover:text-secondary border-2 border-transparent hover:border-secondary',  // Gray - secondary actions
+    accent: 'bg-warning hover:bg-white text-white hover:text-warning border-2 border-transparent hover:border-warning',  // Orange - accent/highlight actions
+    outline: 'bg-white hover:bg-surface text-primary border-2 border-primary',  // White with blue border - cancel/neutral
     danger: 'bg-danger hover:bg-white text-white hover:text-danger border-2 border-transparent hover:border-danger',
     neutral: 'bg-black hover:bg-white text-white hover:text-black border-2 border-black hover:border-black',
     ghost: 'bg-transparent hover:bg-surface text-primary border-2 border-transparent',

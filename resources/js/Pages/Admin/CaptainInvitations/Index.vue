@@ -87,9 +87,9 @@ const copyUrl = (url) => {
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 <!-- Info Banner -->
-                <div class="bg-propoff-blue/10 border border-propoff-blue/30 rounded-lg p-4">
-                    <h3 class="text-sm font-semibold text-propoff-blue mb-2">About Captain Invitations</h3>
-                    <p class="text-sm text-propoff-blue">
+                <div class="bg-primary/10 border border-primary/30 rounded-lg p-4">
+                    <h3 class="text-sm font-semibold text-primary mb-2">About Captain Invitations</h3>
+                    <p class="text-sm text-primary">
                         Captain invitations allow users to create groups and become captains for this event.
                         Share the invitation URL with users who should have captain privileges.
                     </p>
@@ -112,7 +112,7 @@ const copyUrl = (url) => {
                                         v-model="createForm.max_uses"
                                         type="number"
                                         min="1"
-                                        class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                        class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                         placeholder="Unlimited"
                                     />
                                     <p class="text-xs text-gray-500 mt-1">
@@ -127,7 +127,7 @@ const copyUrl = (url) => {
                                     <input
                                         v-model="createForm.expires_at"
                                         type="datetime-local"
-                                        class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                        class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                     />
                                     <p class="text-xs text-gray-500 mt-1">
                                         Leave empty for no expiration
@@ -139,7 +139,7 @@ const copyUrl = (url) => {
                                 <button
                                     type="submit"
                                     :disabled="createForm.processing"
-                                    class="bg-propoff-blue hover:bg-propoff-blue/80 text-white px-4 py-2 rounded font-semibold disabled:opacity-50"
+                                    class="bg-primary hover:bg-primary/80 text-white px-4 py-2 rounded font-semibold disabled:opacity-50"
                                 >
                                     Generate Link
                                 </button>
@@ -162,7 +162,7 @@ const copyUrl = (url) => {
                                 v-for="invitation in invitations"
                                 :key="invitation.id"
                                 class="border rounded-lg p-4"
-                                :class="invitation.can_be_used ? 'border-propoff-green/30 bg-propoff-green/10' : 'border-gray-200 bg-gray-50'"
+                                :class="invitation.can_be_used ? 'border-success/30 bg-success/10' : 'border-gray-200 bg-gray-50'"
                             >
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
@@ -170,25 +170,25 @@ const copyUrl = (url) => {
                                         <div class="flex gap-2 mb-3">
                                             <span
                                                 v-if="invitation.is_active && invitation.can_be_used"
-                                                class="px-2 py-1 text-xs font-semibold rounded bg-propoff-green/10 text-propoff-dark-green"
+                                                class="px-2 py-1 text-xs font-semibold rounded bg-success/10 text-success"
                                             >
                                                 Active
                                             </span>
                                             <span
                                                 v-else
-                                                class="px-2 py-1 text-xs font-semibold rounded bg-propoff-red/10 text-propoff-red"
+                                                class="px-2 py-1 text-xs font-semibold rounded bg-danger/10 text-danger"
                                             >
                                                 Inactive
                                             </span>
                                             <span
                                                 v-if="invitation.max_uses"
-                                                class="px-2 py-1 text-xs font-semibold rounded bg-propoff-blue/10 text-propoff-blue"
+                                                class="px-2 py-1 text-xs font-semibold rounded bg-primary/10 text-primary"
                                             >
                                                 {{ invitation.times_used }} / {{ invitation.max_uses }} uses
                                             </span>
                                             <span
                                                 v-else
-                                                class="px-2 py-1 text-xs font-semibold rounded bg-propoff-blue/10 text-propoff-blue"
+                                                class="px-2 py-1 text-xs font-semibold rounded bg-primary/10 text-primary"
                                             >
                                                 {{ invitation.times_used }} uses
                                             </span>
@@ -234,21 +234,21 @@ const copyUrl = (url) => {
                                         <button
                                             v-if="invitation.is_active"
                                             @click="deactivateInvitation(invitation.id)"
-                                            class="text-sm bg-propoff-orange hover:bg-propoff-orange/80 text-white px-3 py-1 rounded"
+                                            class="text-sm bg-warning hover:bg-warning/80 text-white px-3 py-1 rounded"
                                         >
                                             Deactivate
                                         </button>
                                         <button
                                             v-else
                                             @click="reactivateInvitation(invitation.id)"
-                                            class="text-sm bg-propoff-green hover:bg-propoff-dark-green text-white px-3 py-1 rounded"
+                                            class="text-sm bg-success hover:bg-success text-white px-3 py-1 rounded"
                                         >
                                             Reactivate
                                         </button>
                                         <button
                                             v-if="invitation.times_used === 0"
                                             @click="deleteInvitation(invitation.id)"
-                                            class="text-sm bg-propoff-red hover:bg-propoff-red/80 text-white px-3 py-1 rounded"
+                                            class="text-sm bg-danger hover:bg-danger/80 text-white px-3 py-1 rounded"
                                         >
                                             Delete
                                         </button>

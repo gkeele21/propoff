@@ -8,7 +8,7 @@ import {
     CheckCircleIcon,
     XCircleIcon,
 } from '@heroicons/vue/24/outline';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Button from '@/Components/Base/Button.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 
 const props = defineProps({
@@ -123,10 +123,10 @@ const exportDetailedCSV = (groupId = null) => {
                         <DocumentArrowDownIcon class="w-4 h-4 mr-2" />
                         Export CSV
                     </button>
-                    <PrimaryButton @click="calculateScores">
+                    <Button variant="primary" @click="calculateScores">
                         <CalculatorIcon class="w-4 h-4 mr-2" />
                         Calculate Scores
-                    </PrimaryButton>
+                    </Button>
                 </template>
             </PageHeader>
         </template>
@@ -134,15 +134,15 @@ const exportDetailedCSV = (groupId = null) => {
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 <!-- Instructions -->
-                <div class="bg-propoff-blue/10 border-l-4 border-propoff-blue/30 p-4">
+                <div class="bg-primary/10 border-l-4 border-primary/30 p-4">
                     <div class="flex">
                         <div class="flex-shrink-0">
-                            <svg class="h-5 w-5 text-propoff-blue" viewBox="0 0 20 20" fill="currentColor">
+                            <svg class="h-5 w-5 text-primary" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <p class="text-sm text-propoff-blue">
+                            <p class="text-sm text-primary">
                                 Set group-specific correct answers for each question. Questions can have different answers for different groups.
                                 Mark questions as "void" to exclude them from scoring for specific groups.
                             </p>
@@ -162,7 +162,7 @@ const exportDetailedCSV = (groupId = null) => {
                                 class="px-4 py-3 text-sm font-medium rounded-lg border-2 transition"
                                 :class="
                                     selectedGroup?.id === group.id
-                                        ? 'border-propoff-blue bg-propoff-blue/10 text-propoff-blue'
+                                        ? 'border-primary bg-primary/10 text-primary'
                                         : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
                                 "
                             >
@@ -181,7 +181,7 @@ const exportDetailedCSV = (groupId = null) => {
                             </h3>
                             <button
                                 @click="exportDetailedCSV(selectedGroup.id)"
-                                class="text-sm text-propoff-blue hover:text-propoff-blue/80"
+                                class="text-sm text-primary hover:text-primary/80"
                             >
                                 Export Detailed CSV
                             </button>
@@ -201,9 +201,9 @@ const exportDetailedCSV = (groupId = null) => {
                                             </span>
                                             <span
                                                 :class="{
-                                                    'bg-propoff-blue/10 text-propoff-blue': question.question_type === 'multiple_choice',
-                                                    'bg-propoff-green/10 text-propoff-dark-green': question.question_type === 'yes_no',
-                                                    'bg-propoff-orange/10 text-propoff-orange': question.question_type === 'numeric',
+                                                    'bg-primary/10 text-primary': question.question_type === 'multiple_choice',
+                                                    'bg-success/10 text-success': question.question_type === 'yes_no',
+                                                    'bg-warning/10 text-warning': question.question_type === 'numeric',
                                                     'bg-gray-100 text-gray-700': question.question_type === 'text'
                                                 }"
                                                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
@@ -226,14 +226,14 @@ const exportDetailedCSV = (groupId = null) => {
                                                     </p>
                                                     <p
                                                         v-if="getGroupAnswer(selectedGroup.id, question.id).points_awarded !== null"
-                                                        class="text-sm text-propoff-green mt-1"
+                                                        class="text-sm text-success mt-1"
                                                     >
                                                         Custom Points: {{ getGroupAnswer(selectedGroup.id, question.id).points_awarded }} {{ getGroupAnswer(selectedGroup.id, question.id).points_awarded === 1 ? 'point' : 'points' }}
                                                         <span class="text-gray-500">(default: {{ question.points }} {{ question.points === 1 ? 'point' : 'points' }})</span>
                                                     </p>
                                                     <span
                                                         v-if="getGroupAnswer(selectedGroup.id, question.id).is_void"
-                                                        class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-propoff-red/10 text-propoff-red mt-1"
+                                                        class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-danger/10 text-danger mt-1"
                                                     >
                                                         <XCircleIcon class="w-3 h-3 mr-1" />
                                                         Void
@@ -242,13 +242,13 @@ const exportDetailedCSV = (groupId = null) => {
                                             </div>
                                         </div>
                                         <div v-else class="mt-3 p-3 bg-yellow-50 rounded">
-                                            <p class="text-sm text-propoff-orange">No answer set for this group</p>
+                                            <p class="text-sm text-warning">No answer set for this group</p>
                                         </div>
 
                                         <!-- Edit Form -->
                                         <div
                                             v-if="editingAnswer?.question.id === question.id && editingAnswer?.group.id === selectedGroup.id"
-                                            class="mt-4 p-4 bg-propoff-blue/10 rounded-lg"
+                                            class="mt-4 p-4 bg-primary/10 rounded-lg"
                                         >
                                             <form @submit.prevent="saveAnswer(question)">
                                                 <div class="mb-3">
@@ -260,7 +260,7 @@ const exportDetailedCSV = (groupId = null) => {
                                                     <select
                                                         v-if="question.question_type === 'multiple_choice'"
                                                         v-model="answerForm.correct_answer"
-                                                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
                                                         required
                                                     >
                                                         <option value="">Select correct answer...</option>
@@ -277,7 +277,7 @@ const exportDetailedCSV = (groupId = null) => {
                                                     <select
                                                         v-else-if="question.question_type === 'yes_no'"
                                                         v-model="answerForm.correct_answer"
-                                                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
                                                         required
                                                     >
                                                         <option value="">Select correct answer...</option>
@@ -291,7 +291,7 @@ const exportDetailedCSV = (groupId = null) => {
                                                         v-model="answerForm.correct_answer"
                                                         type="text"
                                                         required
-                                                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
                                                         placeholder="Enter correct answer..."
                                                     />
                                                 </div>
@@ -303,7 +303,7 @@ const exportDetailedCSV = (groupId = null) => {
                                                         v-model="answerForm.points_awarded"
                                                         type="number"
                                                         min="0"
-                                                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
                                                         :placeholder="`Leave blank for default (${question.points} ${question.points === 1 ? 'point' : 'points'})`"
                                                     />
                                                     <p class="text-xs text-gray-500 mt-1">
@@ -315,7 +315,7 @@ const exportDetailedCSV = (groupId = null) => {
                                                         <input
                                                             v-model="answerForm.is_void"
                                                             type="checkbox"
-                                                            class="rounded border-gray-300 text-propoff-blue shadow-sm focus:border-propoff-blue focus:ring focus:ring-propoff-blue/50 focus:ring-opacity-50"
+                                                            class="rounded border-gray-300 text-primary shadow-sm focus:border-primary focus:ring focus:ring-primary/50 focus:ring-opacity-50"
                                                         />
                                                         <span class="ml-2 text-sm text-gray-700">
                                                             Mark as void (exclude from scoring)
@@ -326,7 +326,7 @@ const exportDetailedCSV = (groupId = null) => {
                                                     <button
                                                         type="submit"
                                                         :disabled="answerForm.processing"
-                                                        class="px-4 py-2 bg-propoff-blue text-white text-sm font-medium rounded-md hover:bg-propoff-blue/80"
+                                                        class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-md hover:bg-primary/80"
                                                     >
                                                         Save Answer
                                                     </button>
@@ -345,7 +345,7 @@ const exportDetailedCSV = (groupId = null) => {
                                     <div class="ml-4 flex flex-col space-y-2">
                                         <button
                                             @click="editAnswer(question, selectedGroup)"
-                                            class="text-sm text-propoff-blue hover:text-propoff-blue/80"
+                                            class="text-sm text-primary hover:text-primary/80"
                                         >
                                             Set Answer
                                         </button>

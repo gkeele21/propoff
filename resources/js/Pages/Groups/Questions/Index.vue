@@ -47,9 +47,9 @@ const getTypeLabel = (type) => {
 
 const typeClass = (type) => {
     const classes = {
-        multiple_choice: 'bg-propoff-blue/10 text-propoff-blue',
-        yes_no: 'bg-propoff-green/10 text-propoff-dark-green',
-        numeric: 'bg-propoff-orange/10 text-propoff-orange',
+        multiple_choice: 'bg-primary/10 text-primary',
+        yes_no: 'bg-success/10 text-success',
+        numeric: 'bg-warning/10 text-warning',
         text: 'bg-gray-100 text-gray-700',
     };
     return classes[type] || 'bg-gray-100 text-gray-700';
@@ -168,7 +168,7 @@ const saveOrder = () => {
                             <p class="text-gray-600 mb-4">Get started by creating your first question</p>
                             <Link
                                 :href="route('groups.questions.create', group.id)"
-                                class="inline-flex items-center px-4 py-2 bg-propoff-blue border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-propoff-blue/80"
+                                class="inline-flex items-center px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary/80"
                             >
                                 <PlusIcon class="w-4 h-4 mr-2" />
                                 Create Question
@@ -177,11 +177,11 @@ const saveOrder = () => {
 
                         <div v-else>
                             <!-- Reorder Notice -->
-                            <div v-if="isReordering" class="bg-propoff-orange/10 border border-propoff-orange/30 rounded-lg p-4 mb-4">
+                            <div v-if="isReordering" class="bg-warning/10 border border-warning/30 rounded-lg p-4 mb-4">
                                 <div class="flex items-start gap-3">
-                                    <ExclamationTriangleIcon class="w-5 h-5 text-propoff-orange mt-0.5" />
+                                    <ExclamationTriangleIcon class="w-5 h-5 text-warning mt-0.5" />
                                     <div class="flex-1">
-                                        <p class="text-sm text-propoff-orange">
+                                        <p class="text-sm text-warning">
                                             Drag and drop questions to reorder them. Click "Save Order" when done.
                                         </p>
                                     </div>
@@ -189,7 +189,7 @@ const saveOrder = () => {
                                         <button
                                             @click="saveOrder"
                                             :disabled="form.processing"
-                                            class="px-3 py-1.5 bg-propoff-green text-white text-sm rounded hover:bg-propoff-dark-green disabled:opacity-50"
+                                            class="px-3 py-1.5 bg-success text-white text-sm rounded hover:bg-success disabled:opacity-50"
                                         >
                                             Save Order
                                         </button>
@@ -208,7 +208,7 @@ const saveOrder = () => {
                                     <h3 class="text-lg font-semibold">Questions ({{ questions.length }})</h3>
                                     <Link
                                         :href="route('groups.questions.create', group.id)"
-                                        class="inline-flex items-center px-3 py-1.5 bg-propoff-blue border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-propoff-blue/80"
+                                        class="inline-flex items-center px-3 py-1.5 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary/80"
                                     >
                                         <PlusIcon class="w-4 h-4 mr-1" />
                                         Add Question
@@ -234,7 +234,7 @@ const saveOrder = () => {
                                     @drop="drop(index)"
                                     :class="{
                                         'cursor-move': isReordering,
-                                        'border-l-4 border-propoff-blue': draggedIndex === index,
+                                        'border-l-4 border-primary': draggedIndex === index,
                                         'opacity-50': draggedIndex === index || !question.is_active
                                     }"
                                     class="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition"
@@ -242,17 +242,17 @@ const saveOrder = () => {
                                     <div class="flex items-start justify-between gap-4">
                                         <div class="flex-1">
                                             <div class="flex items-center gap-3 mb-2">
-                                                <span class="inline-flex items-center justify-center w-8 h-8 bg-propoff-blue/10 text-propoff-blue font-bold rounded-full text-sm">
+                                                <span class="inline-flex items-center justify-center w-8 h-8 bg-primary/10 text-primary font-bold rounded-full text-sm">
                                                     {{ question.display_order }}
                                                 </span>
                                                 <span :class="typeClass(question.question_type)" class="px-2 py-1 rounded text-xs font-medium">
                                                     {{ getTypeLabel(question.question_type) }}
                                                 </span>
                                                 <span class="text-sm text-gray-600">{{ question.points }} {{ question.points === 1 ? 'point' : 'points' }}</span>
-                                                <span v-if="question.is_custom" class="px-2 py-1 text-xs font-semibold rounded bg-propoff-blue/10 text-propoff-blue">
+                                                <span v-if="question.is_custom" class="px-2 py-1 text-xs font-semibold rounded bg-primary/10 text-primary">
                                                     Custom
                                                 </span>
-                                                <span v-if="!question.is_active" class="px-2 py-1 text-xs font-semibold rounded bg-propoff-red/10 text-propoff-red">
+                                                <span v-if="!question.is_active" class="px-2 py-1 text-xs font-semibold rounded bg-danger/10 text-danger">
                                                     Inactive
                                                 </span>
                                             </div>
@@ -276,21 +276,21 @@ const saveOrder = () => {
                                         <div class="flex items-center gap-2">
                                             <Link
                                                 :href="route('groups.questions.edit', [group.id, question.id])"
-                                                class="p-2 text-propoff-blue hover:bg-propoff-blue/10 rounded"
+                                                class="p-2 text-primary hover:bg-primary/10 rounded"
                                                 title="Edit"
                                             >
                                                 <PencilIcon class="w-5 h-5" />
                                             </Link>
                                             <button
                                                 @click="duplicateQuestion(question.id)"
-                                                class="p-2 text-propoff-green hover:bg-green-50 rounded"
+                                                class="p-2 text-success hover:bg-green-50 rounded"
                                                 title="Duplicate"
                                             >
                                                 <DocumentDuplicateIcon class="w-5 h-5" />
                                             </button>
                                             <button
                                                 @click="deleteQuestion(question.id)"
-                                                class="p-2 text-propoff-red hover:bg-propoff-red/10 rounded"
+                                                class="p-2 text-danger hover:bg-danger/10 rounded"
                                                 title="Delete"
                                             >
                                                 <TrashIcon class="w-5 h-5" />

@@ -2,14 +2,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
-import {
-    PlusIcon,
-    MagnifyingGlassIcon,
-    FunnelIcon,
-    DocumentArrowDownIcon,
-} from '@heroicons/vue/24/outline';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import PageHeader from '@/Components/PageHeader.vue';
+import Button from '@/Components/Base/Button.vue';
+import Badge from '@/Components/Base/Badge.vue';
+import Card from '@/Components/Base/Card.vue';
+import Icon from '@/Components/Base/Icon.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
 
 const props = defineProps({
     events: Object,
@@ -37,14 +34,26 @@ const formatDate = (dateString) => {
     });
 };
 
-const getStatusClass = (status) => {
-    const classes = {
-        'draft': 'bg-gray-100 text-gray-800',
-        'open': 'bg-propoff-green/20 text-propoff-dark-green',
-        'locked': 'bg-propoff-orange/20 text-propoff-orange',
-        'completed': 'bg-propoff-dark-green/20 text-propoff-dark-green',
+const getStatusVariant = (status) => {
+    const variants = {
+        'draft': 'secondary',
+        'open': 'success',
+        'locked': 'warning',
+        'in_progress': 'info',
+        'completed': 'success',
     };
-    return classes[status] || 'bg-gray-100 text-gray-800';
+    return variants[status] || 'secondary';
+};
+
+const getBorderColor = (status) => {
+    const colors = {
+        'draft': 'border-gray-dark',
+        'open': 'border-success',
+        'locked': 'border-warning',
+        'in_progress': 'border-primary',
+        'completed': 'border-success',
+    };
+    return colors[status] || 'border-gray-light';
 };
 </script>
 
@@ -63,10 +72,9 @@ const getStatusClass = (status) => {
             >
                 <template #actions>
                     <Link :href="route('admin.events.create')">
-                        <PrimaryButton>
-                            <PlusIcon class="w-5 h-5 mr-2" />
+                        <Button variant="primary" icon="plus">
                             Create Event
-                        </PrimaryButton>
+                        </Button>
                     </Link>
                 </template>
             </PageHeader>
@@ -79,8 +87,8 @@ const getStatusClass = (status) => {
                     <div class="p-6">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div class="col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <MagnifyingGlassIcon class="w-4 h-4 inline mr-1" />
+                                <label class="block text-sm font-medium text-body mb-2">
+                                    <Icon name="magnifying-glass" size="sm" class="mr-1" />
                                     Search
                                 </label>
                                 <input
@@ -88,18 +96,18 @@ const getStatusClass = (status) => {
                                     @input="filterEvents"
                                     type="text"
                                     placeholder="Search events..."
-                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                    class="w-full border-border rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
                                 />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <FunnelIcon class="w-4 h-4 inline mr-1" />
+                                <label class="block text-sm font-medium text-body mb-2">
+                                    <Icon name="filter" size="sm" class="mr-1" />
                                     Status
                                 </label>
                                 <select
                                     v-model="statusFilter"
                                     @change="filterEvents"
-                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                    class="w-full border-border rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
                                 >
                                     <option value="all">All Statuses</option>
                                     <option value="draft">Draft</option>
@@ -113,95 +121,77 @@ const getStatusClass = (status) => {
                 </div>
 
                 <!-- Events List -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div v-if="events.data.length === 0" class="text-center py-12">
-                            <p class="text-gray-500">No events found.</p>
-                        </div>
+                <div v-if="events.data.length === 0" class="text-center py-12 bg-white rounded-lg shadow-sm">
+                    <p class="text-gray-500">No events found.</p>
+                </div>
 
-                        <div v-else class="space-y-4">
-                            <div
+                <div v-else class="space-y-4">
+                            <Link
                                 v-for="event in events.data"
                                 :key="event.id"
-                                class="border rounded-lg p-6 hover:shadow-md transition"
+                                :href="route('admin.events.show', event.id)"
+                                class="block"
                             >
-                                <div class="flex justify-between items-start">
-                                    <div class="flex-1">
-                                        <div class="flex items-center space-x-2">
-                                            <Link
-                                                :href="route('admin.events.show', event.id)"
-                                                class="text-xl font-semibold text-gray-900 hover:text-propoff-blue"
-                                            >
+                                <div
+                                    class="bg-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer border-l-4 shadow-sm"
+                                    :class="getBorderColor(event.status)"
+                                >
+                                    <div class="p-6">
+                                        <div class="flex items-start gap-3 mb-3">
+                                            <h3 class="text-xl font-semibold text-body flex-1">
                                                 {{ event.name }}
-                                            </Link>
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                                                :class="getStatusClass(event.status)"
-                                            >
+                                            </h3>
+                                            <Badge :variant="getStatusVariant(event.status)">
                                                 {{ event.status }}
+                                            </Badge>
+                                        </div>
+
+                                        <p v-if="event.description" class="text-subtle mb-4 line-clamp-2">
+                                            {{ event.description }}
+                                        </p>
+
+                                        <div class="flex flex-wrap items-center gap-4 text-sm text-muted">
+                                            <span class="flex items-center gap-1">
+                                                <Icon name="circle-question" size="sm" />
+                                                {{ event.questions_count }} questions
+                                            </span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon name="users" size="sm" />
+                                                {{ event.entries_count }} entries
+                                            </span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon name="calendar" size="sm" />
+                                                {{ formatDate(event.event_date) }}
+                                            </span>
+                                            <span v-if="event.lock_date" class="flex items-center gap-1">
+                                                <Icon name="lock" size="sm" />
+                                                Lock: {{ formatDate(event.lock_date) }}
                                             </span>
                                         </div>
-                                        <p v-if="event.description" class="mt-2 text-gray-600">{{ event.description }}</p>
-
-                                        <div class="mt-4 flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                                            <span>{{ event.questions_count }} questions</span>
-                                            <span>{{ event.entries_count }} entries</span>
-                                            <span>Event: {{ formatDate(event.event_date) }}</span>
-                                            <span v-if="event.lock_date">Lock: {{ formatDate(event.lock_date) }}</span>
-                                        </div>
                                     </div>
-
-                                    <!-- <div class="ml-4 flex flex-col space-y-2">
-                                        <Link
-                                            :href="route('admin.events.show', event.id)"
-                                            class="text-sm text-propoff-blue hover:text-propoff-blue/80"
-                                        >
-                                            View
-                                        </Link>
-                                        <Link
-                                            :href="route('admin.events.edit', event.id)"
-                                            class="text-sm text-gray-600 hover:text-gray-900"
-                                        >
-                                            Edit
-                                        </Link>
-                                        <Link
-                                            :href="route('admin.events.event-questions.index', event.id)"
-                                            class="text-sm text-gray-600 hover:text-gray-900"
-                                        >
-                                            Questions
-                                        </Link>
-                                        <Link
-                                            :href="route('admin.events.grading.index', event.id)"
-                                            class="text-sm text-propoff-green hover:text-propoff-dark-green"
-                                        >
-                                            Grading
-                                        </Link>
-                                    </div> -->
                                 </div>
-                            </div>
+                            </Link>
                         </div>
 
-                        <!-- Pagination -->
-                        <div v-if="events.links.length > 3" class="mt-6 flex justify-center">
-                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                                <component
-                                    v-for="(link, index) in events.links"
-                                    :key="index"
-                                    :is="link.url ? Link : 'span'"
-                                    :href="link.url"
-                                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium"
-                                    :class="{
-                                        'bg-propoff-blue/10 border-propoff-blue text-propoff-blue': link.active,
-                                        'bg-white text-gray-700 hover:bg-gray-50': !link.active && link.url,
-                                        'bg-gray-100 text-gray-400 cursor-not-allowed': !link.url,
-                                        'rounded-l-md': index === 0,
-                                        'rounded-r-md': index === events.links.length - 1,
-                                    }"
-                                    v-html="link.label"
-                                />
-                            </nav>
-                        </div>
-                    </div>
+                <!-- Pagination -->
+                <div v-if="events.links.length > 3" class="mt-6 flex justify-center">
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                        <component
+                            v-for="(link, index) in events.links"
+                            :key="index"
+                            :is="link.url ? Link : 'span'"
+                            :href="link.url"
+                            class="relative inline-flex items-center px-4 py-2 border border-border text-sm font-medium"
+                            :class="{
+                                'bg-primary/10 border-primary text-primary': link.active,
+                                'bg-white text-body hover:bg-surface': !link.active && link.url,
+                                'bg-surface text-muted cursor-not-allowed': !link.url,
+                                'rounded-l-md': index === 0,
+                                'rounded-r-md': index === events.links.length - 1,
+                            }"
+                            v-html="link.label"
+                        />
+                    </nav>
                 </div>
             </div>
         </div>

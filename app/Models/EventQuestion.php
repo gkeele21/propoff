@@ -19,6 +19,7 @@ class EventQuestion extends Model
         'options',
         'points',
         'display_order',
+        'correct_answer',
     ];
 
     protected $casts = [

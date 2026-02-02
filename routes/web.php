@@ -155,18 +155,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/question-templates/{template}/duplicate', [QuestionTemplateController::class, 'duplicate'])->name('question-templates.duplicate');
 
     // Event Questions
-    Route::get('/events/{event}/event-questions', [AdminEventQuestionController::class, 'index'])->name('events.event-questions.index');
-    Route::get('/events/{event}/event-questions/create', [AdminEventQuestionController::class, 'create'])->name('events.event-questions.create');
+    Route::get('/events/{event}/import-questions', [AdminEventQuestionController::class, 'importQuestions'])->name('events.import-questions');
     Route::get('/events/{event}/event-questions/search-templates', [AdminEventQuestionController::class, 'searchTemplates'])->name('events.event-questions.searchTemplates');
     Route::post('/events/{event}/event-questions', [AdminEventQuestionController::class, 'store'])->name('events.event-questions.store');
     Route::post('/events/{event}/event-questions/template/{template}', [AdminEventQuestionController::class, 'createFromTemplate'])->name('events.event-questions.createFromTemplate');
     Route::post('/events/{event}/event-questions/bulk-create-from-templates', [AdminEventQuestionController::class, 'bulkCreateFromTemplates'])->name('events.event-questions.bulkCreateFromTemplates');
-    Route::get('/events/{event}/event-questions/{eventQuestion}/edit', [AdminEventQuestionController::class, 'edit'])->name('events.event-questions.edit');
     Route::patch('/events/{event}/event-questions/{eventQuestion}', [AdminEventQuestionController::class, 'update'])->name('events.event-questions.update');
     Route::delete('/events/{event}/event-questions/{eventQuestion}', [AdminEventQuestionController::class, 'destroy'])->name('events.event-questions.destroy');
     Route::post('/events/{event}/event-questions/reorder', [AdminEventQuestionController::class, 'reorder'])->name('events.event-questions.reorder');
     Route::post('/events/{event}/event-questions/{eventQuestion}/duplicate', [AdminEventQuestionController::class, 'duplicate'])->name('events.event-questions.duplicate');
     Route::post('/events/{event}/event-questions/bulk-import', [AdminEventQuestionController::class, 'bulkImport'])->name('events.event-questions.bulkImport');
+    Route::post('/events/{event}/questions/{eventQuestion}/set-answer', [AdminEventQuestionController::class, 'setAnswer'])->name('events.questions.set-answer');
 
     // Grading
     Route::get('/events/{event}/grading', [GradingController::class, 'index'])->name('events.grading.index');
@@ -214,12 +213,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/events/{event}/captain-invitations/{invitation}/reactivate', [\App\Http\Controllers\Admin\CaptainInvitationController::class, 'reactivate'])->name('events.captain-invitations.reactivate');
     Route::post('/events/{event}/generate-captain-invitation', [AdminEventController::class, 'generateCaptainInvitation'])->name('events.generateCaptainInvitation');
 
-    // Event Answers (Admin-level grading)
-    Route::get('/events/{event}/event-answers', [\App\Http\Controllers\Admin\EventAnswerController::class, 'index'])->name('events.event-answers.index');
-    Route::post('/events/{event}/event-questions/{eventQuestion}/set-event-answer', [\App\Http\Controllers\Admin\EventAnswerController::class, 'setAnswer'])->name('events.event-answers.setAnswer');
-    Route::post('/events/{event}/event-answers/bulk-set', [\App\Http\Controllers\Admin\EventAnswerController::class, 'bulkSetAnswers'])->name('events.event-answers.bulkSetAnswers');
+    // Event Answers - Void functionality
     Route::post('/events/{event}/event-questions/{eventQuestion}/toggle-event-void', [\App\Http\Controllers\Admin\EventAnswerController::class, 'toggleVoid'])->name('events.event-answers.toggleVoid');
-    Route::delete('/events/{event}/event-questions/{eventQuestion}/clear-event-answer', [\App\Http\Controllers\Admin\EventAnswerController::class, 'clearAnswer'])->name('events.event-answers.clearAnswer');
 
     // America Says Admin (requires auth)
     Route::prefix('america-says')->name('america-says.')->group(function () {

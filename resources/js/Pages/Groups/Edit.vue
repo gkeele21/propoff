@@ -22,18 +22,18 @@
                         <!-- Group Name -->
                         <div class="mb-6">
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                                Group Name <span class="text-propoff-red">*</span>
+                                Group Name <span class="text-danger">*</span>
                             </label>
                             <input
                                 v-model="form.name"
                                 type="text"
                                 id="name"
                                 placeholder="My Awesome Group"
-                                class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                 required
                                 autofocus
                             />
-                            <p v-if="form.errors.name" class="mt-1 text-sm text-propoff-red">{{ form.errors.name }}</p>
+                            <p v-if="form.errors.name" class="mt-1 text-sm text-danger">{{ form.errors.name }}</p>
                         </div>
 
                         <!-- Description -->
@@ -44,21 +44,21 @@
                             <textarea
                                 id="description"
                                 v-model="form.description"
-                                class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                 rows="3"
                                 placeholder="Enter a description for your group"
                             ></textarea>
-                            <p v-if="form.errors.description" class="mt-1 text-sm text-propoff-red">{{ form.errors.description }}</p>
+                            <p v-if="form.errors.description" class="mt-1 text-sm text-danger">{{ form.errors.description }}</p>
                         </div>
 
                         <!-- Grading Source (conditionally editable) -->
                         <div v-if="canChangeGradingSource" class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Grading Source <span class="text-propoff-red">*</span>
+                                Grading Source <span class="text-danger">*</span>
                             </label>
                             <div class="space-y-3">
                                 <label class="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition"
-                                       :class="{ 'border-propoff-blue bg-propoff-blue/10': form.grading_source === 'captain' }">
+                                       :class="{ 'border-primary bg-primary/10': form.grading_source === 'captain' }">
                                     <input
                                         type="radio"
                                         v-model="form.grading_source"
@@ -74,7 +74,7 @@
                                 </label>
 
                                 <label class="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition"
-                                       :class="{ 'border-propoff-blue bg-propoff-blue/10': form.grading_source === 'admin' }">
+                                       :class="{ 'border-primary bg-primary/10': form.grading_source === 'admin' }">
                                     <input
                                         type="radio"
                                         v-model="form.grading_source"
@@ -89,7 +89,7 @@
                                     </div>
                                 </label>
                             </div>
-                            <p v-if="form.errors.grading_source" class="mt-1 text-sm text-propoff-red">{{ form.errors.grading_source }}</p>
+                            <p v-if="form.errors.grading_source" class="mt-1 text-sm text-danger">{{ form.errors.grading_source }}</p>
                         </div>
 
                         <!-- Entry Cutoff -->
@@ -101,9 +101,9 @@
                                 v-model="form.entry_cutoff"
                                 type="datetime-local"
                                 id="entry_cutoff"
-                                class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                             />
-                            <p v-if="form.errors.entry_cutoff" class="mt-1 text-sm text-propoff-red">{{ form.errors.entry_cutoff }}</p>
+                            <p v-if="form.errors.entry_cutoff" class="mt-1 text-sm text-danger">{{ form.errors.entry_cutoff }}</p>
                             <p class="mt-1 text-sm text-gray-500">
                                 Set a deadline for when members can no longer submit or edit entries.
                                 Leave blank to use the event's lock date.
@@ -116,7 +116,7 @@
                                 <input
                                     type="checkbox"
                                     v-model="form.is_public"
-                                    class="rounded border-gray-300 text-propoff-blue focus:ring-propoff-blue/50"
+                                    class="rounded border-gray-300 text-primary focus:ring-primary/50"
                                 />
                                 <span class="ml-2 text-sm text-gray-700">Make this group public (others can find and join)</span>
                             </label>
@@ -143,7 +143,7 @@
                             <button
                                 type="submit"
                                 :disabled="form.processing"
-                                class="inline-flex items-center px-4 py-2 bg-propoff-blue border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-propoff-blue/80 disabled:opacity-50"
+                                class="inline-flex items-center px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary/80 disabled:opacity-50"
                             >
                                 <span v-if="form.processing">Saving...</span>
                                 <span v-else>Save Changes</span>

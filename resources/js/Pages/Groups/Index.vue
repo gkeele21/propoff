@@ -2,8 +2,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { PlusIcon, UserGroupIcon } from '@heroicons/vue/24/outline';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
+import Button from '@/Components/Base/Button.vue';
+import TextField from '@/Components/Form/TextField.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 import { ref } from 'vue';
 
@@ -48,10 +48,10 @@ const joinGroup = () => {
                         Join Group
                     </button>
                     <Link :href="route('groups.create')">
-                        <PrimaryButton>
+                        <Button variant="primary">
                             <PlusIcon class="w-5 h-5 mr-2" />
                             Create Group
-                        </PrimaryButton>
+                        </Button>
                     </Link>
                 </template>
             </PageHeader>
@@ -76,7 +76,7 @@ const joinGroup = () => {
                                 class="border rounded-lg p-4 hover:shadow-md transition"
                             >
                                 <div class="flex items-start gap-3">
-                                    <UserGroupIcon class="w-8 h-8 text-propoff-orange flex-shrink-0" />
+                                    <UserGroupIcon class="w-8 h-8 text-warning flex-shrink-0" />
                                     <div class="flex-1 min-w-0">
                                         <h4 class="font-semibold text-gray-900 truncate">{{ group.name }}</h4>
                                         <p class="text-sm text-gray-600 mt-1 line-clamp-2">{{ group.description }}</p>
@@ -117,7 +117,7 @@ const joinGroup = () => {
                                         </div>
                                         <Link
                                             :href="route('groups.show', group.id)"
-                                            class="mt-3 inline-block text-propoff-blue hover:text-propoff-blue/80 text-sm"
+                                            class="mt-3 inline-block text-primary hover:text-primary/80 text-sm"
                                         >
                                             View Group →
                                         </Link>
@@ -140,14 +140,11 @@ const joinGroup = () => {
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Join a Group</h3>
                 <form @submit.prevent="joinGroup">
                     <div class="mb-4">
-                        <label for="code" class="block text-sm font-medium text-gray-700 mb-1">
-                            Group Code
-                        </label>
-                        <TextInput
+                        <TextField
                             id="code"
                             v-model="joinForm.code"
                             type="text"
-                            class="w-full"
+                            label="Group Code"
                             placeholder="Enter 8-character code"
                             required
                             autofocus
@@ -164,9 +161,9 @@ const joinGroup = () => {
                         >
                             Cancel
                         </button>
-                        <PrimaryButton type="submit" :disabled="joinForm.processing">
+                        <Button variant="primary" type="submit" :disabled="joinForm.processing">
                             Join Group
-                        </PrimaryButton>
+                        </Button>
                     </div>
                 </form>
             </div>

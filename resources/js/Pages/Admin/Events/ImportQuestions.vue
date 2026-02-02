@@ -1,17 +1,16 @@
 <template>
-    <Head :title="`Create Questions - ${event.name}`" />
+    <Head :title="`Import Questions - ${event.name}`" />
 
     <AuthenticatedLayout>
         <template #header>
             <PageHeader
-                title="Add Questions"
-                subtitle="Add questions from templates or create custom questions"
+                title="Import from Templates"
+                subtitle="Search and import questions from your template library"
                 :crumbs="[
                     { label: 'Admin Dashboard', href: route('admin.dashboard') },
                     { label: 'Events', href: route('admin.events.index') },
                     { label: event.name, href: route('admin.events.show', event.id) },
-                    { label: 'Questions', href: route('admin.events.event-questions.index', event.id) },
-                    { label: 'Add' }
+                    { label: 'Import Templates' }
                 ]"
             >
                 <template #metadata>
@@ -165,7 +164,7 @@
 
                                 <div v-if="currentQuestions.length === 0" class="text-center py-8 text-gray-500">
                                     <p>No questions added yet.</p>
-                                    <p class="text-sm mt-2">Search templates or create a custom question below.</p>
+                                    <p class="text-sm mt-2">Search and import templates to get started.</p>
                                 </div>
 
                                 <div v-else class="space-y-2 max-h-96 overflow-y-auto">
@@ -188,266 +187,12 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Add Manual Question Button - Always show -->
-                                <button @click="showManualForm = !showManualForm"
-                                        class="w-full mt-4 px-3 py-2 text-sm bg-propoff-blue text-white rounded hover:bg-propoff-blue/80">
-                                    {{ showManualForm ? '- Hide Form' : '+ Add Custom Question' }}
-                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Manual Question Form (if expanded) -->
-                <div v-if="showManualForm" class="mt-6 bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-semibold text-gray-900">
-                            Create Custom Question
-                        </h3>
-                        <button @click="showManualForm = false" class="text-gray-500 hover:text-gray-700">
-                            <XMarkIcon class="w-5 h-5" />
-                        </button>
-                    </div>
-
-                    <form @submit.prevent="submitManual" class="space-y-6">
-                        <!-- Question Text -->
-                        <div>
-                            <label for="question_text" class="block text-sm font-medium text-gray-700 mb-2">
-                                Question Text <span class="text-propoff-red">*</span>
-                            </label>
-                            <textarea
-                                id="question_text"
-                                v-model="form.question_text"
-                                rows="4"
-                                class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
-                                placeholder="Enter your question here..."
-                                required
-                            ></textarea>
-                            <p v-if="form.errors.question_text" class="mt-1 text-sm text-propoff-red">
-                                {{ form.errors.question_text }}
-                            </p>
-                        </div>
-
-                        <!-- Question Type -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">
-                                Question Type <span class="text-propoff-red">*</span>
-                            </label>
-                            <div class="grid grid-cols-2 gap-3">
-                                <label
-                                    v-for="type in questionTypes"
-                                    :key="type.value"
-                                    :class="[
-                                        'flex items-center p-3 border-2 rounded-lg cursor-pointer transition',
-                                        form.question_type === type.value
-                                            ? 'border-propoff-blue bg-propoff-blue/10'
-                                            : 'border-gray-200 hover:border-gray-300'
-                                    ]"
-                                >
-                                    <input
-                                        type="radio"
-                                        v-model="form.question_type"
-                                        :value="type.value"
-                                        class="text-propoff-blue focus:ring-propoff-blue/50"
-                                    />
-                                    <span class="ml-2 text-sm font-medium text-gray-900">{{ type.label }}</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Options (for multiple choice) -->
-                        <div v-if="form.question_type === 'multiple_choice'" class="space-y-3">
-                            <label class="block text-sm font-medium text-gray-700">
-                                Answer Options <span class="text-propoff-red">*</span>
-                            </label>
-                            <p class="text-sm text-gray-500 mb-2">
-                                Set bonus points for each option. Leave at 0 for no bonus (players get only base question points).
-                            </p>
-
-                            <div class="space-y-2">
-                                <div
-                                    v-for="(option, index) in form.options"
-                                    :key="index"
-                                    class="flex items-start gap-2"
-                                >
-                                    <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-700 font-medium rounded-full text-sm mt-1">
-                                        {{ String.fromCharCode(65 + index) }}
-                                    </span>
-                                    <div class="flex-1 space-y-1">
-                                        <input
-                                            type="text"
-                                            v-model="form.options[index].label"
-                                            class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
-                                            :placeholder="`Option ${String.fromCharCode(65 + index)}`"
-                                        />
-                                        <div class="flex items-center gap-2">
-                                            <label class="text-xs text-gray-500">Bonus:</label>
-                                            <input
-                                                type="number"
-                                                v-model.number="form.options[index].points"
-                                                min="0"
-                                                step="1"
-                                                class="w-20 text-sm border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
-                                                placeholder="0"
-                                            />
-                                            <span class="text-xs text-gray-400">+bonus pts (optional)</span>
-                                        </div>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        @click="removeOption(index)"
-                                        class="flex-shrink-0 p-2 text-propoff-red hover:bg-propoff-red/10 rounded mt-1"
-                                        :disabled="form.options.length <= 2"
-                                    >
-                                        <TrashIcon class="w-5 h-5" />
-                                    </button>
-                                </div>
-                            </div>
-
-                            <button
-                                type="button"
-                                @click="addOption"
-                                class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                            >
-                                <PlusIcon class="w-4 h-4 mr-2" />
-                                Add Option
-                            </button>
-                        </div>
-
-                        <!-- Ranked Answers (for ranked_answers type) -->
-                        <div v-if="form.question_type === 'ranked_answers'" class="space-y-3">
-                            <label class="block text-sm font-medium text-gray-700">
-                                Ranked Answers <span class="text-propoff-red">*</span>
-                            </label>
-                            <p class="text-sm text-gray-500 mb-3">
-                                Add up to 7 ranked answers. Answer #1 should be the most popular/common response.
-                            </p>
-
-                            <div v-if="form.event_answers.length > 0" class="space-y-3">
-                                <div
-                                    v-for="(answer, index) in form.event_answers"
-                                    :key="index"
-                                    class="flex items-center gap-3 p-4 border border-gray-200 rounded-lg"
-                                >
-                                    <!-- Rank Number -->
-                                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-propoff-orange text-white flex items-center justify-center font-bold">
-                                        #{{ answer.display_order }}
-                                    </div>
-
-                                    <!-- Answer Input -->
-                                    <div class="flex-1">
-                                        <input
-                                            type="text"
-                                            v-model="answer.correct_answer"
-                                            class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
-                                            placeholder="Enter answer..."
-                                            required
-                                        />
-                                    </div>
-
-                                    <!-- Reorder Buttons -->
-                                    <div class="flex flex-col gap-1">
-                                        <button
-                                            type="button"
-                                            @click="moveRankedAnswerUp(index)"
-                                            :disabled="index === 0"
-                                            class="p-1 text-gray-600 hover:text-propoff-blue disabled:opacity-30 disabled:cursor-not-allowed"
-                                            title="Move up (higher rank)"
-                                        >
-                                            <ArrowUpIcon class="w-5 h-5" />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            @click="moveRankedAnswerDown(index)"
-                                            :disabled="index === form.event_answers.length - 1"
-                                            class="p-1 text-gray-600 hover:text-propoff-blue disabled:opacity-30 disabled:cursor-not-allowed"
-                                            title="Move down (lower rank)"
-                                        >
-                                            <ArrowDownIcon class="w-5 h-5" />
-                                        </button>
-                                    </div>
-
-                                    <!-- Remove Button -->
-                                    <button
-                                        type="button"
-                                        @click="removeRankedAnswer(index)"
-                                        class="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded"
-                                        title="Remove answer"
-                                    >
-                                        <TrashIcon class="w-5 h-5" />
-                                    </button>
-                                </div>
-                            </div>
-
-                            <button
-                                v-if="form.event_answers.length < 7"
-                                type="button"
-                                @click="addRankedAnswer"
-                                class="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-propoff-blue hover:text-propoff-blue transition"
-                            >
-                                <PlusIcon class="w-5 h-5 inline mr-2" />
-                                Add Answer ({{ form.event_answers.length }}/7)
-                            </button>
-
-                            <p v-if="form.errors.event_answers" class="text-sm text-propoff-red">
-                                {{ form.errors.event_answers }}
-                            </p>
-                        </div>
-
-                        <!-- Points and Order -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="points" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Base Points <span class="text-propoff-red">*</span>
-                                </label>
-                                <input
-                                    type="number"
-                                    id="points"
-                                    v-model.number="form.points"
-                                    min="1"
-                                    class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
-                                    required
-                                />
-                                <p class="text-xs text-gray-500 mt-1">
-                                    Points awarded for answering (+ any option bonus)
-                                </p>
-                            </div>
-
-                            <div>
-                                <label for="order" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Order Number
-                                </label>
-                                <input
-                                    type="number"
-                                    id="order"
-                                    v-model.number="form.order"
-                                    min="0"
-                                    class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
-                                />
-                            </div>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="flex items-center justify-end gap-3 pt-4 border-t">
-                            <button
-                                type="button"
-                                @click="showManualForm = false"
-                                class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                :disabled="form.processing"
-                                class="inline-flex items-center px-4 py-2 bg-propoff-blue border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-propoff-blue/80 disabled:opacity-50"
-                            >
-                                <span v-if="form.processing">Creating...</span>
-                                <span v-else>Save</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                <!-- Removed manual question form - use the modal on the Events Show page instead -->
 
                 <!-- Consolidated Variable Input Modal -->
                 <div v-if="showConsolidatedVariableModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -535,17 +280,14 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { Head } from '@inertiajs/vue3';
-import { router, useForm } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import {
     InformationCircleIcon,
     DocumentPlusIcon,
     ListBulletIcon,
     TrashIcon,
-    PlusIcon,
     XMarkIcon,
-    ArrowUpIcon,
-    ArrowDownIcon,
 } from '@heroicons/vue/24/outline';
 import PageHeader from '@/Components/PageHeader.vue';
 import axios from 'axios';
@@ -569,30 +311,6 @@ const selectedTemplates = ref([]);
 // Consolidated Variable Modal State
 const showConsolidatedVariableModal = ref(false);
 const consolidatedVariables = ref({});
-
-// Manual Form State
-const showManualForm = ref(false);
-
-// Form for manual creation
-const questionTypes = [
-    { value: 'multiple_choice', label: 'Multiple Choice' },
-    { value: 'yes_no', label: 'Yes/No' },
-    { value: 'numeric', label: 'Numeric' },
-    { value: 'text', label: 'Text' },
-    { value: 'ranked_answers', label: 'Ranked Answers' },
-];
-
-const form = useForm({
-    question_text: '',
-    question_type: 'multiple_choice',
-    points: 1,
-    order: props.nextOrder || 1,
-    options: [
-        { label: '', points: 0 },
-        { label: '', points: 0 }
-    ],
-    event_answers: [],
-});
 
 // Computed: Get all distinct variables across selected templates
 const distinctVariables = computed(() => {
@@ -799,7 +517,7 @@ const deleteQuestion = (questionId) => {
             route('admin.events.event-questions.destroy', [props.event.id, questionId]),
             {
                 onSuccess: () => {
-                    router.visit(route('admin.events.event-questions.create', props.event.id));
+                    router.visit(route('admin.events.import-questions', props.event.id));
                 }
             }
         );
@@ -835,70 +553,5 @@ const typeClass = (type) => {
         ranked_answers: 'bg-propoff-orange/10 text-propoff-orange',
     };
     return classes[type] || 'bg-gray-100 text-gray-800';
-};
-
-// Add option
-const addOption = () => {
-    form.options.push({ label: '', points: 0 });
-};
-
-// Remove option
-const removeOption = (index) => {
-    if (form.options.length > 2) {
-        form.options.splice(index, 1);
-    }
-};
-
-// Ranked Answers functions
-const addRankedAnswer = () => {
-    const nextOrder = form.event_answers.length + 1;
-    if (nextOrder <= 7) {
-        form.event_answers.push({
-            correct_answer: '',
-            display_order: nextOrder,
-        });
-    }
-};
-
-const removeRankedAnswer = (index) => {
-    form.event_answers.splice(index, 1);
-    // Reorder remaining answers
-    form.event_answers.forEach((answer, idx) => {
-        answer.display_order = idx + 1;
-    });
-};
-
-const moveRankedAnswerUp = (index) => {
-    if (index > 0) {
-        const temp = form.event_answers[index];
-        form.event_answers[index] = form.event_answers[index - 1];
-        form.event_answers[index - 1] = temp;
-        // Update display orders
-        form.event_answers.forEach((answer, idx) => {
-            answer.display_order = idx + 1;
-        });
-    }
-};
-
-const moveRankedAnswerDown = (index) => {
-    if (index < form.event_answers.length - 1) {
-        const temp = form.event_answers[index];
-        form.event_answers[index] = form.event_answers[index + 1];
-        form.event_answers[index + 1] = temp;
-        // Update display orders
-        form.event_answers.forEach((answer, idx) => {
-            answer.display_order = idx + 1;
-        });
-    }
-};
-
-// Submit manual question
-const submitManual = () => {
-    form.post(route('admin.events.event-questions.store', props.event.id), {
-        onSuccess: () => {
-            showManualForm.value = false;
-            form.reset();
-        }
-    });
 };
 </script>

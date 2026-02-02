@@ -4,7 +4,7 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 </script>
 
 <template>
-    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gradient-to-br from-propoff-blue via-propoff-dark-green to-propoff-red">
+    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gradient-to-br from-primary via-success to-danger">
         <div>
             <Link href="/" class="flex flex-col items-center">
                 <ApplicationLogo size="xl" />

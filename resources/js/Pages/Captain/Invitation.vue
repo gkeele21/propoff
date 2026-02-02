@@ -15,7 +15,7 @@
                 <template #metadata>
                     <span class="font-medium text-gray-900">{{ group.name }}</span>
                     <span class="text-gray-400 mx-2">•</span>
-                    <span :class="invitation.is_active ? 'text-propoff-green' : 'text-propoff-red'">
+                    <span :class="invitation.is_active ? 'text-success' : 'text-danger'">
                         {{ invitation.is_active ? 'Active' : 'Inactive' }}
                     </span>
                 </template>
@@ -27,8 +27,8 @@
                 <!-- Group Info -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <div class="flex items-start gap-4">
-                        <div class="flex-shrink-0 w-12 h-12 bg-propoff-orange/10 rounded-full flex items-center justify-center">
-                            <UserGroupIcon class="w-6 h-6 text-propoff-orange" />
+                        <div class="flex-shrink-0 w-12 h-12 bg-warning/10 rounded-full flex items-center justify-center">
+                            <UserGroupIcon class="w-6 h-6 text-warning" />
                         </div>
                         <div class="flex-1">
                             <h3 class="text-lg font-semibold text-gray-900">{{ group.name }}</h3>
@@ -50,8 +50,8 @@
                             :class="[
                                 'px-3 py-1 rounded-full text-xs font-semibold',
                                 invitation.is_active
-                                    ? 'bg-propoff-green/20 text-propoff-dark-green'
-                                    : 'bg-propoff-red/20 text-propoff-red'
+                                    ? 'bg-success/20 text-success'
+                                    : 'bg-danger/20 text-danger'
                             ]"
                         >
                             {{ invitation.is_active ? 'Active' : 'Inactive' }}
@@ -72,7 +72,7 @@
                             />
                             <button
                                 @click="copyToClipboard"
-                                class="inline-flex items-center px-4 py-2 bg-propoff-blue text-white rounded-md hover:bg-propoff-blue/80 transition"
+                                class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80 transition"
                             >
                                 <ClipboardDocumentIcon class="w-5 h-5 mr-2" />
                                 {{ copied ? 'Copied!' : 'Copy' }}
@@ -90,15 +90,15 @@
 
                     <!-- Stats -->
                     <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div class="bg-propoff-blue/10 rounded-lg p-4">
-                            <div class="text-2xl font-bold text-propoff-blue">{{ invitation.times_used }}</div>
-                            <div class="text-sm text-propoff-blue">Times Used</div>
+                        <div class="bg-primary/10 rounded-lg p-4">
+                            <div class="text-2xl font-bold text-primary">{{ invitation.times_used }}</div>
+                            <div class="text-sm text-primary">Times Used</div>
                         </div>
-                        <div class="bg-propoff-orange/10 rounded-lg p-4">
-                            <div class="text-2xl font-bold text-propoff-orange">
+                        <div class="bg-warning/10 rounded-lg p-4">
+                            <div class="text-2xl font-bold text-warning">
                                 {{ invitation.max_uses || '∞' }}
                             </div>
-                            <div class="text-sm text-propoff-orange">Max Uses</div>
+                            <div class="text-sm text-warning">Max Uses</div>
                         </div>
                     </div>
 
@@ -110,15 +110,15 @@
                             :class="[
                                 'inline-flex items-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs uppercase tracking-widest transition',
                                 invitation.is_active
-                                    ? 'bg-propoff-red text-white hover:bg-propoff-red/80'
-                                    : 'bg-propoff-green text-white hover:bg-propoff-dark-green'
+                                    ? 'bg-danger text-white hover:bg-danger/80'
+                                    : 'bg-success text-white hover:bg-success'
                             ]"
                         >
                             {{ invitation.is_active ? 'Deactivate' : 'Activate' }}
                         </button>
                         <button
                             @click="showRegenerateModal = true"
-                            class="inline-flex items-center px-4 py-2 bg-propoff-orange border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-propoff-orange/80"
+                            class="inline-flex items-center px-4 py-2 bg-warning border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-warning/80"
                         >
                             <ArrowPathIcon class="w-4 h-4 mr-2" />
                             Regenerate Link
@@ -134,12 +134,12 @@
                 </div>
 
                 <!-- Warning if inactive -->
-                <div v-if="!invitation.is_active" class="bg-propoff-orange/10 border border-propoff-orange/30 rounded-lg p-4">
+                <div v-if="!invitation.is_active" class="bg-warning/10 border border-warning/30 rounded-lg p-4">
                     <div class="flex items-start gap-3">
-                        <ExclamationTriangleIcon class="w-5 h-5 text-propoff-orange flex-shrink-0 mt-0.5" />
+                        <ExclamationTriangleIcon class="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
                         <div>
-                            <h4 class="font-semibold text-propoff-orange">Invitation Inactive</h4>
-                            <p class="text-sm text-propoff-orange mt-1">
+                            <h4 class="font-semibold text-warning">Invitation Inactive</h4>
+                            <p class="text-sm text-warning mt-1">
                                 This invitation link is currently inactive. New members cannot join using this link.
                             </p>
                         </div>
@@ -171,7 +171,7 @@
                     <button
                         @click="regenerateInvitation"
                         :disabled="regenerateForm.processing"
-                        class="px-4 py-2 bg-propoff-orange text-white rounded-md text-sm font-medium hover:bg-propoff-orange/80 disabled:opacity-50"
+                        class="px-4 py-2 bg-warning text-white rounded-md text-sm font-medium hover:bg-warning/80 disabled:opacity-50"
                     >
                         {{ regenerateForm.processing ? 'Regenerating...' : 'Regenerate' }}
                     </button>
@@ -203,7 +203,7 @@
                             class="w-full px-3 py-2 border border-gray-300 rounded-md"
                             placeholder="Unlimited"
                         />
-                        <p v-if="settingsForm.errors.max_uses" class="mt-1 text-sm text-propoff-red">
+                        <p v-if="settingsForm.errors.max_uses" class="mt-1 text-sm text-danger">
                             {{ settingsForm.errors.max_uses }}
                         </p>
                     </div>
@@ -218,7 +218,7 @@
                             v-model="settingsForm.expires_at"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md"
                         />
-                        <p v-if="settingsForm.errors.expires_at" class="mt-1 text-sm text-propoff-red">
+                        <p v-if="settingsForm.errors.expires_at" class="mt-1 text-sm text-danger">
                             {{ settingsForm.errors.expires_at }}
                         </p>
                     </div>
@@ -234,7 +234,7 @@
                         <button
                             type="submit"
                             :disabled="settingsForm.processing"
-                            class="px-4 py-2 bg-propoff-blue text-white rounded-md text-sm font-medium hover:bg-propoff-blue/80 disabled:opacity-50"
+                            class="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium hover:bg-primary/80 disabled:opacity-50"
                         >
                             {{ settingsForm.processing ? 'Saving...' : 'Save Settings' }}
                         </button>

@@ -72,9 +72,6 @@ class EventController extends Controller
     {
         $event->load([
             'creator',
-            'eventQuestions' => function ($query) {
-                $query->orderBy('display_order');
-            },
             'invitations.group',
             'groups',
         ]);
@@ -92,11 +89,34 @@ class EventController extends Controller
             'participating_groups' => $event->groups()->count(),
         ];
 
+        // Get questions with all necessary data
+        $questions = $event->eventQuestions()
+            ->with('eventAnswers')
+            ->withCount(['groupQuestions as user_answers_count' => function ($query) {
+                $query->whereHas('userAnswers');
+            }])
+            ->orderBy('display_order')
+            ->get()
+            ->map(function ($question) {
+                return [
+                    'id' => $question->id,
+                    'question_text' => $question->question_text,
+                    'question_type' => $question->question_type,
+                    'options' => $question->options,
+                    'points' => $question->points,
+                    'display_order' => $question->display_order,
+                    'correct_answer' => $question->correct_answer,
+                    'user_answers_count' => $question->user_answers_count ?? 0,
+                    'event_answers' => $question->eventAnswers,
+                ];
+            });
+
         // Get all groups for invitation generation
         $availableGroups = Group::all();
 
         return Inertia::render('Admin/Events/Show', [
             'event' => $event,
+            'questions' => $questions,
             'stats' => $stats,
             'invitations' => $event->invitations,
             'availableGroups' => $availableGroups,

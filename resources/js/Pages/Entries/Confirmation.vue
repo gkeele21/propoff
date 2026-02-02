@@ -13,7 +13,7 @@
                 ]"
             >
                 <template #metadata>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-propoff-green/10 text-propoff-dark-green">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success/10 text-success">
                         Submitted
                     </span>
                 </template>
@@ -26,7 +26,7 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                     <div class="p-6 text-center">
                         <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <CheckCircleIcon class="w-10 h-10 text-propoff-green" />
+                            <CheckCircleIcon class="w-10 h-10 text-success" />
                         </div>
                         <h3 class="text-2xl font-bold text-gray-900 mb-2">
                             Entry Complete!
@@ -36,9 +36,9 @@
                         </p>
 
                         <!-- Score Display -->
-                        <div class="inline-flex items-center gap-4 bg-propoff-blue/10 rounded-lg px-6 py-4">
+                        <div class="inline-flex items-center gap-4 bg-primary/10 rounded-lg px-6 py-4">
                             <div>
-                                <div class="text-4xl font-bold text-propoff-blue">
+                                <div class="text-4xl font-bold text-primary">
                                     {{ entry.percentage }}%
                                 </div>
                                 <div class="text-sm text-gray-600">
@@ -50,15 +50,15 @@
                 </div>
 
                 <!-- Personal Link (for guests only) -->
-                <div v-if="personalLink" class="bg-propoff-orange/10 border-2 border-propoff-orange/30 rounded-lg shadow-lg mb-6">
+                <div v-if="personalLink" class="bg-warning/10 border-2 border-warning/30 rounded-lg shadow-lg mb-6">
                     <div class="p-6">
                         <div class="flex items-start gap-3">
-                            <ExclamationTriangleIcon class="w-8 h-8 text-propoff-orange flex-shrink-0" />
+                            <ExclamationTriangleIcon class="w-8 h-8 text-warning flex-shrink-0" />
                             <div class="flex-1">
-                                <h4 class="text-lg font-bold text-propoff-orange mb-2">
+                                <h4 class="text-lg font-bold text-warning mb-2">
                                     ⭐ SAVE THIS LINK! ⭐
                                 </h4>
-                                <p class="text-propoff-orange mb-4">
+                                <p class="text-warning mb-4">
                                     This is your personal results link. Save it now to view your results anytime without logging in!
                                 </p>
                                 
@@ -71,7 +71,7 @@
                                         />
                                         <button
                                             @click="copyPersonalLink"
-                                            class="px-4 py-2 bg-propoff-orange text-white font-semibold rounded hover:bg-propoff-orange/80 flex items-center gap-2"
+                                            class="px-4 py-2 bg-warning text-white font-semibold rounded hover:bg-warning/80 flex items-center gap-2"
                                         >
                                             <ClipboardDocumentIcon class="w-5 h-5" />
                                             {{ linkCopied ? 'Copied!' : 'Copy Link' }}
@@ -98,14 +98,14 @@
                             <Link
                                 v-if="personalLink"
                                 :href="personalLink"
-                                class="block w-full px-4 py-3 bg-propoff-blue text-white text-center rounded-lg hover:bg-propoff-blue/80 font-semibold"
+                                class="block w-full px-4 py-3 bg-primary text-white text-center rounded-lg hover:bg-primary/80 font-semibold"
                             >
                                 View My Results
                             </Link>
                             
                             <Link
                                 :href="route('groups.leaderboard', group.id)"
-                                class="block w-full px-4 py-3 bg-propoff-dark-green text-white text-center rounded-lg hover:bg-propoff-dark-green/80 font-semibold"
+                                class="block w-full px-4 py-3 bg-success text-white text-center rounded-lg hover:bg-success/80 font-semibold"
                             >
                                 View {{ group.name }} Leaderboard
                             </Link>

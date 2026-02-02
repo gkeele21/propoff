@@ -2,7 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { PlayIcon } from '@heroicons/vue/24/outline';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Button from '@/Components/Base/Button.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 
 const props = defineProps({
@@ -27,9 +27,9 @@ const props = defineProps({
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                         :class="{
                             'bg-gray-100 text-gray-800': event.status === 'draft',
-                            'bg-propoff-green/20 text-propoff-dark-green': event.status === 'open',
-                            'bg-propoff-orange/20 text-propoff-orange': event.status === 'locked',
-                            'bg-propoff-dark-green/20 text-propoff-dark-green': event.status === 'completed',
+                            'bg-success/20 text-success': event.status === 'open',
+                            'bg-warning/20 text-warning': event.status === 'locked',
+                            'bg-success/20 text-success': event.status === 'completed',
                         }"
                     >
                         {{ event.status }}
@@ -40,10 +40,10 @@ const props = defineProps({
                         v-if="event.status === 'open'"
                         :href="route('events.show', event.id)"
                     >
-                        <PrimaryButton>
+                        <Button variant="primary">
                             <PlayIcon class="w-5 h-5 mr-2" />
                             Play Event
-                        </PrimaryButton>
+                        </Button>
                     </Link>
                 </template>
             </PageHeader>
@@ -86,9 +86,9 @@ const props = defineProps({
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                                                 :class="{
                                                     'bg-gray-100 text-gray-800': event.status === 'draft',
-                                                    'bg-propoff-green/20 text-propoff-dark-green': event.status === 'active',
-                                                    'bg-propoff-orange/20 text-propoff-orange': event.status === 'locked',
-                                                    'bg-propoff-dark-green/20 text-propoff-dark-green': event.status === 'completed',
+                                                    'bg-success/20 text-success': event.status === 'active',
+                                                    'bg-warning/20 text-warning': event.status === 'locked',
+                                                    'bg-success/20 text-success': event.status === 'completed',
                                                 }"
                                             >
                                                 {{ event.status }}

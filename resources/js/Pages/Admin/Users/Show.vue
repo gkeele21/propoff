@@ -14,7 +14,7 @@
                 <template #metadata>
                     <span :class="[
                         'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                        user.role === 'admin' ? 'bg-propoff-red/10 text-propoff-red' : 'bg-gray-100 text-gray-700'
+                        user.role === 'admin' ? 'bg-danger/10 text-danger' : 'bg-gray-100 text-gray-700'
                     ]">
                         {{ user.role }}
                     </span>
@@ -43,7 +43,7 @@
                                 <label class="text-sm font-medium text-gray-500">Role</label>
                                 <span :class="[
                                     'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                                    user.role === 'admin' ? 'bg-propoff-red/10 text-propoff-red' : 'bg-gray-100 text-gray-700'
+                                    user.role === 'admin' ? 'bg-danger/10 text-danger' : 'bg-gray-100 text-gray-700'
                                 ]">
                                     {{ user.role }}
                                 </span>
@@ -54,10 +54,10 @@
                             </div>
                         </div>
                         <div class="mt-4 pt-4 border-t border-gray-200">
-                            <button @click="showRoleModal = true" class="px-4 py-2 bg-propoff-blue text-white rounded-md hover:bg-propoff-blue/80 mr-2">
+                            <button @click="showRoleModal = true" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80 mr-2">
                                 Change Role
                             </button>
-                            <button @click="confirmDelete" class="px-4 py-2 bg-propoff-red text-white rounded-md hover:bg-propoff-red/80">
+                            <button @click="confirmDelete" class="px-4 py-2 bg-danger text-white rounded-md hover:bg-danger/80">
                                 Delete User
                             </button>
                         </div>
@@ -69,7 +69,7 @@
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
                             <div class="flex items-center">
-                                <TrophyIcon class="w-8 h-8 text-propoff-orange mr-3" />
+                                <TrophyIcon class="w-8 h-8 text-warning mr-3" />
                                 <div>
                                     <p class="text-sm text-gray-500">Total Entries</p>
                                     <p class="text-2xl font-bold text-gray-900">{{ stats?.total_entries || 0 }}</p>
@@ -80,7 +80,7 @@
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
                             <div class="flex items-center">
-                                <UserGroupIcon class="w-8 h-8 text-propoff-orange mr-3" />
+                                <UserGroupIcon class="w-8 h-8 text-warning mr-3" />
                                 <div>
                                     <p class="text-sm text-gray-500">Groups</p>
                                     <p class="text-2xl font-bold text-gray-900">{{ stats?.groups_joined || 0 }}</p>
@@ -91,7 +91,7 @@
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
                             <div class="flex items-center">
-                                <ChartBarIcon class="w-8 h-8 text-propoff-green mr-3" />
+                                <ChartBarIcon class="w-8 h-8 text-success mr-3" />
                                 <div>
                                     <p class="text-sm text-gray-500">Average Score</p>
                                     <p class="text-2xl font-bold text-gray-900">{{ Number(stats?.average_score || 0).toFixed(1) }}%</p>
@@ -102,7 +102,7 @@
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
                             <div class="flex items-center">
-                                <StarIcon class="w-8 h-8 text-propoff-dark-green mr-3" />
+                                <StarIcon class="w-8 h-8 text-success mr-3" />
                                 <div>
                                     <p class="text-sm text-gray-500">Best Score</p>
                                     <p class="text-2xl font-bold text-gray-900">{{ Number(stats?.best_score || 0).toFixed(1) }}%</p>
@@ -140,7 +140,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span :class="[
                                                 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                                                entry.is_complete ? 'bg-propoff-green/10 text-propoff-dark-green' : 'bg-propoff-orange/10 text-propoff-orange'
+                                                entry.is_complete ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
                                             ]">
                                                 {{ entry.is_complete ? 'Complete' : 'In Progress' }}
                                             </span>
@@ -166,7 +166,7 @@
                             <div v-for="position in leaderboardPositions" :key="position.id" class="border border-gray-200 rounded-lg p-4">
                                 <div class="flex justify-between items-start mb-2">
                                     <h4 class="font-semibold text-gray-900">{{ position.event?.name || 'Unknown Event' }}</h4>
-                                    <span class="text-lg font-bold text-propoff-dark-green">#{{ position.rank }}</span>
+                                    <span class="text-lg font-bold text-success">#{{ position.rank }}</span>
                                 </div>
                                 <p class="text-sm text-gray-500">Group: {{ position.group?.name || 'N/A' }}</p>
                                 <p class="text-sm text-gray-600 mt-2">
@@ -187,7 +187,7 @@
                 <form @submit.prevent="updateRole">
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Select Role</label>
-                        <select v-model="roleForm.role" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50">
+                        <select v-model="roleForm.role" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary/50">
                             <option value="user">User</option>
                             <option value="admin">Admin</option>
                         </select>
@@ -196,7 +196,7 @@
                         <button type="button" @click="showRoleModal = false" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
                             Cancel
                         </button>
-                        <button type="submit" class="px-4 py-2 bg-propoff-blue text-white rounded-md hover:bg-propoff-blue/80">
+                        <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80">
                             Update Role
                         </button>
                     </div>

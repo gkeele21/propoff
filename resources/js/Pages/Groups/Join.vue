@@ -1,10 +1,8 @@
 <script setup>
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
+import Button from '@/Components/Base/Button.vue';
+import TextField from '@/Components/Form/TextField.vue';
 
 const props = defineProps({
     group: Object,
@@ -40,10 +38,10 @@ const formatDate = (dateString) => {
                 <!-- Group Info -->
                 <div class="mb-8 pb-6 border-b">
                     <h2 class="text-2xl font-bold text-gray-900 mb-2">Join {{ group.name }}</h2>
-                    <div class="bg-propoff-blue/10 border border-propoff-blue/30 rounded-lg p-4 mt-4">
-                        <p class="text-sm text-propoff-blue font-semibold mb-1">Event</p>
-                        <p class="text-lg font-bold text-propoff-blue">{{ group.event.name }}</p>
-                        <p class="text-sm text-propoff-blue mt-2">
+                    <div class="bg-primary/10 border border-primary/30 rounded-lg p-4 mt-4">
+                        <p class="text-sm text-primary font-semibold mb-1">Event</p>
+                        <p class="text-lg font-bold text-primary">{{ group.event.name }}</p>
+                        <p class="text-sm text-primary mt-2">
                             Event Date: {{ formatDate(group.event.event_date) }}
                         </p>
                     </div>
@@ -54,49 +52,47 @@ const formatDate = (dateString) => {
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Your Information</h3>
 
                     <div class="mb-4">
-                        <InputLabel for="name" value="Your Name" />
-                        <TextInput
+                        <TextField
                             id="name"
                             v-model="form.name"
                             type="text"
-                            class="mt-1 block w-full"
+                            label="Your Name"
+                            :error="form.errors.name"
                             required
                             autofocus
                             placeholder="Enter your name"
                         />
-                        <InputError class="mt-2" :message="form.errors.name" />
                     </div>
 
                     <div class="mb-6">
-                        <InputLabel for="email" value="Your Email (Optional - Recommended)" />
-                        <TextInput
+                        <TextField
                             id="email"
                             v-model="form.email"
                             type="email"
-                            class="mt-1 block w-full"
+                            label="Your Email (Optional - Recommended)"
+                            :error="form.errors.email"
                             placeholder="your.email@example.com (optional)"
                         />
-                        <div class="mt-2 p-3 bg-propoff-blue/10 border border-propoff-blue/30 rounded-md">
-                            <p class="text-sm text-propoff-blue font-medium mb-1">
+                        <div class="mt-2 p-3 bg-primary/10 border border-primary/30 rounded-md">
+                            <p class="text-sm text-primary font-medium mb-1">
                                 📧 Why provide an email?
                             </p>
-                            <ul class="text-xs text-propoff-blue space-y-1 ml-4 list-disc">
+                            <ul class="text-xs text-primary space-y-1 ml-4 list-disc">
                                 <li>Track your entries across multiple events</li>
                                 <li>View your history from past groups</li>
                                 <li>If you've played before, use the same email to see your stats</li>
                                 <li>Skip it if this is a one-time thing</li>
                             </ul>
                         </div>
-                        <InputError class="mt-2" :message="form.errors.email" />
                     </div>
 
                     <div class="flex items-center justify-end">
-                        <PrimaryButton
-                            :class="{ 'opacity-25': form.processing }"
+                        <Button
+                            variant="primary"
                             :disabled="form.processing"
                         >
                             Join Group
-                        </PrimaryButton>
+                        </Button>
                     </div>
                 </form>
             </div>

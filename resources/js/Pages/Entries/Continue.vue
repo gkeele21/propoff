@@ -2,8 +2,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
+import Button from '@/Components/Base/Button.vue';
+import TextField from '@/Components/Form/TextField.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 
 const props = defineProps({
@@ -131,7 +131,7 @@ const getOptionPoints = (option) => {
                     <div class="w-64">
                         <div class="w-full bg-gray-200 rounded-full h-2">
                             <div
-                                class="bg-propoff-blue h-2 rounded-full transition-all duration-300"
+                                class="bg-primary h-2 rounded-full transition-all duration-300"
                                 :style="{ width: `${progress}%` }"
                             ></div>
                         </div>
@@ -157,8 +157,8 @@ const getOptionPoints = (option) => {
                                     @click="goToQuestion(index)"
                                     class="w-full text-left px-3 py-2 rounded transition"
                                     :class="{
-                                        'bg-propoff-blue text-white': index === currentQuestionIndex,
-                                        'bg-propoff-green/10 text-propoff-dark-green': answers[question.id] && index !== currentQuestionIndex,
+                                        'bg-primary text-white': index === currentQuestionIndex,
+                                        'bg-success/10 text-success': answers[question.id] && index !== currentQuestionIndex,
                                         'bg-gray-100 text-gray-700 hover:bg-gray-200': !answers[question.id] && index !== currentQuestionIndex,
                                     }"
                                 >
@@ -190,7 +190,7 @@ const getOptionPoints = (option) => {
                                         <h3 class="text-2xl font-bold text-gray-900">
                                             Question {{ currentQuestionIndex + 1 }}
                                         </h3>
-                                        <span class="px-3 py-1 bg-propoff-blue/10 text-propoff-blue text-sm font-medium rounded">
+                                        <span class="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded">
                                             {{ currentQuestion.points }} {{ currentQuestion.points === 1 ? 'point' : 'points' }}
                                         </span>
                                     </div>
@@ -207,7 +207,7 @@ const getOptionPoints = (option) => {
                                                 :key="index"
                                                 class="flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition"
                                                 :class="{
-                                                    'border-propoff-blue bg-propoff-blue/10': answers[currentQuestion.id] === getOptionValue(option),
+                                                    'border-primary bg-primary/10': answers[currentQuestion.id] === getOptionValue(option),
                                                     'border-gray-200 hover:border-gray-300': answers[currentQuestion.id] !== getOptionValue(option),
                                                 }"
                                             >
@@ -216,12 +216,12 @@ const getOptionPoints = (option) => {
                                                         type="radio"
                                                         v-model="answers[currentQuestion.id]"
                                                         :value="getOptionValue(option)"
-                                                        class="h-4 w-4 text-propoff-blue focus:ring-propoff-blue/50"
+                                                        class="h-4 w-4 text-primary focus:ring-primary/50"
                                                     />
                                                     <span class="ml-3 text-gray-900">{{ getOptionLabel(option) }}</span>
                                                 </div>
                                                 <div v-if="getOptionPoints(option) > 0" class="ml-4 flex items-center gap-1">
-                                                    <span class="text-xs font-medium text-propoff-blue bg-propoff-blue/10 px-2 py-1 rounded">
+                                                    <span class="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded">
                                                         +{{ getOptionPoints(option) }} bonus {{ getOptionPoints(option) === 1 ? 'pt' : 'pts' }}
                                                     </span>
                                                 </div>
@@ -238,7 +238,7 @@ const getOptionPoints = (option) => {
                                             <label
                                                 class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition"
                                                 :class="{
-                                                    'border-propoff-blue bg-propoff-blue/10': answers[currentQuestion.id] === 'Yes',
+                                                    'border-primary bg-primary/10': answers[currentQuestion.id] === 'Yes',
                                                     'border-gray-200 hover:border-gray-300': answers[currentQuestion.id] !== 'Yes',
                                                 }"
                                             >
@@ -246,14 +246,14 @@ const getOptionPoints = (option) => {
                                                     type="radio"
                                                     v-model="answers[currentQuestion.id]"
                                                     value="Yes"
-                                                    class="h-4 w-4 text-propoff-blue focus:ring-propoff-blue/50"
+                                                    class="h-4 w-4 text-primary focus:ring-primary/50"
                                                 />
                                                 <span class="ml-3 text-gray-900">Yes</span>
                                             </label>
                                             <label
                                                 class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition"
                                                 :class="{
-                                                    'border-propoff-blue bg-propoff-blue/10': answers[currentQuestion.id] === 'No',
+                                                    'border-primary bg-primary/10': answers[currentQuestion.id] === 'No',
                                                     'border-gray-200 hover:border-gray-300': answers[currentQuestion.id] !== 'No',
                                                 }"
                                             >
@@ -261,7 +261,7 @@ const getOptionPoints = (option) => {
                                                     type="radio"
                                                     v-model="answers[currentQuestion.id]"
                                                     value="No"
-                                                    class="h-4 w-4 text-propoff-blue focus:ring-propoff-blue/50"
+                                                    class="h-4 w-4 text-primary focus:ring-primary/50"
                                                 />
                                                 <span class="ml-3 text-gray-900">No</span>
                                             </label>
@@ -274,7 +274,7 @@ const getOptionPoints = (option) => {
                                             <label
                                                 class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition"
                                                 :class="{
-                                                    'border-propoff-blue bg-propoff-blue/10': answers[currentQuestion.id] === 'True',
+                                                    'border-primary bg-primary/10': answers[currentQuestion.id] === 'True',
                                                     'border-gray-200 hover:border-gray-300': answers[currentQuestion.id] !== 'True',
                                                 }"
                                             >
@@ -282,14 +282,14 @@ const getOptionPoints = (option) => {
                                                     type="radio"
                                                     v-model="answers[currentQuestion.id]"
                                                     value="True"
-                                                    class="h-4 w-4 text-propoff-blue focus:ring-propoff-blue/50"
+                                                    class="h-4 w-4 text-primary focus:ring-primary/50"
                                                 />
                                                 <span class="ml-3 text-gray-900">True</span>
                                             </label>
                                             <label
                                                 class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition"
                                                 :class="{
-                                                    'border-propoff-blue bg-propoff-blue/10': answers[currentQuestion.id] === 'False',
+                                                    'border-primary bg-primary/10': answers[currentQuestion.id] === 'False',
                                                     'border-gray-200 hover:border-gray-300': answers[currentQuestion.id] !== 'False',
                                                 }"
                                             >
@@ -297,7 +297,7 @@ const getOptionPoints = (option) => {
                                                     type="radio"
                                                     v-model="answers[currentQuestion.id]"
                                                     value="False"
-                                                    class="h-4 w-4 text-propoff-blue focus:ring-propoff-blue/50"
+                                                    class="h-4 w-4 text-primary focus:ring-primary/50"
                                                 />
                                                 <span class="ml-3 text-gray-900">False</span>
                                             </label>
@@ -306,10 +306,9 @@ const getOptionPoints = (option) => {
 
                                     <!-- Short Answer or Number -->
                                     <div v-else>
-                                        <TextInput
+                                        <TextField
                                             v-model="answers[currentQuestion.id]"
                                             :type="currentQuestion.question_type === 'number' ? 'number' : 'text'"
-                                            class="w-full"
                                             :placeholder="currentQuestion.question_type === 'number' ? 'Enter a number' : 'Enter your answer'"
                                         />
                                     </div>
@@ -332,7 +331,7 @@ const getOptionPoints = (option) => {
                                     <button
                                         v-if="!isLastQuestion"
                                         @click="nextQuestion"
-                                        class="px-4 py-2 bg-propoff-blue text-white hover:bg-propoff-blue/80 rounded transition"
+                                        class="px-4 py-2 bg-primary text-white hover:bg-primary/80 rounded transition"
                                     >
                                         Next →
                                     </button>
@@ -348,20 +347,21 @@ const getOptionPoints = (option) => {
                         </div>
 
                         <!-- Submit Button (always visible at bottom) -->
-                        <div class="mt-6 bg-propoff-orange/10 border border-propoff-orange/30 rounded-lg p-4">
+                        <div class="mt-6 bg-warning/10 border border-warning/30 rounded-lg p-4">
                             <div class="flex items-start justify-between">
                                 <div>
-                                    <h4 class="font-medium text-propoff-orange">Ready to submit?</h4>
-                                    <p class="text-sm text-propoff-orange mt-1">
+                                    <h4 class="font-medium text-warning">Ready to submit?</h4>
+                                    <p class="text-sm text-warning mt-1">
                                         Make sure you've answered all questions before submitting.
                                     </p>
                                 </div>
-                                <PrimaryButton
+                                <Button
+                                    variant="primary"
                                     @click="submitForm"
                                     class="ml-4"
                                 >
                                     Submit Final Answers
-                                </PrimaryButton>
+                                </Button>
                             </div>
                         </div>
                     </div>

@@ -18,10 +18,10 @@
                 </template>
                 <template #actions>
                     <Link :href="route('admin.groups.edit', group.id)">
-                        <PrimaryButton>
+                        <Button variant="primary">
                             <PencilIcon class="w-4 h-4 mr-2" />
                             Edit Group
-                        </PrimaryButton>
+                        </Button>
                     </Link>
                 </template>
             </PageHeader>
@@ -78,7 +78,7 @@
                             <h3 class="text-lg font-semibold text-gray-900">Members</h3>
                             <button
                                 @click="showAddMember = true"
-                                class="px-4 py-2 bg-propoff-blue text-white text-sm rounded-md hover:bg-propoff-blue/80"
+                                class="px-4 py-2 bg-primary text-white text-sm rounded-md hover:bg-primary/80"
                             >
                                 Add Member
                             </button>
@@ -106,7 +106,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span :class="[
                                                 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
-                                                member.role === 'admin' ? 'bg-propoff-red/10 text-propoff-red' : 'bg-gray-100 text-gray-700'
+                                                member.role === 'admin' ? 'bg-danger/10 text-danger' : 'bg-gray-100 text-gray-700'
                                             ]">
                                                 {{ member.role }}
                                             </span>
@@ -117,7 +117,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <button
                                                 @click="removeMember(member.id)"
-                                                class="text-propoff-red hover:text-propoff-red/80"
+                                                class="text-danger hover:text-danger/80"
                                             >
                                                 Remove
                                             </button>
@@ -158,7 +158,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span :class="[
                                                 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
-                                                entry.status === 'completed' ? 'bg-propoff-green/10 text-propoff-dark-green' : 'bg-propoff-orange/10 text-propoff-orange'
+                                                entry.status === 'completed' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
                                             ]">
                                                 {{ entry.status }}
                                             </span>
@@ -186,7 +186,7 @@
                             v-model="addMemberForm.email"
                             type="email"
                             required
-                            class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                            class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                         />
                     </div>
                     <div class="flex justify-end space-x-2">
@@ -199,7 +199,7 @@
                         </button>
                         <button
                             type="submit"
-                            class="px-4 py-2 bg-propoff-blue text-white rounded-md hover:bg-propoff-blue/80"
+                            class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80"
                         >
                             Add Member
                         </button>
@@ -215,7 +215,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { PencilIcon } from '@heroicons/vue/24/outline';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Button from '@/Components/Base/Button.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 
 const props = defineProps({

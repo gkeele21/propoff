@@ -13,7 +13,7 @@
                         :class="[
                             'px-3 py-2 text-sm font-medium rounded-md',
                             link.active
-                                ? 'bg-propoff-blue text-white'
+                                ? 'bg-primary text-white'
                                 : link.url
                                     ? 'text-gray-700 hover:bg-gray-100'
                                     : 'text-gray-400 cursor-not-allowed'

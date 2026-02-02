@@ -56,9 +56,9 @@ const getOrdinal = (num) => {
 const getStatusColor = (status) => {
     const colors = {
         'draft': 'bg-gray-100 text-gray-800',
-        'open': 'bg-propoff-green/20 text-propoff-dark-green',
-        'locked': 'bg-propoff-orange/20 text-propoff-orange',
-        'completed': 'bg-propoff-dark-green/20 text-propoff-dark-green',
+        'open': 'bg-success/20 text-success',
+        'locked': 'bg-warning/20 text-warning',
+        'completed': 'bg-success/20 text-success',
     };
     return colors[status] || 'bg-gray-100 text-gray-800';
 };
@@ -98,8 +98,8 @@ const copyMagicLink = (link) => {
                     <div class="p-6">
                         <h3 class="text-2xl font-bold text-gray-900">
                             Welcome back, {{ $page.props.auth.user.name }}!
-                            <span v-if="isAdmin" class="ml-2 text-sm bg-propoff-red/20 text-propoff-red px-3 py-1 rounded-full">Admin</span>
-                            <span v-else-if="isCaptain" class="ml-2 text-sm bg-propoff-orange/20 text-propoff-orange px-3 py-1 rounded-full">Captain</span>
+                            <span v-if="isAdmin" class="ml-2 text-sm bg-danger/20 text-danger px-3 py-1 rounded-full">Admin</span>
+                            <span v-else-if="isCaptain" class="ml-2 text-sm bg-warning/20 text-warning px-3 py-1 rounded-full">Captain</span>
                         </h3>
                         <p class="mt-2 text-gray-600">
                             <span v-if="isAdmin">Manage your system and play events</span>
@@ -110,7 +110,7 @@ const copyMagicLink = (link) => {
                 </div>
 
                 <!-- Magic Link Banner (for guest users) -->
-                <div v-if="$page.props.flash?.show_magic_link && $page.props.auth.user.role === 'guest'" class="bg-gradient-to-r from-propoff-blue to-propoff-blue overflow-hidden shadow-lg sm:rounded-lg">
+                <div v-if="$page.props.flash?.show_magic_link && $page.props.auth.user.role === 'guest'" class="bg-gradient-to-r from-primary to-primary overflow-hidden shadow-lg sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-start">
                             <svg class="h-6 w-6 text-white mt-1 mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -126,7 +126,7 @@ const copyMagicLink = (link) => {
                                 </div>
                                 <button
                                     @click="copyMagicLink($page.props.flash?.magic_link)"
-                                    class="inline-flex items-center px-4 py-2 bg-white text-propoff-blue rounded-md hover:bg-propoff-blue/10 transition font-medium text-sm"
+                                    class="inline-flex items-center px-4 py-2 bg-white text-primary rounded-md hover:bg-primary/10 transition font-medium text-sm"
                                 >
                                     <svg class="h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
@@ -147,18 +147,18 @@ const copyMagicLink = (link) => {
 
                             <button
                                 @click="showJoinGroupModal = true"
-                                class="flex flex-col items-center justify-center p-6 border-2 border-propoff-orange/20 bg-propoff-orange/10 rounded-lg hover:border-propoff-orange hover:bg-propoff-orange/20 transition"
+                                class="flex flex-col items-center justify-center p-6 border-2 border-warning/20 bg-warning/10 rounded-lg hover:border-warning hover:bg-warning/20 transition"
                             >
-                                <UserGroupIcon class="h-12 w-12 text-propoff-orange mb-3" />
+                                <UserGroupIcon class="h-12 w-12 text-warning mb-3" />
                                 <span class="font-semibold text-gray-900">Join New Group</span>
                                 <span class="text-xs text-gray-600 text-center mt-1">Enter a join code</span>
                             </button>
 
                             <Link
                                 :href="route('entries.index')"
-                                class="flex flex-col items-center justify-center p-6 border-2 border-gray-200 rounded-lg hover:border-propoff-green hover:bg-propoff-green/10 transition"
+                                class="flex flex-col items-center justify-center p-6 border-2 border-gray-200 rounded-lg hover:border-success hover:bg-success/10 transition"
                             >
-                                <ChartBarIcon class="h-12 w-12 text-propoff-green mb-3" />
+                                <ChartBarIcon class="h-12 w-12 text-success mb-3" />
                                 <span class="font-semibold text-gray-900">My Entries</span>
                                 <span class="text-xs text-gray-600 text-center mt-1">View answers</span>
                             </Link>
@@ -172,7 +172,7 @@ const copyMagicLink = (link) => {
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
                             <div class="flex items-center">
-                                <div class="rounded-md bg-propoff-blue p-3">
+                                <div class="rounded-md bg-primary p-3">
                                     <TrophyIcon class="h-6 w-6 text-white" />
                                 </div>
                                 <div class="ml-4">
@@ -186,7 +186,7 @@ const copyMagicLink = (link) => {
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
                             <div class="flex items-center">
-                                <div class="rounded-md bg-propoff-green p-3">
+                                <div class="rounded-md bg-success p-3">
                                     <ChartBarIcon class="h-6 w-6 text-white" />
                                 </div>
                                 <div class="ml-4">
@@ -200,14 +200,14 @@ const copyMagicLink = (link) => {
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
                             <div class="flex items-center">
-                                <div class="rounded-md bg-propoff-orange p-3">
+                                <div class="rounded-md bg-warning p-3">
                                     <UserGroupIcon class="h-6 w-6 text-white" />
                                 </div>
                                 <div class="ml-4">
                                     <p class="text-sm font-medium text-gray-500">My Groups</p>
                                     <p class="text-2xl font-semibold text-gray-900">
                                         {{ stats.groups_count }}
-                                        <span v-if="isCaptain" class="text-sm text-propoff-orange">({{ stats.captain_groups_count }} captain)</span>
+                                        <span v-if="isCaptain" class="text-sm text-warning">({{ stats.captain_groups_count }} captain)</span>
                                     </p>
                                 </div>
                             </div>
@@ -217,7 +217,7 @@ const copyMagicLink = (link) => {
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
                             <div class="flex items-center">
-                                <div class="rounded-md bg-propoff-dark-green p-3">
+                                <div class="rounded-md bg-success p-3">
                                     <ClockIcon class="h-6 w-6 text-white" />
                                 </div>
                                 <div class="ml-4">
@@ -239,7 +239,7 @@ const copyMagicLink = (link) => {
                             </h3>
                             <button
                                 @click="showJoinGroupModal = true"
-                                class="text-sm text-propoff-blue hover:text-propoff-blue/80 font-semibold"
+                                class="text-sm text-primary hover:text-primary/80 font-semibold"
                             >
                                 + Join New Group
                             </button>
@@ -250,7 +250,7 @@ const copyMagicLink = (link) => {
                             <p class="mt-2 text-sm text-gray-500">You haven't joined any groups yet</p>
                             <button
                                 @click="showJoinGroupModal = true"
-                                class="mt-4 text-sm text-propoff-blue hover:text-propoff-blue/80 font-semibold"
+                                class="mt-4 text-sm text-primary hover:text-primary/80 font-semibold"
                             >
                                 Join a group to get started
                             </button>
@@ -269,7 +269,7 @@ const copyMagicLink = (link) => {
                                             {{ group.name }}
                                             <span
                                                 v-if="group.is_captain"
-                                                class="text-xs bg-propoff-blue text-white px-2 py-1 rounded-full font-bold"
+                                                class="text-xs bg-primary text-white px-2 py-1 rounded-full font-bold"
                                             >
                                                 CAPTAIN
                                             </span>
@@ -288,7 +288,7 @@ const copyMagicLink = (link) => {
                                         <p class="text-xs text-gray-500">Join Code</p>
                                         <button
                                             @click="copyJoinCode(group.code)"
-                                            class="font-mono text-sm font-semibold text-gray-900 hover:text-propoff-blue"
+                                            class="font-mono text-sm font-semibold text-gray-900 hover:text-primary"
                                         >
                                             {{ group.code }}
                                         </button>
@@ -301,35 +301,35 @@ const copyMagicLink = (link) => {
                                     <button
                                         v-if="group.user_entry && group.user_entry.status === 'in_progress'"
                                         @click="$inertia.visit(route('entries.continue', group.user_entry.id))"
-                                        class="inline-flex items-center px-4 py-2 bg-propoff-green text-white rounded hover:bg-propoff-dark-green text-sm font-semibold"
+                                        class="inline-flex items-center px-4 py-2 bg-success text-white rounded hover:bg-success text-sm font-semibold"
                                     >
                                         Continue
                                     </button>
                                     <Link
                                         v-else-if="group.user_entry && group.user_entry.status === 'completed'"
                                         :href="route('entries.show', group.user_entry.id)"
-                                        class="inline-flex items-center px-4 py-2 bg-propoff-blue text-white rounded hover:bg-propoff-blue/80 text-sm font-semibold"
+                                        class="inline-flex items-center px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 text-sm font-semibold"
                                     >
                                         View Entry
                                     </Link>
                                     <button
                                         v-else-if="group.event.status === 'open'"
                                         @click="$inertia.post(route('entries.start', group.event.id), { group_id: group.id })"
-                                        class="inline-flex items-center px-4 py-2 bg-propoff-blue text-white rounded hover:bg-propoff-blue/80 text-sm font-semibold"
+                                        class="inline-flex items-center px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 text-sm font-semibold"
                                     >
                                         Enter Event
                                     </button>
                                     <Link
                                         v-if="group.has_leaderboard"
                                         :href="route('groups.leaderboard', group.id)"
-                                        class="inline-flex items-center px-4 py-2 bg-propoff-dark-green text-white rounded hover:bg-propoff-dark-green/80 text-sm font-semibold"
+                                        class="inline-flex items-center px-4 py-2 bg-success text-white rounded hover:bg-success/80 text-sm font-semibold"
                                     >
                                         View Leaderboard
                                     </Link>
                                     <Link
                                         v-if="group.is_captain"
                                         :href="route('groups.show', group.id)"
-                                        class="inline-flex items-center px-4 py-2 bg-propoff-orange text-white rounded hover:bg-propoff-orange/80 text-sm font-semibold"
+                                        class="inline-flex items-center px-4 py-2 bg-warning text-white rounded hover:bg-warning/80 text-sm font-semibold"
                                     >
                                         Manage Group
                                     </Link>
@@ -346,7 +346,7 @@ const copyMagicLink = (link) => {
                             <h3 class="text-lg font-semibold text-gray-900">Active Events</h3>
                             <Link
                                 :href="route('dashboard')"
-                                class="text-sm text-propoff-blue hover:text-propoff-blue/80"
+                                class="text-sm text-primary hover:text-primary/80"
                             >
                                 View all
                             </Link>
@@ -377,14 +377,14 @@ const copyMagicLink = (link) => {
                                     <Link
                                         v-if="event.has_submitted && event.entry_id"
                                         :href="route('entries.show', event.entry_id)"
-                                        class="text-center px-4 py-2 bg-propoff-green/20 text-propoff-dark-green rounded font-semibold text-sm"
+                                        class="text-center px-4 py-2 bg-success/20 text-success rounded font-semibold text-sm"
                                     >
                                         ✓ View Entry
                                     </Link>
                                     <Link
                                         v-else-if="event.has_joined && event.group_id"
                                         :href="route('events.show', event.id)"
-                                        class="text-center px-4 py-2 bg-propoff-blue text-white rounded font-semibold text-sm hover:bg-propoff-blue/80"
+                                        class="text-center px-4 py-2 bg-primary text-white rounded font-semibold text-sm hover:bg-primary/80"
                                     >
                                         Play Now
                                     </Link>
@@ -408,7 +408,7 @@ const copyMagicLink = (link) => {
                             <h3 class="text-lg font-semibold text-gray-900">Recent Entries</h3>
                             <Link
                                 :href="route('entries.index')"
-                                class="text-sm text-propoff-blue hover:text-propoff-blue/80"
+                                class="text-sm text-primary hover:text-primary/80"
                             >
                                 View all
                             </Link>
@@ -432,7 +432,7 @@ const copyMagicLink = (link) => {
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <Link
                                                 :href="route('entries.show', result.id)"
-                                                class="text-sm font-medium text-propoff-blue hover:text-propoff-blue/80"
+                                                class="text-sm font-medium text-primary hover:text-primary/80"
                                             >
                                                 {{ result.event.name }}
                                             </Link>
@@ -486,12 +486,12 @@ const copyMagicLink = (link) => {
                                 id="join-code"
                                 v-model="joinGroupForm.code"
                                 type="text"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-propoff-blue/50 focus:border-propoff-blue uppercase font-mono"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary/50 focus:border-primary uppercase font-mono"
                                 placeholder="ABCD1234"
                                 required
                                 autofocus
                             />
-                            <p v-if="joinGroupForm.errors.code" class="mt-1 text-sm text-propoff-red">
+                            <p v-if="joinGroupForm.errors.code" class="mt-1 text-sm text-danger">
                                 {{ joinGroupForm.errors.code }}
                             </p>
                         </div>
@@ -506,7 +506,7 @@ const copyMagicLink = (link) => {
                             <button
                                 type="submit"
                                 :disabled="joinGroupForm.processing"
-                                class="px-4 py-2 bg-propoff-blue text-white rounded-md hover:bg-propoff-blue/80 disabled:opacity-50"
+                                class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80 disabled:opacity-50"
                             >
                                 Join Group
                             </button>

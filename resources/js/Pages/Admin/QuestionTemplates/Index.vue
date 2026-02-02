@@ -13,10 +13,10 @@
             >
                 <template #actions>
                     <Link :href="route('admin.question-templates.create')">
-                        <PrimaryButton>
+                        <Button variant="primary">
                             <PlusIcon class="w-4 h-4 mr-2" />
                             Create Template
-                        </PrimaryButton>
+                        </Button>
                     </Link>
                 </template>
             </PageHeader>
@@ -34,14 +34,14 @@
                                     v-model="form.search"
                                     @input="debouncedFilter"
                                     placeholder="Search templates..."
-                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary/50"
                                 />
                             </div>
                             <div>
                                 <select
                                     v-model="form.type"
                                     @change="filterTemplates"
-                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary/50"
                                 >
                                     <option value="">All Types</option>
                                     <option value="multiple_choice">Multiple Choice</option>
@@ -55,7 +55,7 @@
                                 <select
                                     v-model="form.category"
                                     @change="filterTemplates"
-                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary/50"
                                 >
                                     <option value="">All Categories</option>
                                     <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
@@ -78,9 +78,9 @@
                                 </div>
                                 <span :class="[
                                     'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                                    template.question_type === 'multiple_choice' ? 'bg-propoff-blue/10 text-propoff-blue' :
-                                    template.question_type === 'yes_no' ? 'bg-propoff-green/10 text-propoff-dark-green' :
-                                    template.question_type === 'numeric' ? 'bg-propoff-orange/10 text-propoff-orange' :
+                                    template.question_type === 'multiple_choice' ? 'bg-primary/10 text-primary' :
+                                    template.question_type === 'yes_no' ? 'bg-success/10 text-success' :
+                                    template.question_type === 'numeric' ? 'bg-warning/10 text-warning' :
                                     'bg-gray-100 text-gray-700'
                                 ]">
                                     {{ template.question_type?.replace('_', ' ') }}
@@ -93,17 +93,17 @@
                             <div class="mb-4">
                                 <div class="flex items-center gap-2 mb-2">
                                     <span class="text-xs font-medium text-gray-700">Base Points:</span>
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-propoff-green/10 text-propoff-dark-green">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-success/10 text-success">
                                         {{ template.default_points || 0 }} pts
                                     </span>
                                 </div>
 
                                 <!-- Show bonus points if options have them -->
-                                <div v-if="hasOptionBonusPoints(template)" class="text-xs text-propoff-orange">
+                                <div v-if="hasOptionBonusPoints(template)" class="text-xs text-warning">
                                     <span class="font-medium">⭐ Bonus Points:</span>
                                     <div class="ml-4 mt-1 space-y-0.5">
                                         <div v-for="(option, index) in getOptionsWithBonus(template)" :key="index" class="text-gray-700">
-                                            {{ option.label }}: <span class="font-semibold text-propoff-orange">+{{ option.points }} {{ option.points === 1 ? 'pt' : 'pts' }}</span>
+                                            {{ option.label }}: <span class="font-semibold text-warning">+{{ option.points }} {{ option.points === 1 ? 'pt' : 'pts' }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -112,7 +112,7 @@
                             <div v-if="template.variables && template.variables.length > 0" class="mb-4">
                                 <p class="text-xs text-gray-500 mb-1">Variables:</p>
                                 <div class="flex flex-wrap gap-1">
-                                    <span v-for="variable in template.variables" :key="variable" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono bg-propoff-blue/10 text-propoff-blue">
+                                    <span v-for="variable in template.variables" :key="variable" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono bg-primary/10 text-primary">
                                         {{ '{' + variable + '}' }}
                                     </span>
                                 </div>
@@ -120,13 +120,13 @@
 
                             <div class="flex items-center justify-between pt-4 border-t border-gray-200">
                                 <div class="flex space-x-2">
-                                    <Link :href="route('admin.question-templates.edit', template.id)" class="text-propoff-blue hover:text-propoff-blue/80 text-sm font-medium">
+                                    <Link :href="route('admin.question-templates.edit', template.id)" class="text-primary hover:text-primary/80 text-sm font-medium">
                                         Edit
                                     </Link>
-                                    <button @click="duplicateTemplate(template.id)" class="text-propoff-green hover:text-propoff-dark-green text-sm font-medium">
+                                    <button @click="duplicateTemplate(template.id)" class="text-success hover:text-success text-sm font-medium">
                                         Duplicate
                                     </button>
-                                    <button @click="confirmDelete(template.id)" class="text-propoff-red hover:text-propoff-red/80 text-sm font-medium">
+                                    <button @click="confirmDelete(template.id)" class="text-danger hover:text-danger/80 text-sm font-medium">
                                         Delete
                                     </button>
                                 </div>
@@ -145,7 +145,7 @@
                         <h3 class="mt-2 text-sm font-medium text-gray-900">No templates found</h3>
                         <p class="mt-1 text-sm text-gray-500">Get started by creating a new question template.</p>
                         <div class="mt-6">
-                            <Link :href="route('admin.question-templates.create')" class="inline-flex items-center px-4 py-2 bg-propoff-blue border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-propoff-blue/80">
+                            <Link :href="route('admin.question-templates.create')" class="inline-flex items-center px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary/80">
                                 <PlusIcon class="w-4 h-4 mr-2" />
                                 Create Template
                             </Link>
@@ -164,7 +164,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import PageHeader from '@/Components/PageHeader.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Button from '@/Components/Base/Button.vue';
 import Pagination from '@/Components/Pagination.vue';
 import { ref, computed, watch } from 'vue';
 import { PlusIcon, DocumentTextIcon } from '@heroicons/vue/24/outline';

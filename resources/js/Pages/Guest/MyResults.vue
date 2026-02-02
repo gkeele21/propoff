@@ -13,23 +13,23 @@
                         <p class="text-gray-600">Here are your game results</p>
                         
                         <!-- Save This Link Notice -->
-                        <div class="mt-4 bg-propoff-blue/10 border border-propoff-blue/30 rounded-lg p-4">
+                        <div class="mt-4 bg-primary/10 border border-primary/30 rounded-lg p-4">
                             <div class="flex items-start gap-3">
-                                <InformationCircleIcon class="w-5 h-5 text-propoff-blue mt-0.5" />
+                                <InformationCircleIcon class="w-5 h-5 text-primary mt-0.5" />
                                 <div class="flex-1">
-                                    <p class="text-sm text-propoff-blue font-medium">Save this link!</p>
-                                    <p class="text-sm text-propoff-blue mt-1">
+                                    <p class="text-sm text-primary font-medium">Save this link!</p>
+                                    <p class="text-sm text-primary mt-1">
                                         Bookmark this page to return and view your results anytime.
                                     </p>
                                     <div class="mt-2 flex items-center gap-2">
                                         <input
                                             :value="currentUrl"
                                             readonly
-                                            class="flex-1 text-xs bg-white border border-propoff-blue/30 rounded px-2 py-1"
+                                            class="flex-1 text-xs bg-white border border-primary/30 rounded px-2 py-1"
                                         />
                                         <button
                                             @click="copyLink"
-                                            class="px-3 py-1 bg-propoff-blue text-white text-xs rounded hover:bg-propoff-blue/80"
+                                            class="px-3 py-1 bg-primary text-white text-xs rounded hover:bg-primary/80"
                                         >
                                             {{ copied ? 'Copied!' : 'Copy' }}
                                         </button>
@@ -46,7 +46,7 @@
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">My Entries</h3>
                         
                         <div v-if="entries.length === 0" class="text-center py-12">
-                            <TrophyIcon class="w-16 h-16 text-propoff-orange mx-auto mb-4" />
+                            <TrophyIcon class="w-16 h-16 text-warning mx-auto mb-4" />
                             <p class="text-gray-600">No entries yet</p>
                         </div>
 
@@ -63,7 +63,7 @@
                                         
                                         <div class="mt-2 flex items-center gap-4">
                                             <div>
-                                                <span class="text-2xl font-bold text-propoff-green">{{ entry.percentage }}%</span>
+                                                <span class="text-2xl font-bold text-success">{{ entry.percentage }}%</span>
                                                 <span class="text-sm text-gray-600 ml-1">
                                                     ({{ entry.total_score }}/{{ entry.possible_points }} {{ entry.possible_points === 1 ? 'point' : 'points' }})
                                                 </span>
@@ -77,7 +77,7 @@
 
                                     <div class="flex flex-col gap-2">
                                         <span
-                                            :class="entry.is_complete ? 'bg-propoff-green/10 text-propoff-dark-green' : 'bg-propoff-orange/10 text-propoff-orange'"
+                                            :class="entry.is_complete ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'"
                                             class="px-3 py-1 rounded-full text-xs font-medium"
                                         >
                                             {{ entry.is_complete ? 'Complete' : 'In Progress' }}
@@ -86,7 +86,7 @@
                                         <Link
                                             v-if="entry.can_edit"
                                             :href="route('entries.continue', entry.id)"
-                                            class="px-3 py-1 bg-propoff-blue text-white text-xs rounded hover:bg-propoff-blue/80 text-center"
+                                            class="px-3 py-1 bg-primary text-white text-xs rounded hover:bg-primary/80 text-center"
                                         >
                                             {{ entry.is_complete ? 'View' : 'Continue' }}
                                         </Link>

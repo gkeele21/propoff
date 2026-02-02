@@ -61,7 +61,7 @@
                                     <tr
                                         v-for="entry in leaderboard.data"
                                         :key="entry.id"
-                                        :class="entry.user_id === $page.props.auth.user?.id ? 'bg-propoff-blue/10' : ''"
+                                        :class="entry.user_id === $page.props.auth.user?.id ? 'bg-primary/10' : ''"
                                     >
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
@@ -89,7 +89,7 @@
                                                 <div>
                                                     <div class="text-sm font-medium text-gray-900">
                                                         {{ entry.user.name }}
-                                                        <span v-if="entry.user_id === $page.props.auth.user?.id" class="ml-2 text-xs text-propoff-blue">(You)</span>
+                                                        <span v-if="entry.user_id === $page.props.auth.user?.id" class="ml-2 text-xs text-primary">(You)</span>
                                                     </div>
                                                     <div v-if="entry.user.email" class="text-sm text-gray-500">{{ entry.user.email }}</div>
                                                 </div>
@@ -115,7 +115,7 @@
                         </div>
 
                         <div v-if="leaderboard.data.length === 0" class="text-center py-12">
-                            <TrophyIcon class="mx-auto h-12 w-12 text-propoff-orange" />
+                            <TrophyIcon class="mx-auto h-12 w-12 text-warning" />
                             <h3 class="mt-2 text-sm font-medium text-gray-900">No entries yet</h3>
                             <p class="mt-1 text-sm text-gray-500">Be the first to complete this event!</p>
                         </div>

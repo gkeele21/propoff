@@ -1,10 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import InputError from '@/Components/InputError.vue';
+import Button from '@/Components/Base/Button.vue';
+import TextField from '@/Components/Form/TextField.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 
 const props = defineProps({
@@ -46,44 +44,31 @@ const submit = () => {
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <form @submit.prevent="submit" class="p-6 space-y-6">
                         <!-- Name -->
-                        <div>
-                            <InputLabel for="name" value="Group Name" />
-                            <TextInput
-                                id="name"
-                                v-model="form.name"
-                                type="text"
-                                class="mt-1 block w-full"
-                                required
-                                autofocus
-                            />
-                            <InputError :message="form.errors.name" class="mt-2" />
-                            <p class="mt-1 text-sm text-gray-500">
-                                The display name for this group
-                            </p>
-                        </div>
+                        <TextField
+                            v-model="form.name"
+                            label="Group Name"
+                            :error="form.errors.name"
+                            hint="The display name for this group"
+                            required
+                            autofocus
+                        />
 
                         <!-- Code -->
-                        <div>
-                            <InputLabel for="code" value="Group Code" />
-                            <TextInput
-                                id="code"
-                                v-model="form.code"
-                                type="text"
-                                class="mt-1 block w-full uppercase"
-                                required
-                                maxlength="50"
-                                pattern="[A-Z0-9-]+"
-                            />
-                            <InputError :message="form.errors.code" class="mt-2" />
-                            <p class="mt-1 text-sm text-gray-500">
-                                Members use this code to join the group. Only uppercase letters, numbers, and hyphens allowed.
-                            </p>
-                        </div>
+                        <TextField
+                            v-model="form.code"
+                            label="Group Code"
+                            :error="form.errors.code"
+                            hint="Members use this code to join the group. Only uppercase letters, numbers, and hyphens allowed."
+                            class="uppercase"
+                            required
+                            maxlength="50"
+                            pattern="[A-Z0-9-]+"
+                        />
 
                         <!-- Warning Box -->
-                        <div class="bg-propoff-orange/10 border border-propoff-orange/30 rounded-lg p-4">
-                            <h4 class="font-medium text-propoff-orange mb-2">⚠️ Important</h4>
-                            <ul class="text-sm text-propoff-orange space-y-1">
+                        <div class="bg-warning/10 border border-warning/30 rounded-lg p-4">
+                            <h4 class="font-medium text-warning mb-2">⚠️ Important</h4>
+                            <ul class="text-sm text-warning space-y-1">
                                 <li>• Changing the group code will invalidate the old code</li>
                                 <li>• Members will need the new code to join</li>
                                 <li>• Existing members will not be affected</li>
@@ -109,12 +94,13 @@ const submit = () => {
                             >
                                 Cancel
                             </Link>
-                            <PrimaryButton
+                            <Button
+                                variant="primary"
                                 type="submit"
                                 :disabled="form.processing"
                             >
                                 Update Group
-                            </PrimaryButton>
+                            </Button>
                         </div>
                     </form>
                 </div>

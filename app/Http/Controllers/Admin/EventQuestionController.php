@@ -12,25 +12,9 @@ use Inertia\Inertia;
 class EventQuestionController extends Controller
 {
     /**
-     * Display a listing of questions for an event.
+     * Show the form for importing questions from templates.
      */
-    public function index(Event $event)
-    {
-        $questions = $event->eventQuestions()
-            ->with('eventAnswers')
-            ->orderBy('display_order')
-            ->get();
-
-        return Inertia::render('Admin/EventQuestions/Index', [
-            'event' => $event,
-            'questions' => $questions,
-        ]);
-    }
-
-    /**
-     * Show the form for creating a new question.
-     */
-    public function create(Event $event)
+    public function importQuestions(Event $event)
     {
         // Get current questions
         $currentQuestions = $event->eventQuestions()->orderBy('display_order')->get();
@@ -38,7 +22,7 @@ class EventQuestionController extends Controller
         // Get next order (1-based)
         $nextOrder = ($event->eventQuestions()->max('display_order') ?? 0) + 1;
 
-        return Inertia::render('Admin/EventQuestions/Create', [
+        return Inertia::render('Admin/Events/ImportQuestions', [
             'event' => $event,
             'currentQuestions' => $currentQuestions,
             'nextOrder' => $nextOrder,
@@ -135,7 +119,7 @@ class EventQuestionController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.events.event-questions.index', $event)
+        return redirect()->route('admin.events.show', $event)
             ->with('success', 'Question added successfully!');
     }
 
@@ -201,34 +185,8 @@ class EventQuestionController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.events.event-questions.index', $event)
+        return redirect()->route('admin.events.show', $event)
             ->with('success', 'Question created from template successfully!');
-    }
-
-    /**
-     * Display the specified question.
-     */
-    public function show(Event $event, EventQuestion $eventQuestion)
-    {
-        $eventQuestion->load('template', 'groupQuestions');
-
-        return Inertia::render('Admin/EventQuestions/Show', [
-            'event' => $event,
-            'eventQuestion' => $eventQuestion,
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified question.
-     */
-    public function edit(Event $event, EventQuestion $eventQuestion)
-    {
-        $eventQuestion->load('template', 'eventAnswers')->loadCount('groupQuestions');
-
-        return Inertia::render('Admin/EventQuestions/Edit', [
-            'event' => $event,
-            'eventQuestion' => $eventQuestion,
-        ]);
     }
 
     /**
@@ -280,7 +238,7 @@ class EventQuestionController extends Controller
             }
         }
 
-        return redirect()->route('admin.events.event-questions.index', $event)
+        return redirect()->route('admin.events.show', $event)
             ->with('success', 'Question updated successfully!');
     }
 
@@ -294,15 +252,56 @@ class EventQuestionController extends Controller
         // Reorder remaining questions
         $this->reorderQuestionsAfterDelete($event, $eventQuestion->display_order);
 
-        return redirect()->route('admin.events.event-questions.index', $event)
+        return redirect()->route('admin.events.show', $event)
             ->with('success', 'Question deleted successfully!');
     }
 
     /**
      * Reorder questions (drag and drop).
+     * Supports two formats:
+     * 1. Simple format: {question_id: X, new_order: Y}
+     * 2. Bulk format: {event_questions: [{id: X, order: Y}, ...]}
      */
     public function reorder(Request $request, Event $event)
     {
+        // Check if using simple format (single question reorder)
+        if ($request->has('question_id') && $request->has('new_order')) {
+            $validated = $request->validate([
+                'question_id' => 'required|exists:event_questions,id',
+                'new_order' => 'required|integer|min:1',
+            ]);
+
+            $question = EventQuestion::findOrFail($validated['question_id']);
+            $oldOrder = $question->display_order;
+            $newOrder = $validated['new_order'];
+
+            // Move question to new position
+            if ($oldOrder < $newOrder) {
+                // Moving down - shift up questions in between
+                EventQuestion::where('event_id', $event->id)
+                    ->where('display_order', '>', $oldOrder)
+                    ->where('display_order', '<=', $newOrder)
+                    ->decrement('display_order');
+            } else if ($oldOrder > $newOrder) {
+                // Moving up - shift down questions in between
+                EventQuestion::where('event_id', $event->id)
+                    ->where('display_order', '>=', $newOrder)
+                    ->where('display_order', '<', $oldOrder)
+                    ->increment('display_order');
+            }
+
+            // Update the moved question
+            $question->update(['display_order' => $newOrder]);
+
+            // Update corresponding group questions
+            \App\Models\GroupQuestion::where('event_question_id', $question->id)
+                ->where('is_custom', false)
+                ->update(['display_order' => $newOrder]);
+
+            return back()->with('success', 'Questions reordered successfully!');
+        }
+
+        // Bulk format (existing functionality)
         $validated = $request->validate([
             'event_questions' => 'required|array',
             'event_questions.*.id' => 'required|exists:event_questions,id',
@@ -388,7 +387,7 @@ class EventQuestionController extends Controller
             }
         }
 
-        return redirect()->route('admin.events.event-questions.index', $targetEvent)
+        return redirect()->route('admin.events.show', $targetEvent)
             ->with('success', count($sourceQuestions) . ' questions imported successfully!');
     }
 
@@ -467,8 +466,96 @@ class EventQuestionController extends Controller
             }
         }
 
-        return redirect()->route('admin.events.event-questions.index', $event)
+        return redirect()->route('admin.events.show', $event)
             ->with('success', 'Questions imported successfully.');
+    }
+
+    /**
+     * Set the correct answer for a question and recalculate scores.
+     */
+    public function setAnswer(Request $request, Event $event, EventQuestion $eventQuestion)
+    {
+        $validated = $request->validate([
+            'answer' => 'required|string',
+        ]);
+
+        // Update the correct answer
+        $eventQuestion->update([
+            'correct_answer' => $validated['answer'],
+        ]);
+
+        // Recalculate scores for all entries in this event
+        $this->recalculateEventScores($event);
+
+        return back()->with('success', 'Answer saved and scores calculated');
+    }
+
+    /**
+     * Recalculate scores for all entries in an event.
+     */
+    protected function recalculateEventScores(Event $event)
+    {
+        $entries = $event->entries;
+
+        foreach ($entries as $entry) {
+            $score = $this->calculateEntryScore($entry);
+            $percentage = $this->calculateEntryPercentage($entry, $score);
+
+            $entry->update([
+                'score' => $score,
+                'percentage' => $percentage,
+            ]);
+        }
+    }
+
+    /**
+     * Calculate the score for a single entry.
+     */
+    protected function calculateEntryScore($entry)
+    {
+        $totalScore = 0;
+        $userAnswers = $entry->userAnswers;
+
+        foreach ($userAnswers as $userAnswer) {
+            $eventQuestion = $userAnswer->eventQuestion;
+
+            if (!$eventQuestion) {
+                continue;
+            }
+
+            // Check if answer is correct
+            if ($eventQuestion->correct_answer && $userAnswer->answer === $eventQuestion->correct_answer) {
+                // Add base points
+                $totalScore += $eventQuestion->points;
+
+                // Add bonus points if applicable (for multiple choice)
+                if ($eventQuestion->question_type === 'multiple_choice' && $eventQuestion->options) {
+                    foreach ($eventQuestion->options as $option) {
+                        if (isset($option['label']) && $option['label'] === $userAnswer->answer) {
+                            $totalScore += ($option['points'] ?? 0);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $totalScore;
+    }
+
+    /**
+     * Calculate the percentage score for an entry.
+     */
+    protected function calculateEntryPercentage($entry, $score)
+    {
+        $event = $entry->event;
+        $maxPossibleScore = $event->eventQuestions()->sum('points');
+
+        if ($maxPossibleScore === 0) {
+            return 0;
+        }
+
+        return ($score / $maxPossibleScore) * 100;
     }
 
     /**

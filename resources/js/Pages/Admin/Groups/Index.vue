@@ -10,7 +10,7 @@ import {
     PlusIcon,
 } from '@heroicons/vue/24/outline';
 import PageHeader from '@/Components/PageHeader.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Button from '@/Components/Base/Button.vue';
 
 const props = defineProps({
     groups: Object,
@@ -87,15 +87,15 @@ const formatDate = (dateString) => {
             >
                 <template #actions>
                     <Link :href="route('admin.groups.create')">
-                        <PrimaryButton>
+                        <Button variant="primary">
                             <PlusIcon class="w-4 h-4 mr-2" />
                             Create Group
-                        </PrimaryButton>
+                        </Button>
                     </Link>
                     <button
                         v-if="selectedGroups.length > 0"
                         @click="bulkDelete"
-                        class="inline-flex items-center px-4 py-2 bg-propoff-red border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-propoff-red/80"
+                        class="inline-flex items-center px-4 py-2 bg-danger border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-danger/80"
                     >
                         <TrashIcon class="w-4 h-4 mr-2" />
                         Delete Selected ({{ selectedGroups.length }})
@@ -125,7 +125,7 @@ const formatDate = (dateString) => {
                             @input="filterGroups"
                             type="text"
                             placeholder="Search by name or code..."
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-propoff-blue focus:ring-propoff-blue/50"
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
                         />
                     </div>
                 </div>
@@ -141,7 +141,7 @@ const formatDate = (dateString) => {
                                             type="checkbox"
                                             @change="toggleSelectAll"
                                             :checked="selectedGroups.length === groups.data.length && groups.data.length > 0"
-                                            class="rounded border-gray-300 text-propoff-blue shadow-sm focus:border-propoff-blue focus:ring focus:ring-propoff-blue/50 focus:ring-opacity-50"
+                                            class="rounded border-gray-300 text-primary shadow-sm focus:border-primary focus:ring focus:ring-primary/50 focus:ring-opacity-50"
                                         />
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -171,13 +171,13 @@ const formatDate = (dateString) => {
                                             v-model="selectedGroups"
                                             :value="group.id"
                                             type="checkbox"
-                                            class="rounded border-gray-300 text-propoff-blue shadow-sm focus:border-propoff-blue focus:ring focus:ring-propoff-blue/50 focus:ring-opacity-50"
+                                            class="rounded border-gray-300 text-primary shadow-sm focus:border-primary focus:ring focus:ring-primary/50 focus:ring-opacity-50"
                                         />
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <Link
                                             :href="route('admin.groups.show', group.id)"
-                                            class="text-sm font-medium text-gray-900 hover:text-propoff-blue/80"
+                                            class="text-sm font-medium text-gray-900 hover:text-primary/80"
                                         >
                                             {{ group.name }}
                                         </Link>
@@ -202,13 +202,13 @@ const formatDate = (dateString) => {
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <Link
                                             :href="route('admin.groups.show', group.id)"
-                                            class="text-propoff-blue hover:text-propoff-blue/80 mr-3"
+                                            class="text-primary hover:text-primary/80 mr-3"
                                         >
                                             View
                                         </Link>
                                         <Link
                                             :href="route('admin.groups.edit', group.id)"
-                                            class="text-propoff-blue hover:text-propoff-blue/80 mr-3"
+                                            class="text-primary hover:text-primary/80 mr-3"
                                         >
                                             Edit
                                         </Link>
@@ -220,7 +220,7 @@ const formatDate = (dateString) => {
                                         </Link> -->
                                         <button
                                             @click="deleteGroup(group)"
-                                            class="text-propoff-red hover:text-propoff-red/80"
+                                            class="text-danger hover:text-danger/80"
                                         >
                                             Delete
                                         </button>
@@ -246,7 +246,7 @@ const formatDate = (dateString) => {
                                     :href="link.url"
                                     class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium"
                                     :class="{
-                                        'bg-propoff-blue/10 border-propoff-blue text-propoff-blue': link.active,
+                                        'bg-primary/10 border-primary text-primary': link.active,
                                         'bg-white text-gray-700 hover:bg-gray-50': !link.active && link.url,
                                         'bg-gray-100 text-gray-400 cursor-not-allowed': !link.url,
                                         'rounded-l-md': index === 0,

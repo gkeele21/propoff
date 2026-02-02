@@ -3,11 +3,34 @@
         <FormLabel v-if="label" :html-for="inputId" :required="required" :variant="labelVariant">{{ label }}</FormLabel>
 
         <div class="relative">
-            <div v-if="iconLeft" class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <div v-if="iconLeft && !multiline" class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Icon :name="iconLeft" size="sm" class="text-muted" />
             </div>
 
+            <textarea
+                v-if="multiline"
+                :id="inputId"
+                :value="modelValue"
+                @input="$emit('update:modelValue', $event.target.value)"
+                :placeholder="placeholder"
+                :required="required"
+                :disabled="disabled"
+                :readonly="readonly"
+                :rows="rows"
+                :class="[
+                    'block w-full rounded border transition-colors resize-y',
+                    'focus:outline-none focus:ring-1',
+                    error
+                        ? 'border-danger focus:border-danger focus:ring-danger'
+                        : 'border-border focus:border-primary focus:ring-primary',
+                    disabled ? 'bg-surface cursor-not-allowed' : 'bg-white',
+                    'px-3',
+                    sizes[size]
+                ]"
+            />
+
             <input
+                v-else
                 :id="inputId"
                 :type="type"
                 :value="modelValue"
@@ -29,7 +52,7 @@
                 ]"
             />
 
-            <div v-if="iconRight" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <div v-if="iconRight && !multiline" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                 <Icon :name="iconRight" size="sm" class="text-muted" />
             </div>
         </div>
@@ -58,6 +81,8 @@ const props = defineProps({
     size: { type: String, default: 'md' },
     iconLeft: { type: String, default: '' },
     iconRight: { type: String, default: '' },
+    multiline: { type: Boolean, default: false },
+    rows: { type: Number, default: 3 },
 });
 
 defineEmits(['update:modelValue']);
@@ -68,5 +93,5 @@ const sizes = {
     lg: 'py-3 text-lg',
 };
 
-const inputId = computed(() => `textfield-${Math.random().toString(36).substr(2, 9)}`);
+const inputId = computed(() => `textfield-${Math.random().toString(36).substring(2, 11)}`);
 </script>

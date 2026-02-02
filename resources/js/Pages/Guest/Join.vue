@@ -1,12 +1,12 @@
 <template>
     <Head title="Join Event" />
 
-    <div class="min-h-screen bg-gradient-to-r from-propoff-blue to-propoff-dark-green border-b border-propoff-green/20 shadow-lg flex items-center justify-center p-4">
+    <div class="min-h-screen bg-gradient-to-r from-primary to-success border-b border-propoff-green/20 shadow-lg flex items-center justify-center p-4">
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
             <!-- Event Info -->
             <div class="text-center mb-8">
-                <div class="w-16 h-16 bg-propoff-orange/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <TrophyIcon class="w-10 h-10 text-propoff-orange" />
+                <div class="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <TrophyIcon class="w-10 h-10 text-warning" />
                 </div>
                 <h1 class="text-3xl font-bold text-gray-900 mb-2">
                     {{ invitation.event.name }}
@@ -17,10 +17,10 @@
             </div>
 
             <!-- Group Info -->
-            <div class="bg-propoff-orange/10 border border-propoff-orange/30 rounded-lg p-4 mb-6">
+            <div class="bg-warning/10 border border-warning/30 rounded-lg p-4 mb-6">
                 <div class="flex items-center gap-2">
-                    <UserGroupIcon class="w-5 h-5 text-propoff-orange" />
-                    <p class="text-sm text-propoff-orange">
+                    <UserGroupIcon class="w-5 h-5 text-warning" />
+                    <p class="text-sm text-warning">
                         You're joining: <strong>{{ invitation.group.name }}</strong>
                     </p>
                 </div>
@@ -30,18 +30,18 @@
             <form @submit.prevent="submit">
                 <div class="mb-4">
                     <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                        Enter Your Name <span class="text-propoff-red">*</span>
+                        Enter Your Name <span class="text-danger">*</span>
                     </label>
                     <input
                         id="name"
                         v-model="form.name"
                         type="text"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-propoff-blue focus:border-transparent"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                         placeholder="Your name"
                         required
                         autofocus
                     />
-                    <p v-if="form.errors.name" class="mt-1 text-sm text-propoff-red">
+                    <p v-if="form.errors.name" class="mt-1 text-sm text-danger">
                         {{ form.errors.name }}
                     </p>
                 </div>
@@ -54,13 +54,13 @@
                         id="email"
                         v-model="form.email"
                         type="email"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-propoff-blue focus:border-transparent"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                         placeholder="your.email@example.com"
                     />
                     <p class="mt-1 text-xs text-gray-500">
                         Optional: We'll send you a link to view your results later (coming soon)
                     </p>
-                    <p v-if="form.errors.email" class="mt-1 text-sm text-propoff-red">
+                    <p v-if="form.errors.email" class="mt-1 text-sm text-danger">
                         {{ form.errors.email }}
                     </p>
                 </div>
@@ -68,7 +68,7 @@
                 <button
                     type="submit"
                     :disabled="form.processing"
-                    class="w-full bg-propoff-blue text-white py-3 px-4 rounded-lg font-semibold hover:bg-propoff-blue/80 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    class="w-full bg-primary text-white py-3 px-4 rounded-lg font-semibold hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed transition"
                 >
                     <span v-if="form.processing">Joining...</span>
                     <span v-else>Join Event</span>

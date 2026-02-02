@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/vue/24/outline';
 import { computed } from 'vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Button from '@/Components/Base/Button.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 
 const props = defineProps({
@@ -50,9 +50,9 @@ const getOptionPoints = (option) => {
                 </template>
                 <template #actions>
                     <Link :href="route('groups.leaderboard', entry.group.id)">
-                        <PrimaryButton>
+                        <Button variant="primary">
                             View Leaderboard
-                        </PrimaryButton>
+                        </Button>
                     </Link>
                 </template>
             </PageHeader>
@@ -64,7 +64,7 @@ const getOptionPoints = (option) => {
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-8">
                         <div class="text-center">
-                            <div class="inline-flex items-center justify-center w-24 h-24 rounded-full mb-4 bg-propoff-orange">
+                            <div class="inline-flex items-center justify-center w-24 h-24 rounded-full mb-4 bg-warning">
                                 <span class="text-3xl font-bold text-white">
                                     {{ percentage.toFixed(1) }}%
                                 </span>
@@ -94,8 +94,8 @@ const getOptionPoints = (option) => {
                                 :key="question.id"
                                 class="border rounded-lg p-6"
                                 :class="{
-                                    'border-propoff-green/30 bg-propoff-green/10': entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
-                                    'border-propoff-red/30 bg-propoff-red/10': entry.user_answers.find(a => a.group_question_id === question.id) && !entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
+                                    'border-success/30 bg-success/10': entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
+                                    'border-danger/30 bg-danger/10': entry.user_answers.find(a => a.group_question_id === question.id) && !entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
                                     'border-gray-200': !entry.user_answers.find(a => a.group_question_id === question.id),
                                 }"
                             >
@@ -104,11 +104,11 @@ const getOptionPoints = (option) => {
                                     <div class="flex-shrink-0 mt-1">
                                         <CheckCircleIcon
                                             v-if="entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct"
-                                            class="w-6 h-6 text-propoff-green"
+                                            class="w-6 h-6 text-success"
                                         />
                                         <XCircleIcon
                                             v-else-if="entry.user_answers.find(a => a.group_question_id === question.id)"
-                                            class="w-6 h-6 text-propoff-red"
+                                            class="w-6 h-6 text-danger"
                                         />
                                         <div v-else class="w-6 h-6 rounded-full bg-gray-300"></div>
                                     </div>
@@ -121,8 +121,8 @@ const getOptionPoints = (option) => {
                                             </h4>
                                             <span class="text-sm font-medium"
                                                 :class="{
-                                                    'text-propoff-green': entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
-                                                    'text-propoff-red': entry.user_answers.find(a => a.group_question_id === question.id) && !entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
+                                                    'text-success': entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
+                                                    'text-danger': entry.user_answers.find(a => a.group_question_id === question.id) && !entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
                                                     'text-gray-600': !entry.user_answers.find(a => a.group_question_id === question.id),
                                                 }"
                                             >
@@ -148,8 +148,8 @@ const getOptionPoints = (option) => {
                                                 :key="optIndex"
                                                 class="flex items-center justify-between p-3 border-2 rounded-lg"
                                                 :class="{
-                                                    'border-propoff-green bg-propoff-green/10': question.correct_answer && getOptionValue(option) === question.correct_answer,
-                                                    'border-propoff-red bg-propoff-red/10': question.correct_answer && getOptionValue(option) === entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text && getOptionValue(option) !== question.correct_answer,
+                                                    'border-success bg-success/10': question.correct_answer && getOptionValue(option) === question.correct_answer,
+                                                    'border-danger bg-danger/10': question.correct_answer && getOptionValue(option) === entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text && getOptionValue(option) !== question.correct_answer,
                                                     'border-gray-200': !question.correct_answer || (getOptionValue(option) !== question.correct_answer && getOptionValue(option) !== entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text),
                                                 }"
                                             >
@@ -159,8 +159,8 @@ const getOptionPoints = (option) => {
                                                         v-if="getOptionValue(option) === entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text"
                                                         class="text-xs font-semibold px-2 py-1 rounded"
                                                         :class="{
-                                                            'bg-propoff-green/20 text-propoff-green': question.correct_answer && getOptionValue(option) === question.correct_answer,
-                                                            'bg-propoff-red/20 text-propoff-red': question.correct_answer && getOptionValue(option) !== question.correct_answer,
+                                                            'bg-success/20 text-success': question.correct_answer && getOptionValue(option) === question.correct_answer,
+                                                            'bg-danger/20 text-danger': question.correct_answer && getOptionValue(option) !== question.correct_answer,
                                                             'bg-gray-200 text-gray-700': !question.correct_answer,
                                                         }"
                                                     >
@@ -168,12 +168,12 @@ const getOptionPoints = (option) => {
                                                     </span>
                                                     <span
                                                         v-if="question.correct_answer && getOptionValue(option) === question.correct_answer"
-                                                        class="text-xs font-semibold px-2 py-1 rounded bg-propoff-green/20 text-propoff-green"
+                                                        class="text-xs font-semibold px-2 py-1 rounded bg-success/20 text-success"
                                                     >
                                                         ✓ Correct
                                                     </span>
                                                 </div>
-                                                <div v-if="getOptionPoints(option) > 0" class="text-xs font-medium text-propoff-blue">
+                                                <div v-if="getOptionPoints(option) > 0" class="text-xs font-medium text-primary">
                                                     +{{ getOptionPoints(option) }} bonus {{ getOptionPoints(option) === 1 ? 'pt' : 'pts' }}
                                                 </div>
                                             </div>
@@ -193,8 +193,8 @@ const getOptionPoints = (option) => {
                                                 :key="option"
                                                 class="flex items-center gap-3 p-3 border-2 rounded-lg"
                                                 :class="{
-                                                    'border-propoff-green bg-propoff-green/10': question.correct_answer && option === question.correct_answer,
-                                                    'border-propoff-red bg-propoff-red/10': question.correct_answer && option === entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text && option !== question.correct_answer,
+                                                    'border-success bg-success/10': question.correct_answer && option === question.correct_answer,
+                                                    'border-danger bg-danger/10': question.correct_answer && option === entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text && option !== question.correct_answer,
                                                     'border-gray-200': !question.correct_answer || (option !== question.correct_answer && option !== entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text),
                                                 }"
                                             >
@@ -203,8 +203,8 @@ const getOptionPoints = (option) => {
                                                     v-if="option === entry.user_answers.find(a => a.group_question_id === question.id)?.answer_text"
                                                     class="text-xs font-semibold px-2 py-1 rounded"
                                                     :class="{
-                                                        'bg-propoff-green/20 text-propoff-green': question.correct_answer && option === question.correct_answer,
-                                                        'bg-propoff-red/20 text-propoff-red': question.correct_answer && option !== question.correct_answer,
+                                                        'bg-success/20 text-success': question.correct_answer && option === question.correct_answer,
+                                                        'bg-danger/20 text-danger': question.correct_answer && option !== question.correct_answer,
                                                         'bg-gray-200 text-gray-700': !question.correct_answer,
                                                     }"
                                                 >
@@ -212,7 +212,7 @@ const getOptionPoints = (option) => {
                                                 </span>
                                                 <span
                                                     v-if="question.correct_answer && option === question.correct_answer"
-                                                    class="text-xs font-semibold px-2 py-1 rounded bg-propoff-green/20 text-propoff-green"
+                                                    class="text-xs font-semibold px-2 py-1 rounded bg-success/20 text-success"
                                                 >
                                                     ✓ Correct
                                                 </span>
@@ -230,8 +230,8 @@ const getOptionPoints = (option) => {
 
                                             <div class="p-3 rounded-lg border-2"
                                                 :class="{
-                                                    'bg-propoff-green/10 border-propoff-green': entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
-                                                    'bg-propoff-red/10 border-propoff-red': question.correct_answer && entry.user_answers.find(a => a.group_question_id === question.id) && !entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
+                                                    'bg-success/10 border-success': entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
+                                                    'bg-danger/10 border-danger': question.correct_answer && entry.user_answers.find(a => a.group_question_id === question.id) && !entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct,
                                                     'bg-gray-50 border-gray-200': !question.correct_answer,
                                                 }"
                                             >
@@ -239,13 +239,13 @@ const getOptionPoints = (option) => {
                                                     <span class="text-sm font-medium text-gray-600">Your Answer:</span>
                                                     <span
                                                         v-if="entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct"
-                                                        class="text-xs font-semibold px-2 py-1 rounded bg-propoff-green/20 text-propoff-green"
+                                                        class="text-xs font-semibold px-2 py-1 rounded bg-success/20 text-success"
                                                     >
                                                         ✓ Correct
                                                     </span>
                                                     <span
                                                         v-else-if="question.correct_answer && entry.user_answers.find(a => a.group_question_id === question.id)"
-                                                        class="text-xs font-semibold px-2 py-1 rounded bg-propoff-red/20 text-propoff-red"
+                                                        class="text-xs font-semibold px-2 py-1 rounded bg-danger/20 text-danger"
                                                     >
                                                         Incorrect
                                                     </span>
@@ -265,11 +265,11 @@ const getOptionPoints = (option) => {
                                                     !entry.user_answers.find(a => a.group_question_id === question.id)?.is_correct &&
                                                     question.correct_answer
                                                 "
-                                                class="p-3 bg-propoff-green/10 rounded-lg border-2 border-propoff-green"
+                                                class="p-3 bg-success/10 rounded-lg border-2 border-success"
                                             >
                                                 <div class="flex items-center gap-2">
-                                                    <span class="text-sm font-medium text-propoff-green">Correct Answer:</span>
-                                                    <span class="text-propoff-dark-green font-semibold">
+                                                    <span class="text-sm font-medium text-success">Correct Answer:</span>
+                                                    <span class="text-success font-semibold">
                                                         {{ question.correct_answer }}
                                                     </span>
                                                 </div>

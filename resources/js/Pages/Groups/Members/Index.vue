@@ -116,7 +116,7 @@ const submitEntryFor = (userId) => {
                             </div>
                             <button
                                 @click="copyJoinCode"
-                                class="bg-propoff-blue hover:bg-propoff-blue/80 text-white px-4 py-2 rounded font-semibold"
+                                class="bg-primary hover:bg-primary/80 text-white px-4 py-2 rounded font-semibold"
                             >
                                 Copy Code
                             </button>
@@ -137,7 +137,7 @@ const submitEntryFor = (userId) => {
                             <h3 class="text-lg font-semibold">Members ({{ members.length }})</h3>
                             <button
                                 @click="showAddGuestModal = true"
-                                class="bg-propoff-green hover:bg-propoff-green/80 text-white px-4 py-2 rounded font-semibold"
+                                class="bg-success hover:bg-success/80 text-white px-4 py-2 rounded font-semibold"
                             >
                                 + Add Guest User
                             </button>
@@ -206,14 +206,14 @@ const submitEntryFor = (userId) => {
                                         <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                                             <button
                                                 @click="submitEntryFor(member.id)"
-                                                class="text-propoff-green hover:text-propoff-green/80 font-semibold"
+                                                class="text-success hover:text-success/80 font-semibold"
                                             >
                                                 Submit Entry
                                             </button>
                                             <button
                                                 v-if="!member.is_captain"
                                                 @click="promoteToCaptain(member.id)"
-                                                class="text-propoff-blue hover:text-propoff-blue/80 font-semibold"
+                                                class="text-primary hover:text-primary/80 font-semibold"
                                             >
                                                 Promote
                                             </button>
@@ -273,7 +273,7 @@ const submitEntryFor = (userId) => {
                                     v-model="guestName"
                                     type="text"
                                     placeholder="Enter guest name"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-propoff-blue"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                                     @keyup.enter="addGuest"
                                 />
                             </div>
@@ -286,7 +286,7 @@ const submitEntryFor = (userId) => {
                                 </button>
                                 <button
                                     @click="addGuest"
-                                    class="px-4 py-2 bg-propoff-green hover:bg-propoff-green/80 text-white rounded font-semibold"
+                                    class="px-4 py-2 bg-success hover:bg-success/80 text-white rounded font-semibold"
                                 >
                                     Add Guest
                                 </button>

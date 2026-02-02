@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Button from '@/Components/Base/Button.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -28,21 +28,21 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
             we just emailed to you? If you didn't receive the email, we will gladly send you another.
         </div>
 
-        <div class="mb-4 font-medium text-sm text-propoff-green" v-if="verificationLinkSent">
+        <div class="mb-4 font-medium text-sm text-success" v-if="verificationLinkSent">
             A new verification link has been sent to the email address you provided during registration.
         </div>
 
         <form @submit.prevent="submit">
             <div class="mt-4 flex items-center justify-between">
-                <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                <Button variant="primary" :disabled="form.processing">
                     Resend Verification Email
-                </PrimaryButton>
+                </Button>
 
                 <Link
                     :href="route('logout')"
                     method="post"
                     as="button"
-                    class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-propoff-blue/50"
+                    class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
                     >Log Out</Link
                 >
             </div>

@@ -15,7 +15,7 @@
             >
                 <template #metadata>
                     <span class="font-medium text-gray-900">{{ group.name }}</span>
-                    <span v-if="question.is_custom" class="ml-2 text-xs px-2 py-1 bg-propoff-blue/10 text-propoff-blue rounded">Custom</span>
+                    <span v-if="question.is_custom" class="ml-2 text-xs px-2 py-1 bg-primary/10 text-primary rounded">Custom</span>
                 </template>
             </PageHeader>
         </template>
@@ -23,14 +23,14 @@
         <div class="py-12">
             <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
                 <!-- Group Context -->
-                <div class="bg-propoff-blue/10 border border-propoff-blue/30 rounded-lg p-4 mb-6">
+                <div class="bg-primary/10 border border-primary/30 rounded-lg p-4 mb-6">
                     <div class="flex items-start gap-3">
-                        <InformationCircleIcon class="w-5 h-5 text-propoff-blue mt-0.5" />
+                        <InformationCircleIcon class="w-5 h-5 text-primary mt-0.5" />
                         <div>
-                            <h3 class="font-semibold text-propoff-blue">{{ group.name }}</h3>
-                            <p class="text-sm text-propoff-blue mt-1">
+                            <h3 class="font-semibold text-primary">{{ group.name }}</h3>
+                            <p class="text-sm text-primary mt-1">
                                 Event: {{ group.event?.name || 'N/A' }}
-                                <span v-if="question.is_custom" class="ml-2 px-2 py-0.5 bg-propoff-blue/10 text-propoff-blue rounded text-xs font-semibold">Custom Question</span>
+                                <span v-if="question.is_custom" class="ml-2 px-2 py-0.5 bg-primary/10 text-primary rounded text-xs font-semibold">Custom Question</span>
                             </p>
                         </div>
                     </div>
@@ -41,17 +41,17 @@
                         <!-- Question Text -->
                         <div>
                             <label for="question_text" class="block text-sm font-medium text-gray-700 mb-2">
-                                Question Text <span class="text-propoff-red">*</span>
+                                Question Text <span class="text-danger">*</span>
                             </label>
                             <textarea
                                 id="question_text"
                                 v-model="form.question_text"
                                 rows="4"
-                                class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                 placeholder="Enter your question here..."
                                 required
                             ></textarea>
-                            <p v-if="form.errors.question_text" class="mt-1 text-sm text-propoff-red">
+                            <p v-if="form.errors.question_text" class="mt-1 text-sm text-danger">
                                 {{ form.errors.question_text }}
                             </p>
                         </div>
@@ -59,7 +59,7 @@
                         <!-- Question Type -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-3">
-                                Question Type <span class="text-propoff-red">*</span>
+                                Question Type <span class="text-danger">*</span>
                             </label>
                             <div class="grid grid-cols-2 gap-3">
                                 <label
@@ -68,7 +68,7 @@
                                     :class="[
                                         'flex items-center p-3 border-2 rounded-lg cursor-pointer transition',
                                         form.question_type === type.value
-                                            ? 'border-propoff-blue bg-propoff-blue/10'
+                                            ? 'border-primary bg-primary/10'
                                             : 'border-gray-200 hover:border-gray-300'
                                     ]"
                                 >
@@ -76,7 +76,7 @@
                                         type="radio"
                                         v-model="form.question_type"
                                         :value="type.value"
-                                        class="text-propoff-blue focus:ring-propoff-blue/50"
+                                        class="text-primary focus:ring-primary/50"
                                     />
                                     <span class="ml-2 text-sm font-medium text-gray-900">{{ type.label }}</span>
                                 </label>
@@ -86,7 +86,7 @@
                         <!-- Options (for multiple choice) -->
                         <div v-if="form.question_type === 'multiple_choice'" class="space-y-3">
                             <label class="block text-sm font-medium text-gray-700">
-                                Answer Options <span class="text-propoff-red">*</span>
+                                Answer Options <span class="text-danger">*</span>
                             </label>
                             <p class="text-sm text-gray-500 mb-2">
                                 Set bonus points for each option. Leave at 0 for no bonus (players get only base question points).
@@ -105,7 +105,7 @@
                                         <input
                                             type="text"
                                             v-model="form.options[index].label"
-                                            class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                            class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                             :placeholder="`Option ${String.fromCharCode(65 + index)}`"
                                             required
                                         />
@@ -116,7 +116,7 @@
                                                 v-model.number="form.options[index].points"
                                                 min="0"
                                                 step="1"
-                                                class="w-20 text-sm border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                                class="w-20 text-sm border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                                 placeholder="0"
                                             />
                                             <span class="text-xs text-gray-400">+bonus pts (optional)</span>
@@ -125,7 +125,7 @@
                                     <button
                                         type="button"
                                         @click="removeOption(index)"
-                                        class="flex-shrink-0 p-2 text-propoff-red hover:bg-propoff-red/10 rounded mt-1"
+                                        class="flex-shrink-0 p-2 text-danger hover:bg-danger/10 rounded mt-1"
                                         :disabled="form.options.length <= 2"
                                     >
                                         <TrashIcon class="w-5 h-5" />
@@ -147,14 +147,14 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label for="points" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Base Points <span class="text-propoff-red">*</span>
+                                    Base Points <span class="text-danger">*</span>
                                 </label>
                                 <input
                                     type="number"
                                     id="points"
                                     v-model.number="form.points"
                                     min="1"
-                                    class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                    class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                     required
                                 />
                                 <p class="text-xs text-gray-500 mt-1">
@@ -171,7 +171,7 @@
                                     id="display_order"
                                     v-model.number="form.display_order"
                                     min="1"
-                                    class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                    class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                 />
                                 <p class="text-xs text-gray-500 mt-1">
                                     Order in which this question appears
@@ -185,7 +185,7 @@
                                 <input
                                     type="checkbox"
                                     v-model="form.is_active"
-                                    class="rounded border-gray-300 text-propoff-blue focus:ring-propoff-blue/50"
+                                    class="rounded border-gray-300 text-primary focus:ring-primary/50"
                                 />
                                 <span class="ml-2 text-sm text-gray-700">Question is active (visible to players)</span>
                             </label>
@@ -202,7 +202,7 @@
                             <button
                                 type="submit"
                                 :disabled="form.processing"
-                                class="inline-flex items-center px-4 py-2 bg-propoff-blue border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-propoff-blue/80 disabled:opacity-50"
+                                class="inline-flex items-center px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary/80 disabled:opacity-50"
                             >
                                 <span v-if="form.processing">Saving...</span>
                                 <span v-else>Save</span>

@@ -66,11 +66,11 @@ const formatDateTime = (datetime) => {
                 ]"
             >
                 <template #metadata>
-                    <UserGroupIcon class="w-5 h-5 text-propoff-orange inline mr-2" />
+                    <UserGroupIcon class="w-5 h-5 text-warning inline mr-2" />
                     <span>{{ membersList.length }} members</span>
                     <template v-if="isCaptain">
                         <span class="text-gray-400 mx-2">•</span>
-                        <span class="text-sm px-2 py-1 rounded bg-propoff-orange/20 text-propoff-orange">Captain</span>
+                        <span class="text-sm px-2 py-1 rounded bg-warning/20 text-warning">Captain</span>
                     </template>
                 </template>
                 <template #actions>
@@ -85,7 +85,7 @@ const formatDateTime = (datetime) => {
                     <button
                         v-if="isMember && $page.props.auth.user.id !== group.created_by"
                         @click="leaveGroup"
-                        class="inline-flex items-center px-4 py-2 bg-propoff-red border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-propoff-red/80"
+                        class="inline-flex items-center px-4 py-2 bg-danger border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-danger/80"
                     >
                         <ArrowRightOnRectangleIcon class="w-4 h-4 mr-2" />
                         Leave Group
@@ -105,9 +105,9 @@ const formatDateTime = (datetime) => {
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <Link
                                 :href="route('groups.invitation', group.id)"
-                                class="flex flex-col items-center p-6 border-2 border-propoff-orange/20 bg-propoff-orange/10 rounded-lg hover:border-propoff-orange hover:bg-propoff-orange/20 transition"
+                                class="flex flex-col items-center p-6 border-2 border-warning/20 bg-warning/10 rounded-lg hover:border-warning hover:bg-warning/20 transition"
                             >
-                                <svg class="w-12 h-12 text-propoff-orange mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-12 h-12 text-warning mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v6a2 2 0 01-2 2H8a2 2 0 01-2-2V9"></path>
                                 </svg>
@@ -117,9 +117,9 @@ const formatDateTime = (datetime) => {
 
                             <Link
                                 :href="route('groups.questions.index', group.id)"
-                                class="flex flex-col items-center p-6 border-2 border-gray-200 rounded-lg hover:border-propoff-blue hover:bg-propoff-blue/10 transition"
+                                class="flex flex-col items-center p-6 border-2 border-gray-200 rounded-lg hover:border-primary hover:bg-primary/10 transition"
                             >
-                                <svg class="w-12 h-12 text-propoff-blue mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-12 h-12 text-primary mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                                 <span class="font-semibold">Manage Questions</span>
@@ -128,9 +128,9 @@ const formatDateTime = (datetime) => {
 
                             <Link
                                 :href="route('groups.grading.index', group.id)"
-                                class="flex flex-col items-center p-6 border-2 border-gray-200 rounded-lg hover:border-propoff-green hover:bg-propoff-green/10 transition"
+                                class="flex flex-col items-center p-6 border-2 border-gray-200 rounded-lg hover:border-success hover:bg-success/10 transition"
                             >
-                                <svg class="w-12 h-12 text-propoff-green mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-12 h-12 text-success mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
                                 </svg>
                                 <span class="font-semibold">Set Answers</span>
@@ -157,24 +157,24 @@ const formatDateTime = (datetime) => {
                         <h3 class="text-lg font-semibold mb-4">Statistics</h3>
 
                         <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                            <div class="text-center p-4 bg-propoff-orange/10 rounded-lg">
-                                <p class="text-3xl font-bold text-propoff-orange">{{ stats.total_members }}</p>
+                            <div class="text-center p-4 bg-warning/10 rounded-lg">
+                                <p class="text-3xl font-bold text-warning">{{ stats.total_members }}</p>
                                 <p class="text-sm text-gray-600">Members</p>
                             </div>
-                            <div class="text-center p-4 bg-propoff-orange/20 rounded-lg">
-                                <p class="text-3xl font-bold text-propoff-orange">{{ stats.total_captains }}</p>
+                            <div class="text-center p-4 bg-warning/20 rounded-lg">
+                                <p class="text-3xl font-bold text-warning">{{ stats.total_captains }}</p>
                                 <p class="text-sm text-gray-600">Captains</p>
                             </div>
-                            <div class="text-center p-4 bg-propoff-blue/10 rounded-lg">
-                                <p class="text-3xl font-bold text-propoff-blue">{{ stats.total_questions }}</p>
+                            <div class="text-center p-4 bg-primary/10 rounded-lg">
+                                <p class="text-3xl font-bold text-primary">{{ stats.total_questions }}</p>
                                 <p class="text-sm text-gray-600">Questions</p>
                             </div>
-                            <div class="text-center p-4 bg-propoff-green/10 rounded-lg">
-                                <p class="text-3xl font-bold text-propoff-green">{{ stats.total_entries }}</p>
+                            <div class="text-center p-4 bg-success/10 rounded-lg">
+                                <p class="text-3xl font-bold text-success">{{ stats.total_entries }}</p>
                                 <p class="text-sm text-gray-600">Entries</p>
                             </div>
-                            <div class="text-center p-4 bg-propoff-dark-green/10 rounded-lg">
-                                <p class="text-3xl font-bold text-propoff-dark-green">{{ stats.answered_questions }}</p>
+                            <div class="text-center p-4 bg-success/10 rounded-lg">
+                                <p class="text-3xl font-bold text-success">{{ stats.answered_questions }}</p>
                                 <p class="text-sm text-gray-600">Graded</p>
                             </div>
                         </div>
@@ -205,7 +205,7 @@ const formatDateTime = (datetime) => {
                                         <dd class="mt-1">
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                                                 :class="{
-                                                    'bg-propoff-green/20 text-propoff-dark-green': group.is_public,
+                                                    'bg-success/20 text-success': group.is_public,
                                                     'bg-gray-100 text-gray-800': !group.is_public,
                                                 }"
                                             >
@@ -240,7 +240,7 @@ const formatDateTime = (datetime) => {
                                         </div>
                                         <button
                                             @click="copyGroupCode"
-                                            class="px-3 py-2 bg-propoff-blue text-white text-sm rounded hover:bg-propoff-blue/80"
+                                            class="px-3 py-2 bg-primary text-white text-sm rounded hover:bg-primary/80"
                                         >
                                             Copy
                                         </button>
@@ -286,7 +286,7 @@ const formatDateTime = (datetime) => {
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span
                                                 v-if="member.is_captain"
-                                                class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-propoff-orange/20 text-propoff-orange"
+                                                class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-warning/20 text-warning"
                                             >
                                                 Captain
                                             </span>
@@ -354,9 +354,9 @@ const formatDateTime = (datetime) => {
                                 <div class="text-right">
                                     <div class="font-semibold"
                                         :class="{
-                                            'text-propoff-green': entry.percentage >= 80,
-                                            'text-propoff-orange': entry.percentage >= 60 && entry.percentage < 80,
-                                            'text-propoff-red': entry.percentage < 60,
+                                            'text-success': entry.percentage >= 80,
+                                            'text-warning': entry.percentage >= 60 && entry.percentage < 80,
+                                            'text-danger': entry.percentage < 60,
                                         }"
                                     >
                                         {{ entry.percentage.toFixed(1) }}%
@@ -371,16 +371,16 @@ const formatDateTime = (datetime) => {
                 </div>
 
                 <!-- Danger Zone (Captain Only) -->
-                <div v-if="isCaptain" class="bg-white overflow-hidden shadow-sm sm:rounded-lg border-2 border-propoff-red/30">
+                <div v-if="isCaptain" class="bg-white overflow-hidden shadow-sm sm:rounded-lg border-2 border-danger/30">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold text-propoff-red mb-4">Danger Zone</h3>
+                        <h3 class="text-lg font-semibold text-danger mb-4">Danger Zone</h3>
                         <p class="text-sm text-gray-600 mb-4">
                             Deleting this group will remove all associated data. This action cannot be undone.
                         </p>
                         <button
                             @click="deleteGroup"
                             :disabled="deleteForm.processing"
-                            class="bg-propoff-red hover:bg-propoff-red/80 text-white px-4 py-2 rounded font-semibold disabled:opacity-50"
+                            class="bg-danger hover:bg-danger/80 text-white px-4 py-2 rounded font-semibold disabled:opacity-50"
                         >
                             {{ deleteForm.processing ? 'Deleting...' : 'Delete Group' }}
                         </button>

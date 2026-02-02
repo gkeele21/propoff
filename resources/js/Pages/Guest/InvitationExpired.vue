@@ -3,8 +3,8 @@
 
     <div class="min-h-screen bg-gray-100 flex items-center justify-center p-4">
         <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-            <div class="w-16 h-16 bg-propoff-red/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <XCircleIcon class="w-10 h-10 text-propoff-red" />
+            <div class="w-16 h-16 bg-danger/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <XCircleIcon class="w-10 h-10 text-danger" />
             </div>
             
             <h1 class="text-2xl font-bold text-gray-900 mb-2">

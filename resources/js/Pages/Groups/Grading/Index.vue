@@ -84,18 +84,18 @@ const getTypeLabel = (type) => {
                 <!-- Info Banner -->
                 <div
                     v-if="group.grading_source === 'admin'"
-                    class="bg-propoff-orange/10 border border-propoff-orange/30 rounded-lg p-4 mb-6"
+                    class="bg-warning/10 border border-warning/30 rounded-lg p-4 mb-6"
                 >
-                    <p class="text-sm text-propoff-orange">
+                    <p class="text-sm text-warning">
                         ⚠️ This group uses <strong>Admin Grading</strong>. Scores will be calculated based on answers set by the admin, not captain answers.
                     </p>
                 </div>
 
                 <div
                     v-else
-                    class="bg-propoff-blue/10 border border-propoff-blue/30 rounded-lg p-4 mb-6"
+                    class="bg-primary/10 border border-primary/30 rounded-lg p-4 mb-6"
                 >
-                    <p class="text-sm text-propoff-blue">
+                    <p class="text-sm text-primary">
                         ✓ This group uses <strong>Captain Grading</strong>. Set the correct answers below to grade entries in real-time.
                     </p>
                 </div>
@@ -115,19 +115,19 @@ const getTypeLabel = (type) => {
                                         <span class="text-sm font-semibold text-gray-500">Q{{ question.order + 1 }}</span>
                                         <span
                                             :class="{
-                                                'bg-propoff-blue/10 text-propoff-blue': question.question_type === 'multiple_choice',
-                                                'bg-propoff-green/10 text-propoff-dark-green': question.question_type === 'yes_no',
-                                                'bg-propoff-orange/10 text-propoff-orange': question.question_type === 'numeric',
+                                                'bg-primary/10 text-primary': question.question_type === 'multiple_choice',
+                                                'bg-success/10 text-success': question.question_type === 'yes_no',
+                                                'bg-warning/10 text-warning': question.question_type === 'numeric',
                                                 'bg-gray-100 text-gray-700': question.question_type === 'text'
                                             }"
                                             class="px-2 py-1 text-xs font-semibold rounded"
                                         >
                                             {{ getTypeLabel(question.question_type) }}
                                         </span>
-                                        <span v-if="question.is_custom" class="px-2 py-1 text-xs font-semibold rounded bg-propoff-blue/10 text-propoff-blue">
+                                        <span v-if="question.is_custom" class="px-2 py-1 text-xs font-semibold rounded bg-primary/10 text-primary">
                                             Custom
                                         </span>
-                                        <span v-if="question.answer" class="px-2 py-1 text-xs font-semibold rounded bg-propoff-green/10 text-propoff-dark-green">
+                                        <span v-if="question.answer" class="px-2 py-1 text-xs font-semibold rounded bg-success/10 text-success">
                                             Answer Set
                                         </span>
                                     </div>
@@ -163,7 +163,7 @@ const getTypeLabel = (type) => {
                                         <select
                                             v-if="question.question_type === 'multiple_choice'"
                                             v-model="answerForms[question.id].correct_answer"
-                                            class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                            class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                             required
                                         >
                                             <option value="">Select the correct answer...</option>
@@ -180,7 +180,7 @@ const getTypeLabel = (type) => {
                                         <select
                                             v-else-if="question.question_type === 'yes_no'"
                                             v-model="answerForms[question.id].correct_answer"
-                                            class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                            class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                             required
                                         >
                                             <option value="">Select the correct answer...</option>
@@ -193,7 +193,7 @@ const getTypeLabel = (type) => {
                                             v-else
                                             v-model="answerForms[question.id].correct_answer"
                                             type="text"
-                                            class="w-full border-gray-300 focus:border-propoff-blue focus:ring-propoff-blue/50 rounded-md shadow-sm"
+                                            class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
                                             placeholder="Enter the correct answer"
                                             required
                                         />
@@ -204,7 +204,7 @@ const getTypeLabel = (type) => {
                                         <button
                                             type="submit"
                                             :disabled="answerForms[question.id].processing"
-                                            class="bg-propoff-blue hover:bg-propoff-blue/80 text-white px-4 py-2 rounded font-semibold disabled:opacity-50"
+                                            class="bg-primary hover:bg-primary/80 text-white px-4 py-2 rounded font-semibold disabled:opacity-50"
                                         >
                                             {{ question.answer ? 'Update Answer' : 'Set Answer' }}
                                         </button>
@@ -213,7 +213,7 @@ const getTypeLabel = (type) => {
                                             v-if="question.answer"
                                             type="button"
                                             @click="toggleVoid(question.id)"
-                                            class="bg-propoff-orange hover:bg-propoff-orange/80 text-white px-4 py-2 rounded font-semibold"
+                                            class="bg-warning hover:bg-warning/80 text-white px-4 py-2 rounded font-semibold"
                                         >
                                             {{ question.answer.is_void ? 'Unvoid' : 'Void' }} Question
                                         </button>
@@ -237,7 +237,7 @@ const getTypeLabel = (type) => {
                         <p class="text-gray-500 mb-4">No questions to grade yet.</p>
                         <Link
                             :href="route('groups.questions.index', group.id)"
-                            class="text-propoff-blue hover:text-propoff-blue/80 font-semibold"
+                            class="text-primary hover:text-primary/80 font-semibold"
                         >
                             Manage Questions
                         </Link>

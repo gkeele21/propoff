@@ -12,8 +12,8 @@ const showingNavigationDropdown = ref(false);
 
 <template>
     <div>
-        <div class="min-h-screen bg-gray-100">
-            <nav class="bg-gradient-to-r from-propoff-blue to-propoff-dark-green border-b border-propoff-green/20 shadow-lg">
+        <div class="min-h-screen bg-border">
+            <nav class="bg-gradient-to-r from-primary to-success border-b border-success/20 shadow-lg">
                 <!-- Primary Navigation Menu -->
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between h-16">
@@ -51,7 +51,7 @@ const showingNavigationDropdown = ref(false);
                                         <span class="inline-flex rounded-md">
                                             <button
                                                 type="button"
-                                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white hover:text-propoff-orange focus:outline-none transition ease-in-out duration-150"
+                                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white hover:text-warning focus:outline-none transition ease-in-out duration-150"
                                             >
                                                 {{ $page.props.auth.user.name }}
 
@@ -85,7 +85,7 @@ const showingNavigationDropdown = ref(false);
                         <div class="-me-2 flex items-center sm:hidden">
                             <button
                                 @click="showingNavigationDropdown = !showingNavigationDropdown"
-                                class="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-propoff-orange hover:bg-white/10 focus:outline-none focus:bg-white/10 focus:text-propoff-orange transition duration-150 ease-in-out"
+                                class="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-warning hover:bg-white/10 focus:outline-none focus:bg-white/10 focus:text-warning transition duration-150 ease-in-out"
                             >
                                 <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                                     <path
