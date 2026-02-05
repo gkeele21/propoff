@@ -313,3 +313,90 @@ The following old components in `Components/` root should be gradually replaced:
 - **Styling:** Tailwind CSS
 - **Icons:** Font Awesome 6
 - **Database:** MySQL/MariaDB
+
+---
+
+## Implementation Guidelines
+
+### Quality Over Speed
+
+Take time to implement correctly. Read specs thoroughly, check mockups, verify against this document. It's better to be slow and right than fast and wrong.
+
+### Before Starting Any Page
+
+1. **Read the spec** - Check `docs/specs/` for relevant spec files
+2. **View the mockup** - Open HTML mockups in browser to see exact design
+3. **Identify components** - Map each UI element to an existing component
+4. **Check for patterns** - Look at similar existing pages for reference
+5. **Review layouts** - Check `Layouts/` for structural patterns (nav, header, footer)
+
+### Mockups vs Layouts
+
+**Mockups define page content.** HTML mockups in `docs/specs/` show the content area design - cards, forms, data displays, etc. Match this content layout exactly.
+
+**Layouts define structure.** The codebase has established patterns for:
+- Navigation (logo, nav links, user menu)
+- Page headers (PageHeader component with breadcrumbs)
+- Content wrappers (max-width, padding, spacing)
+- Footer
+
+**When mockups don't show something (nav, logo, header structure), follow existing codebase patterns.** Look at similar pages like `Admin/Events/Show.vue` or `Admin/Grading/Index.vue` to see how they handle layout structure.
+
+### Anti-Patterns (DO NOT DO)
+
+**Colors:**
+- ❌ DO NOT use arbitrary Tailwind colors (`bg-gray-800`, `text-blue-500`)
+- ❌ DO NOT add new color variables to tailwind.config.js
+- ❌ DO NOT use inline styles for colors
+- ✅ DO use only colors defined in the Color Palette section above
+
+**Components:**
+- ❌ DO NOT create new components without asking first
+- ❌ DO NOT use native HTML elements when a component exists (e.g., `<button>` instead of `<Button>`)
+- ❌ DO NOT duplicate component functionality with custom code
+- ✅ DO check the Component Library section before building anything
+
+**Styling:**
+- ❌ DO NOT add custom CSS classes when Tailwind utilities exist
+- ❌ DO NOT use `@apply` to create new utility classes
+- ❌ DO NOT override component styles with inline styles
+- ✅ DO use component props and variants as designed
+
+**Data Display:**
+- ❌ DO NOT show percentages for scores (use points only)
+- ❌ DO NOT use colored medals/icons for ranks (use consistent `surface-inset` badges)
+- ❌ DO NOT add emoji icons to events or categories
+- ✅ DO keep users feeling positive - points > percentages
+
+### UI Consistency Rules
+
+**Rank Badges:** Always use `bg-surface-inset` background with ordinal text (1st, 2nd, 3rd). Same styling everywhere - leaderboard, history, results.
+
+**Points Display:** Show scores as points only (e.g., "68 pts"). Never show percentages.
+
+**Bonus Points:** Display inline with answer text using `Badge` component with `variant="primary-soft"` (e.g., "Kansas City Chiefs +5 bonus").
+
+**Breadcrumbs:** Use for sub-page navigation within a context. Format: `[Parent] / [Current Page]`
+
+### Verification Checklist
+
+Before considering any page complete:
+
+- [ ] Uses ONLY colors from the Color Palette section
+- [ ] Uses ONLY components from the Component Library section
+- [ ] Page content matches the mockup design exactly
+- [ ] Layout structure follows existing codebase patterns (nav, headers, wrappers)
+- [ ] No new CSS colors or Tailwind color classes added
+- [ ] No new components created
+- [ ] Responsive behavior works on mobile
+- [ ] Dark mode looks correct (it's the default)
+- [ ] Points shown as points, not percentages
+- [ ] Rank badges use consistent `surface-inset` styling
+
+### When Unsure
+
+If you're unsure about:
+- **Which component to use** → Ask the user
+- **How to style something** → Check the mockup, then ask
+- **Whether to create something new** → Don't. Ask first.
+- **Color choices** → Use only defined colors. If none fit, ask.

@@ -306,14 +306,10 @@ const getTypeBadgeVariant = (type) => {
                         <div class="flex gap-2">
                             <Link :href="route('groups.invitation', group.id)">
                                 <Button variant="accent" size="sm">
-                                    <Icon name="paper-plane" class="mr-2" size="sm" />
-                                    Invite Members
+                                    <Icon name="share-nodes" class="mr-2" size="sm" />
+                                    Join Info
                                 </Button>
                             </Link>
-                            <Button variant="primary" size="sm" @click="openAddModal">
-                                <Icon name="plus" class="mr-2" size="sm" />
-                                Add Question
-                            </Button>
                         </div>
                     </div>
                 </div>
@@ -403,8 +399,8 @@ const getTypeBadgeVariant = (type) => {
                                             {{ question.question_type?.replace('_', ' ') }}
                                         </Badge>
                                         <Badge v-if="question.is_void" variant="danger" size="sm">Voided</Badge>
-                                        <Badge v-if="question.is_custom" variant="primary-soft" size="sm">Custom</Badge>
-                                        <span class="text-sm text-subtle">{{ question.points }} {{ question.points === 1 ? 'pt' : 'pts' }}</span>
+                                        <Badge v-if="question.is_custom" variant="warning-soft" size="sm">Custom</Badge>
+                                        <span class="text-sm text-white">{{ question.points }} {{ question.points === 1 ? 'point' : 'points' }}</span>
                                     </div>
                                 </div>
 

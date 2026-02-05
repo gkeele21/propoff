@@ -106,11 +106,12 @@
         border-color: transparent !important;
     }
 
-    /* Checked/Selected glow for small controls */
+    /* Checked/Selected glow - matches outline glow style */
     .checked-glow {
         box-shadow:
-            0 0 0 2px rgb(var(--color-primary)),
-            0 0 10px rgb(var(--color-primary) / 0.4);
+            0 0 0 1px rgb(var(--color-text)),
+            0 0 0 3px rgb(var(--color-primary)),
+            0 0 15px rgb(var(--color-primary) / 0.3);
     }
 
     /* Focus glow for small controls (checkbox, toggle) - smaller version */
@@ -119,6 +120,15 @@
             0 0 0 2px rgb(var(--color-primary)),
             0 0 8px rgb(var(--color-primary) / 0.4) !important;
         outline: none !important;
+    }
+
+    /* Focus-within glow for containers with hidden inputs (radio cards, etc) */
+    .focus-within-glow:focus-within {
+        box-shadow:
+            0 0 0 1px rgb(var(--color-text)),
+            0 0 0 3px rgb(var(--color-primary)),
+            0 0 15px rgb(var(--color-primary) / 0.3) !important;
+        border-color: transparent !important;
     }
 }
 

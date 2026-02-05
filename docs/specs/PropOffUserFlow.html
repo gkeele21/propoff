@@ -1,0 +1,2206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PropOff User Flow Mockup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* PropOff Design System Colors */
+        :root {
+            --primary: #57d025;
+            --primary-hover: #4ab820;
+            --success: #57d025;
+            --warning: #f47612;
+            --danger: #ef4444;
+            --info: #3b82f6;
+
+            --bg: #404040;
+            --surface: #1f1f1f;
+            --surface-elevated: #262626;
+            --surface-overlay: #333333;
+            --surface-inset: #0f0f0f;
+            --surface-header: #171717;
+
+            --body: #f5f5f5;
+            --muted: #a3a3a3;
+            --subtle: #737373;
+
+            --border: #2e2e2e;
+            --border-strong: #404040;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--body);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .nav {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .nav-logo .diamond {
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            transform: rotate(45deg);
+            border-radius: 4px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 0;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--body);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--body);
+            cursor: pointer;
+        }
+
+        /* Flow Selector (mockup controls) */
+        .flow-selector {
+            background: var(--surface-elevated);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+        }
+
+        .flow-selector-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .flow-label {
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .flow-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--muted);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .flow-btn:hover {
+            border-color: var(--primary);
+            color: var(--body);
+        }
+
+        .flow-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .flow-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+        }
+
+        /* Toggle Switch */
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle {
+            width: 44px;
+            height: 24px;
+            background: var(--surface-inset);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .toggle.active {
+            background: var(--primary);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.2s;
+        }
+
+        .toggle.active::after {
+            transform: translateX(20px);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .main-content.wide {
+            max-width: 1200px;
+        }
+
+        /* Page Views */
+        .page-view {
+            display: none;
+        }
+
+        .page-view.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .card-header {
+            background: var(--surface-header);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-primary { background: var(--primary); color: white; }
+        .badge-primary-soft { background: rgba(87, 208, 37, 0.15); color: var(--primary); }
+        .badge-warning-soft { background: rgba(244, 118, 18, 0.15); color: var(--warning); }
+        .badge-info-soft { background: rgba(59, 130, 246, 0.15); color: var(--info); }
+        .badge-success-soft { background: rgba(87, 208, 37, 0.15); color: var(--success); }
+        .badge-danger-soft { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .breadcrumbs a {
+            color: var(--muted);
+            text-decoration: none;
+        }
+
+        .breadcrumbs a:hover {
+            color: var(--primary);
+        }
+
+        .breadcrumbs .separator {
+            color: var(--subtle);
+        }
+
+        .breadcrumbs .current {
+            color: var(--body);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background: var(--surface-elevated);
+            color: var(--body);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface-overlay);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--muted);
+        }
+
+        .btn-ghost:hover {
+            color: var(--body);
+            background: var(--surface-overlay);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .btn-lg {
+            padding: 14px 28px;
+            font-size: 16px;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 24px;
+            margin-bottom: 24px;
+            margin: -24px -24px 24px -24px;
+        }
+
+        .page-header-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .page-header.wide .page-header-content {
+            max-width: 1200px;
+        }
+
+        .page-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .page-header-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .page-header-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .page-header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--surface-inset);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-card.success { border-top: 4px solid var(--success); }
+        .stat-card.warning { border-top: 4px solid var(--warning); }
+        .stat-card.primary { border-top: 4px solid var(--primary); }
+        .stat-card.info { border-top: 4px solid var(--info); }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-card.success .stat-value { color: var(--success); }
+        .stat-card.warning .stat-value { color: var(--warning); }
+        .stat-card.primary .stat-value { color: var(--primary); }
+        .stat-card.info .stat-value { color: var(--info); }
+
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--muted);
+        }
+
+        /* Two Column Layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* My Entry Card */
+        .entry-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .entry-progress {
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+
+        .entry-score {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .entry-rank {
+            color: var(--muted);
+        }
+
+        .entry-divider {
+            border-top: 1px solid var(--border);
+            margin: 16px 0;
+            padding-top: 16px;
+        }
+
+        .entry-upsell {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .entry-upsell a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* Game Status Card */
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            color: var(--muted);
+        }
+
+        .status-value {
+            font-weight: 600;
+        }
+
+        .status-value.open {
+            color: var(--success);
+        }
+
+        .status-value.locked {
+            color: var(--danger);
+        }
+
+        /* Leaderboard */
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
+
+        .leaderboard-item.highlight {
+            background: var(--surface-elevated);
+            margin: 0 -20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+        }
+
+        .leaderboard-rank {
+            min-width: 36px;
+            height: 28px;
+            padding: 0 8px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            margin-right: 12px;
+            background: var(--surface-inset);
+            color: var(--body);
+        }
+
+        .leaderboard-name {
+            flex: 1;
+        }
+
+        .leaderboard-score {
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .leaderboard-percent {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        /* Question Card */
+        .question-card {
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .question-number {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .question-points {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .question-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .question-option {
+            background: var(--surface-inset);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .question-option:hover {
+            border-color: var(--primary);
+        }
+
+        .question-option.selected {
+            border-color: var(--primary);
+            background: rgba(87, 208, 37, 0.1);
+        }
+
+        .question-option.correct {
+            border-color: var(--success);
+            background: rgba(87, 208, 37, 0.1);
+        }
+
+        .question-option.incorrect {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-letter {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--surface-overlay);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .question-option.selected .option-letter {
+            background: var(--primary);
+            color: white;
+        }
+
+        .option-icon {
+            font-size: 18px;
+        }
+
+        .option-icon.correct { color: var(--success); }
+        .option-icon.incorrect { color: var(--danger); }
+
+        .option-bonus {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary);
+            background: rgba(87, 208, 37, 0.15);
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        /* Captain Controls Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-section {
+            margin-bottom: 24px;
+        }
+
+        .modal-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .modal-section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        .control-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--surface-elevated);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .control-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .control-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .control-icon.success { background: rgba(87, 208, 37, 0.15); color: var(--success); }
+        .control-icon.warning { background: rgba(244, 118, 18, 0.15); color: var(--warning); }
+        .control-icon.info { background: rgba(59, 130, 246, 0.15); color: var(--info); }
+        .control-icon.danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+        .control-label {
+            font-weight: 500;
+        }
+
+        .control-meta {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        /* Join Form */
+        .join-container {
+            max-width: 400px;
+            margin: 60px auto;
+        }
+
+        .join-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+        }
+
+        .join-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .join-subtitle {
+            color: var(--muted);
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--surface-inset);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--body);
+            font-size: 16px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-hint {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 8px;
+        }
+
+        .join-footer {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .join-footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* Verify Card */
+        .verify-card {
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .verify-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .verify-info {
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+
+        .verify-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* History Page */
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--muted);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-event-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .history-group-name {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .history-date {
+            font-size: 13px;
+            color: var(--subtle);
+        }
+
+        .history-stats {
+            text-align: right;
+        }
+
+        .history-rank {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 28px;
+            padding: 0 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            background: var(--surface-inset);
+            color: var(--body);
+            margin-bottom: 4px;
+        }
+
+        .history-score {
+            font-size: 14px;
+        }
+
+        /* Group Selector */
+        .selector-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .selector-item:hover {
+            background: var(--surface-elevated);
+        }
+
+        .selector-item:last-child {
+            border-bottom: none;
+        }
+
+        .selector-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selector-event {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .selector-meta {
+            font-size: 13px;
+            color: var(--subtle);
+        }
+
+        .selector-arrow {
+            color: var(--muted);
+        }
+
+        /* Captain Management View */
+        .question-manage-card {
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 12px;
+        }
+
+        .question-manage-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .drag-handle {
+            color: var(--muted);
+            cursor: grab;
+            padding: 4px;
+        }
+
+        .question-manage-info {
+            flex: 1;
+        }
+
+        .question-manage-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .question-manage-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .answer-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--surface-inset);
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .answer-indicator.set {
+            background: rgba(87, 208, 37, 0.1);
+            color: var(--success);
+        }
+
+        .answer-indicator.pending {
+            background: rgba(244, 118, 18, 0.1);
+            color: var(--warning);
+        }
+
+        /* Checkbox for admin sync */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-label {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        /* Results View */
+        .results-summary {
+            text-align: center;
+            padding: 32px;
+            background: var(--surface-elevated);
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .results-rank {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 8px;
+        }
+
+        .results-score {
+            font-size: 24px;
+            color: var(--body);
+            margin-bottom: 4px;
+        }
+
+        .results-percent {
+            color: var(--muted);
+        }
+
+        /* Navigation Progress */
+        .entry-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .entry-progress-bar {
+            flex: 1;
+            height: 4px;
+            background: var(--surface-inset);
+            border-radius: 2px;
+            margin: 0 24px;
+        }
+
+        .entry-progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-content">
+            <div class="nav-logo">
+                <div class="diamond"></div>
+                PROPOFF
+            </div>
+            <div class="nav-links">
+                <a class="nav-link" onclick="showPage('selector')">My Home</a>
+                <a class="nav-link active" onclick="showPage('hub')" style="display: flex; align-items: center; gap: 6px;">
+                    Super Bowl Party
+                    <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
+                </a>
+                <a class="nav-link" onclick="showPage('history')">History</a>
+            </div>
+            <div class="nav-user">
+                <span>Mike T.</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flow Selector (Mockup Controls) -->
+    <div class="flow-selector">
+        <div class="flow-selector-content">
+            <span class="flow-label">View:</span>
+            <button class="flow-btn active" onclick="showPage('hub')">Play Hub</button>
+            <button class="flow-btn" onclick="showPage('entry')">Answer Questions</button>
+            <button class="flow-btn" onclick="showPage('results')">View Results</button>
+            <button class="flow-btn" onclick="showPage('join')">Guest Join</button>
+
+            <div class="flow-divider"></div>
+
+            <button class="flow-btn" onclick="showPage('captain')">Captain View</button>
+            <button class="flow-btn" onclick="showPage('selector')">Group Selector</button>
+            <button class="flow-btn" onclick="showPage('history')">History</button>
+
+            <div class="flow-divider"></div>
+
+            <div class="toggle-group">
+                <span class="flow-label">Captain:</span>
+                <div class="toggle active" id="captainToggle" onclick="toggleCaptain()"></div>
+            </div>
+
+            <div class="toggle-group">
+                <span class="flow-label">Locked:</span>
+                <div class="toggle" id="lockedToggle" onclick="toggleLocked()"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: Play Hub (Player View) -->
+    <div class="page-view active" id="page-hub">
+        <div class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-header-content">
+                    <div class="page-header-top">
+                        <div>
+                            <div class="page-header-title">
+                                Super Bowl Party
+                                <span class="badge badge-warning-soft captain-only">Captain</span>
+                            </div>
+                            <div class="page-header-meta">
+                                <span>Super Bowl LVIII</span>
+                                <span>•</span>
+                                <span>Feb 11, 2024</span>
+                                <span>•</span>
+                                <span>12 members</span>
+                                <span>•</span>
+                                <span style="font-family: monospace; font-weight: 600; color: var(--primary);">BOWL24</span>
+                            </div>
+                        </div>
+                        <div class="page-header-actions captain-only">
+                            <button class="btn btn-warning btn-sm" onclick="openModal('captainControls')">
+                                <i class="fas fa-sliders"></i> Captain Controls
+                            </button>
+                            <button class="btn btn-info btn-sm">
+                                <i class="fas fa-share-nodes"></i> Share
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-card success">
+                    <div class="stat-value">10</div>
+                    <div class="stat-label">Questions</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-value graded-count">7</div>
+                    <div class="stat-label">Graded</div>
+                </div>
+                <div class="stat-card primary">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Members</div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-value">85</div>
+                    <div class="stat-label">Max Possible</div>
+                </div>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="two-col">
+                <!-- My Entry Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">My Entry</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="entry-status">
+                            <i class="fas fa-circle-check" style="color: var(--success);"></i>
+                            <span>Submitted</span>
+                        </div>
+                        <div class="entry-score" id="entryScore">68 pts</div>
+                        <div class="entry-rank" id="entryRank">3rd of 12</div>
+                        <div style="margin-top: 16px;">
+                            <button class="btn btn-primary" id="entryButton" onclick="showPage('entry')">
+                                <i class="fas fa-eye"></i> View My Answers
+                            </button>
+                        </div>
+                        <div class="entry-divider guest-only" style="display: none;">
+                            <div class="entry-upsell">
+                                Want to save your results?<br>
+                                <a href="#">Create an account →</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Status Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Game Status</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="status-item">
+                            <span class="status-label">Status</span>
+                            <span class="status-value open" id="gameStatus">Open</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Closes</span>
+                            <span class="status-value" id="closeTime">Feb 11, 5:30 PM</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Questions</span>
+                            <span class="status-value">10</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Grading</span>
+                            <span class="status-value">
+                                <span class="badge badge-warning-soft">Captain Graded</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaderboard Preview -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Leaderboard</span>
+                    <button class="btn btn-ghost btn-sm">View Full →</button>
+                </div>
+                <div class="card-body">
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank">1st</div>
+                        <div class="leaderboard-name">Sarah K.</div>
+                        <div class="leaderboard-score">72 pts</div>
+                    </div>
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank">2nd</div>
+                        <div class="leaderboard-name">John D.</div>
+                        <div class="leaderboard-score">70 pts</div>
+                    </div>
+                    <div class="leaderboard-item highlight">
+                        <div class="leaderboard-rank">3rd</div>
+                        <div class="leaderboard-name">Mike T. <span class="badge badge-primary-soft" style="margin-left: 8px;">You</span></div>
+                        <div class="leaderboard-score">68 pts</div>
+                    </div>
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank">4th</div>
+                        <div class="leaderboard-name">Emily R.</div>
+                        <div class="leaderboard-score">65 pts</div>
+                    </div>
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank">5th</div>
+                        <div class="leaderboard-name">Chris P.</div>
+                        <div class="leaderboard-score">62 pts</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: Answer Questions (Play/Entry) -->
+    <div class="page-view" id="page-entry">
+        <div class="main-content">
+            <div class="page-header">
+                <div class="page-header-content">
+                    <div class="breadcrumbs">
+                        <a href="#" onclick="showPage('hub'); return false;">Super Bowl Party</a>
+                        <span class="separator">/</span>
+                        <span class="current">Play</span>
+                    </div>
+                    <div class="page-header-top">
+                        <div>
+                            <div class="page-header-title">Super Bowl LVIII</div>
+                            <div class="page-header-meta">
+                                <span>8 of 10 answered</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 1 -->
+            <div class="question-card">
+                <div class="question-header">
+                    <div class="question-text">Who will win Super Bowl LVIII?</div>
+                    <div class="question-points">10 points</div>
+                </div>
+                <div class="question-options">
+                    <div class="question-option selected" onclick="selectOption(this)">
+                        <div class="option-label">
+                            <div class="option-letter">A</div>
+                            <span>Kansas City Chiefs</span>
+                            <span class="option-bonus">+5 bonus</span>
+                        </div>
+                    </div>
+                    <div class="question-option" onclick="selectOption(this)">
+                        <div class="option-label">
+                            <div class="option-letter">B</div>
+                            <span>San Francisco 49ers</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-card">
+                <div class="question-header">
+                    <div class="question-text">Who will be named Super Bowl MVP?</div>
+                    <div class="question-points">10 points</div>
+                </div>
+                <div class="question-options">
+                    <div class="question-option" onclick="selectOption(this)">
+                        <div class="option-label">
+                            <div class="option-letter">A</div>
+                            <span>Patrick Mahomes</span>
+                        </div>
+                    </div>
+                    <div class="question-option selected" onclick="selectOption(this)">
+                        <div class="option-label">
+                            <div class="option-letter">B</div>
+                            <span>Travis Kelce</span>
+                            <span class="option-bonus">+3 bonus</span>
+                        </div>
+                    </div>
+                    <div class="question-option" onclick="selectOption(this)">
+                        <div class="option-label">
+                            <div class="option-letter">C</div>
+                            <span>Brock Purdy</span>
+                        </div>
+                    </div>
+                    <div class="question-option" onclick="selectOption(this)">
+                        <div class="option-label">
+                            <div class="option-letter">D</div>
+                            <span>Christian McCaffrey</span>
+                            <span class="option-bonus">+5 bonus</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-card">
+                <div class="question-header">
+                    <div class="question-text">Will there be a safety in the game?</div>
+                    <div class="question-points">5 points</div>
+                </div>
+                <div class="question-options">
+                    <div class="question-option" onclick="selectOption(this)">
+                        <div class="option-label">
+                            <div class="option-letter">A</div>
+                            <span>Yes</span>
+                            <span class="option-bonus">+10 bonus</span>
+                        </div>
+                    </div>
+                    <div class="question-option" onclick="selectOption(this)">
+                        <div class="option-label">
+                            <div class="option-letter">B</div>
+                            <span>No</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Section -->
+            <div class="card" style="margin-top: 24px; border-color: var(--warning);">
+                <div class="card-body" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-weight: 600; color: var(--warning);">Ready to submit?</div>
+                        <div style="font-size: 14px; color: var(--muted);">8 of 10 questions answered</div>
+                    </div>
+                    <button class="btn btn-primary">
+                        Submit Final Answers
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: View Results -->
+    <div class="page-view" id="page-results">
+        <div class="main-content">
+            <div class="page-header">
+                <div class="page-header-content">
+                    <div class="breadcrumbs">
+                        <a href="#" onclick="showPage('hub'); return false;">Super Bowl Party</a>
+                        <span class="separator">/</span>
+                        <span class="current">My Results</span>
+                    </div>
+                    <div class="page-header-top">
+                        <div>
+                            <div class="page-header-title">My Results</div>
+                            <div class="page-header-meta">
+                                <span>Super Bowl LVIII</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Summary -->
+            <div class="results-summary">
+                <div class="results-rank">3rd Place</div>
+                <div class="results-score">68 points</div>
+            </div>
+
+            <!-- Question Results -->
+            <div class="question-card">
+                <div class="question-header">
+                    <div class="question-text">Who will win Super Bowl LVIII?</div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="badge badge-success-soft">+10 pts</span>
+                    </div>
+                </div>
+                <div class="question-options">
+                    <div class="question-option correct">
+                        <div class="option-label">
+                            <div class="option-letter">A</div>
+                            <span>Kansas City Chiefs</span>
+                        </div>
+                        <i class="fas fa-circle-check option-icon correct"></i>
+                    </div>
+                    <div class="question-option">
+                        <div class="option-label">
+                            <div class="option-letter">B</div>
+                            <span>San Francisco 49ers</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-header">
+                    <div class="question-text">Who will be named Super Bowl MVP?</div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="badge badge-danger-soft">0 pts</span>
+                    </div>
+                </div>
+                <div class="question-options">
+                    <div class="question-option correct">
+                        <div class="option-label">
+                            <div class="option-letter">A</div>
+                            <span>Patrick Mahomes</span>
+                        </div>
+                        <i class="fas fa-circle-check option-icon correct"></i>
+                    </div>
+                    <div class="question-option incorrect">
+                        <div class="option-label">
+                            <div class="option-letter">B</div>
+                            <span>Travis Kelce</span>
+                        </div>
+                        <i class="fas fa-circle-xmark option-icon incorrect"></i>
+                    </div>
+                    <div class="question-option">
+                        <div class="option-label">
+                            <div class="option-letter">C</div>
+                            <span>Brock Purdy</span>
+                        </div>
+                    </div>
+                    <div class="question-option">
+                        <div class="option-label">
+                            <div class="option-letter">D</div>
+                            <span>Christian McCaffrey</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: Guest Join -->
+    <div class="page-view" id="page-join">
+        <div class="join-container">
+            <div class="join-card" id="joinStep1">
+                <div class="join-title">Join Super Bowl Party</div>
+                <div class="join-subtitle">Enter your name to join the game</div>
+
+                <div class="form-group">
+                    <label class="form-label">What's your name?</label>
+                    <input type="text" class="form-input" placeholder="Enter your first name" id="guestName">
+                </div>
+
+                <button class="btn btn-primary btn-lg" style="width: 100%;" onclick="showJoinStep(2)">
+                    Continue <i class="fas fa-arrow-right"></i>
+                </button>
+
+                <div class="join-footer">
+                    Already have an account? <a href="#">Log in</a>
+                </div>
+            </div>
+
+            <!-- Step 2: Last Initial (shown if name exists) -->
+            <div class="join-card" id="joinStep2" style="display: none;">
+                <div class="join-title">One more thing...</div>
+                <div class="join-subtitle">There's already a "Mike" in this group. What's your last initial?</div>
+
+                <div class="form-group">
+                    <label class="form-label">Last initial</label>
+                    <input type="text" class="form-input" placeholder="T" maxlength="1" style="width: 80px; text-align: center; font-size: 24px;">
+                    <div class="form-hint">You'll appear as "Mike T."</div>
+                </div>
+
+                <button class="btn btn-primary btn-lg" style="width: 100%;" onclick="showJoinStep(3)">
+                    Continue <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Step 3: Verify (shown if name + initial matches) -->
+            <div class="join-card" id="joinStep3" style="display: none;">
+                <div class="join-title">Is this you?</div>
+                <div class="join-subtitle">We found an existing entry for "Mike T."</div>
+
+                <div class="verify-card">
+                    <div class="verify-title">Mike T.</div>
+                    <div class="verify-info">8 of 10 questions answered</div>
+                    <div class="verify-actions">
+                        <button class="btn btn-primary" onclick="showPage('hub')">
+                            Yes, that's me
+                        </button>
+                        <button class="btn btn-secondary" onclick="showJoinStep(4)">
+                            No, create new
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Different initial needed -->
+            <div class="join-card" id="joinStep4" style="display: none;">
+                <div class="join-title">Choose a different initial</div>
+                <div class="join-subtitle">"Mike T." is taken. Please use a different last initial.</div>
+
+                <div class="form-group">
+                    <label class="form-label">Last initial</label>
+                    <input type="text" class="form-input" placeholder="?" maxlength="1" style="width: 80px; text-align: center; font-size: 24px;">
+                </div>
+
+                <button class="btn btn-primary btn-lg" style="width: 100%;" onclick="showPage('hub')">
+                    Join as Mike ?. <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: Captain Management (Groups/Show) -->
+    <div class="page-view" id="page-captain">
+        <div class="main-content wide">
+            <div class="page-header wide">
+                <div class="page-header-content">
+                    <div class="page-header-top">
+                        <div>
+                            <div class="page-header-title">
+                                Super Bowl Party
+                                <span class="badge badge-warning-soft">Captain</span>
+                            </div>
+                            <div class="page-header-meta">
+                                <span>Super Bowl LVIII</span>
+                                <span>•</span>
+                                <span>Feb 11, 2024</span>
+                                <span>•</span>
+                                <span>12 members</span>
+                                <span>•</span>
+                                <span style="font-family: monospace;">BOWL24</span>
+                                <span>•</span>
+                                <a href="#" style="color: var(--primary); text-decoration: none;">Edit</a>
+                            </div>
+                        </div>
+                        <div class="page-header-actions">
+                            <button class="btn btn-info btn-sm">
+                                <i class="fas fa-share-nodes"></i> Join Info
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Banner -->
+            <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 12px 16px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 12px;">
+                <i class="fas fa-circle-info" style="color: var(--info); margin-top: 2px;"></i>
+                <div style="font-size: 14px; color: var(--body);">
+                    <strong>Captain Grading Mode</strong> — Set the correct answers here as results come in. This is for grading your group's entries, not your personal predictions. To play, use the Play Hub.
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-card success">
+                    <div class="stat-value">10</div>
+                    <div class="stat-label">Questions</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-value">7</div>
+                    <div class="stat-label">Answered</div>
+                </div>
+                <div class="stat-card primary">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Members</div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-value">85</div>
+                    <div class="stat-label">Total Points</div>
+                </div>
+            </div>
+
+            <!-- Questions Section -->
+            <div class="card">
+                <div class="card-header">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="card-title">Questions</span>
+                        <span class="badge badge-primary-soft">10</span>
+                    </div>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Add Question
+                    </button>
+                </div>
+                <div class="card-body">
+                    <!-- Question 1 - Answered -->
+                    <div class="question-manage-card">
+                        <div class="question-manage-header">
+                            <div class="drag-handle">
+                                <i class="fas fa-grip-vertical"></i>
+                            </div>
+                            <div class="question-manage-info">
+                                <div class="question-manage-title">
+                                    1. Who will win Super Bowl LVIII?
+                                    <span class="badge badge-info-soft">multiple choice</span>
+                                    <span style="color: var(--muted); font-weight: normal; font-size: 13px;">10 pts</span>
+                                </div>
+                            </div>
+                            <div class="question-manage-actions">
+                                <button class="btn btn-ghost btn-sm">Edit</button>
+                                <button class="btn btn-ghost btn-sm" style="color: var(--warning);">Void</button>
+                            </div>
+                        </div>
+                        <div class="question-options" style="margin-left: 36px;">
+                            <div class="question-option correct">
+                                <div class="option-label">
+                                    <div class="option-letter" style="background: var(--success); color: white;">A</div>
+                                    <span>Kansas City Chiefs</span>
+                                </div>
+                                <i class="fas fa-circle-check" style="color: var(--success);"></i>
+                            </div>
+                            <div class="question-option">
+                                <div class="option-label">
+                                    <div class="option-letter">B</div>
+                                    <span>San Francisco 49ers</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 2 - Not Answered -->
+                    <div class="question-manage-card">
+                        <div class="question-manage-header">
+                            <div class="drag-handle">
+                                <i class="fas fa-grip-vertical"></i>
+                            </div>
+                            <div class="question-manage-info">
+                                <div class="question-manage-title">
+                                    2. Who will be named Super Bowl MVP?
+                                    <span class="badge badge-info-soft">multiple choice</span>
+                                    <span style="color: var(--muted); font-weight: normal; font-size: 13px;">10 pts</span>
+                                </div>
+                            </div>
+                            <div class="question-manage-actions">
+                                <button class="btn btn-ghost btn-sm">Edit</button>
+                            </div>
+                        </div>
+                        <div class="question-options" style="margin-left: 36px;">
+                            <div class="question-option" onclick="selectCaptainOption(this)">
+                                <div class="option-label">
+                                    <div class="option-letter">A</div>
+                                    <span>Patrick Mahomes</span>
+                                </div>
+                            </div>
+                            <div class="question-option" onclick="selectCaptainOption(this)">
+                                <div class="option-label">
+                                    <div class="option-letter">B</div>
+                                    <span>Travis Kelce</span>
+                                </div>
+                            </div>
+                            <div class="question-option" onclick="selectCaptainOption(this)">
+                                <div class="option-label">
+                                    <div class="option-letter">C</div>
+                                    <span>Brock Purdy</span>
+                                </div>
+                            </div>
+                            <div class="question-option" onclick="selectCaptainOption(this)">
+                                <div class="option-label">
+                                    <div class="option-letter">D</div>
+                                    <span>Christian McCaffrey</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-left: 36px; margin-top: 12px; display: none;" id="saveAnswerSection">
+                            <div class="checkbox-group">
+                                <input type="checkbox" class="checkbox" id="syncAdmin" checked>
+                                <label class="checkbox-label" for="syncAdmin">Also set for admin grading</label>
+                            </div>
+                            <button class="btn btn-primary btn-sm" style="margin-top: 12px;">
+                                Save Answer
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="question-manage-card">
+                        <div class="question-manage-header">
+                            <div class="drag-handle">
+                                <i class="fas fa-grip-vertical"></i>
+                            </div>
+                            <div class="question-manage-info">
+                                <div class="question-manage-title">
+                                    3. Will there be a safety in the game?
+                                    <span class="badge badge-success-soft">yes/no</span>
+                                    <span style="color: var(--muted); font-weight: normal; font-size: 13px;">5 pts</span>
+                                </div>
+                            </div>
+                            <div class="question-manage-actions">
+                                <button class="btn btn-ghost btn-sm">Edit</button>
+                            </div>
+                        </div>
+                        <div class="question-options" style="margin-left: 36px;">
+                            <div class="question-option" onclick="selectCaptainOption(this)">
+                                <div class="option-label">
+                                    <div class="option-letter">A</div>
+                                    <span>Yes</span>
+                                </div>
+                            </div>
+                            <div class="question-option" onclick="selectCaptainOption(this)">
+                                <div class="option-label">
+                                    <div class="option-letter">B</div>
+                                    <span>No</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: Group Selector -->
+    <div class="page-view" id="page-selector">
+        <div class="main-content">
+            <div class="page-header">
+                <div class="page-header-content">
+                    <div class="page-header-title">Choose a Group</div>
+                    <div class="page-header-meta">
+                        <span>Select a group to view or play</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body" style="padding: 0;">
+                    <div class="selector-item" onclick="showPage('hub')">
+                        <div>
+                            <div class="selector-name">
+                                Super Bowl Party
+                                <span class="badge badge-warning-soft">Captain</span>
+                            </div>
+                            <div class="selector-event">Super Bowl LVIII</div>
+                            <div class="selector-meta">12 members • 8/10 answered • 3rd place</div>
+                        </div>
+                        <i class="fas fa-chevron-right selector-arrow"></i>
+                    </div>
+                    <div class="selector-item" onclick="showPage('hub')">
+                        <div>
+                            <div class="selector-name">Work Friends</div>
+                            <div class="selector-event">Super Bowl LVIII</div>
+                            <div class="selector-meta">8 members • Not started</div>
+                        </div>
+                        <i class="fas fa-chevron-right selector-arrow"></i>
+                    </div>
+                    <div class="selector-item" onclick="showPage('hub')">
+                        <div>
+                            <div class="selector-name">
+                                March Madness Squad
+                                <span class="badge badge-warning-soft">Captain</span>
+                            </div>
+                            <div class="selector-event">NCAA Tournament 2024</div>
+                            <div class="selector-meta">6 members • Opens Mar 19</div>
+                        </div>
+                        <i class="fas fa-chevron-right selector-arrow"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: History -->
+    <div class="page-view" id="page-history">
+        <div class="main-content">
+            <div class="page-header">
+                <div class="page-header-content">
+                    <div class="page-header-title">History</div>
+                    <div class="page-header-meta">
+                        <span>Your past events and results</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-row">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">2024</button>
+                <button class="filter-btn">2023</button>
+                <button class="filter-btn">2022</button>
+            </div>
+
+            <!-- Stats Summary -->
+            <div class="stats-row" style="margin-bottom: 24px;">
+                <div class="stat-card success">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Events Played</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-value" style="font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 0;">
+                        <span style="min-width: 36px; text-align: center;">3</span>
+                        <span style="color: var(--subtle); margin: 0 10px;">|</span>
+                        <span style="min-width: 36px; text-align: center;">2</span>
+                        <span style="color: var(--subtle); margin: 0 10px;">|</span>
+                        <span style="min-width: 36px; text-align: center;">1</span>
+                    </div>
+                    <div class="stat-label" style="display: flex; align-items: center; justify-content: center; gap: 0; font-size: 13px;">
+                        <span style="min-width: 36px; text-align: center;">1st</span>
+                        <span style="color: transparent; margin: 0 10px;">|</span>
+                        <span style="min-width: 36px; text-align: center;">2nd</span>
+                        <span style="color: transparent; margin: 0 10px;">|</span>
+                        <span style="min-width: 36px; text-align: center;">3rd</span>
+                    </div>
+                </div>
+                <div class="stat-card primary">
+                    <div class="stat-value">-8.3 pts</div>
+                    <div class="stat-label">Avg from 1st</div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-value">2.4</div>
+                    <div class="stat-label">Avg Rank</div>
+                </div>
+            </div>
+
+            <!-- History List -->
+            <div class="card">
+                <div class="card-body" style="padding: 16px;">
+                    <div class="history-item">
+                        <div>
+                            <div class="history-event-name">Super Bowl LVII</div>
+                            <div class="history-group-name">Super Bowl Party 2023</div>
+                            <div class="history-date">Feb 12, 2023 • 15 players</div>
+                        </div>
+                        <div class="history-stats">
+                            <div class="history-rank">1st</div>
+                            <div class="history-score">82 pts</div>
+                        </div>
+                    </div>
+                    <div class="history-item">
+                        <div>
+                            <div class="history-event-name">March Madness 2023</div>
+                            <div class="history-group-name">Bracket Busters</div>
+                            <div class="history-date">Mar 14, 2023 • 12 players</div>
+                        </div>
+                        <div class="history-stats">
+                            <div class="history-rank">2nd</div>
+                            <div class="history-score">156 pts</div>
+                        </div>
+                    </div>
+                    <div class="history-item">
+                        <div>
+                            <div class="history-event-name">Super Bowl LVI</div>
+                            <div class="history-group-name">Office Pool</div>
+                            <div class="history-date">Feb 13, 2022 • 20 players</div>
+                        </div>
+                        <div class="history-stats">
+                            <div class="history-rank">3rd</div>
+                            <div class="history-score">71 pts</div>
+                        </div>
+                    </div>
+                    <div class="history-item">
+                        <div>
+                            <div class="history-event-name">World Series 2022</div>
+                            <div class="history-group-name">Baseball Fans</div>
+                            <div class="history-date">Oct 28, 2022 • 8 players</div>
+                        </div>
+                        <div class="history-stats">
+                            <div class="history-rank">5th</div>
+                            <div class="history-score">45 pts</div>
+                        </div>
+                    </div>
+                    <div class="history-item">
+                        <div>
+                            <div class="history-event-name">Super Bowl LV</div>
+                            <div class="history-group-name">Family Game</div>
+                            <div class="history-date">Feb 7, 2021 • 6 players</div>
+                        </div>
+                        <div class="history-stats">
+                            <div class="history-rank">1st</div>
+                            <div class="history-score">78 pts</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Captain Controls -->
+    <div class="modal-overlay" id="modal-captainControls">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Captain Controls</span>
+                <button class="modal-close" onclick="closeModal('captainControls')">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <div class="modal-section-title">Game Status</div>
+                    <div class="control-item">
+                        <div class="control-info">
+                            <div class="control-icon danger">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <div>
+                                <div class="control-label">Lock entries now</div>
+                                <div class="control-meta">Players can't submit or edit</div>
+                            </div>
+                        </div>
+                        <div class="toggle" id="lockToggle" onclick="this.classList.toggle('active')"></div>
+                    </div>
+                    <div class="control-item">
+                        <div class="control-info">
+                            <div class="control-icon info">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <div class="control-label">Scheduled lock</div>
+                                <div class="control-meta">Feb 11, 5:30 PM</div>
+                            </div>
+                        </div>
+                        <a href="#" style="color: var(--primary); text-decoration: none; font-size: 14px;">Edit</a>
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">Manage</div>
+                    <div class="control-item" onclick="closeModal('captainControls'); showPage('captain');">
+                        <div class="control-info">
+                            <div class="control-icon success">
+                                <i class="fas fa-list-check"></i>
+                            </div>
+                            <div>
+                                <div class="control-label">Questions</div>
+                                <div class="control-meta">10 questions • 7 graded</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color: var(--muted);"></i>
+                    </div>
+                    <div class="control-item">
+                        <div class="control-info">
+                            <div class="control-icon warning">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                            <div>
+                                <div class="control-label">Grade Answers</div>
+                                <div class="control-meta">3 pending</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color: var(--muted);"></i>
+                    </div>
+                    <div class="control-item">
+                        <div class="control-info">
+                            <div class="control-icon info">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div>
+                                <div class="control-label">Members</div>
+                                <div class="control-meta">12 players • 2 captains</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color: var(--muted);"></i>
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">Share</div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-secondary" style="flex: 1;">
+                            <i class="fas fa-link"></i> Copy Link
+                        </button>
+                        <button class="btn btn-secondary" style="flex: 1;">
+                            <i class="fas fa-qrcode"></i> QR Code
+                        </button>
+                        <button class="btn btn-secondary" style="flex: 1;">
+                            <i class="fas fa-envelope"></i> Email
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let isCaptain = true;
+        let isLocked = false;
+
+        // Show page
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-view').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            document.getElementById('page-' + pageId).classList.add('active');
+
+            // Update flow buttons
+            document.querySelectorAll('.flow-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+        }
+
+        // Toggle captain mode
+        function toggleCaptain() {
+            isCaptain = !isCaptain;
+            document.getElementById('captainToggle').classList.toggle('active');
+
+            document.querySelectorAll('.captain-only').forEach(el => {
+                el.style.display = isCaptain ? '' : 'none';
+            });
+        }
+
+        // Toggle locked state
+        function toggleLocked() {
+            isLocked = !isLocked;
+            document.getElementById('lockedToggle').classList.toggle('active');
+
+            const statusEl = document.getElementById('gameStatus');
+            const closeTimeEl = document.getElementById('closeTime');
+            const entryButton = document.getElementById('entryButton');
+
+            if (isLocked) {
+                statusEl.textContent = 'Locked';
+                statusEl.className = 'status-value locked';
+                closeTimeEl.textContent = 'Closed';
+                entryButton.innerHTML = '<i class="fas fa-eye"></i> View My Answers';
+            } else {
+                statusEl.textContent = 'Open';
+                statusEl.className = 'status-value open';
+                closeTimeEl.textContent = 'Feb 11, 5:30 PM';
+                entryButton.innerHTML = '<i class="fas fa-play"></i> Continue Playing';
+            }
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById('modal-' + modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById('modal-' + modalId).classList.remove('active');
+        }
+
+        // Close modal on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // Select option in question
+        function selectOption(element) {
+            const card = element.closest('.question-card');
+            card.querySelectorAll('.question-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+
+        // Select option in captain grading
+        function selectCaptainOption(element) {
+            const card = element.closest('.question-manage-card');
+            card.querySelectorAll('.question-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+
+            // Show save button
+            const saveSection = document.getElementById('saveAnswerSection');
+            if (saveSection) {
+                saveSection.style.display = 'block';
+            }
+        }
+
+        // Join flow steps
+        function showJoinStep(step) {
+            document.querySelectorAll('.join-card').forEach(card => {
+                card.style.display = 'none';
+            });
+            document.getElementById('joinStep' + step).style.display = 'block';
+        }
+
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Initialize
+        toggleCaptain();
+        toggleCaptain(); // Reset to show captain elements
+    </script>
+</body>
+</html>

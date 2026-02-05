@@ -242,6 +242,7 @@ class GroupController extends Controller
                 'event' => [
                     'id' => $group->event->id,
                     'status' => $group->event->status,
+                    'lock_date' => $group->event->lock_date,
                 ],
             ],
             'canChangeGradingSource' => $canChangeGradingSource,

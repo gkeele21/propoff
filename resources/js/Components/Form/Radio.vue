@@ -2,7 +2,7 @@
     <label
         :for="inputId"
         :class="[
-            'flex items-start gap-3 p-4 border rounded-lg transition-all',
+            'flex items-start gap-3 p-4 border rounded-lg transition-all focus-within-glow',
             disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
             modelValue === value
                 ? 'border-primary bg-primary/10 checked-glow'

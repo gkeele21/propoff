@@ -76,21 +76,14 @@
                     ]">
                         {{ option.label }}
                     </span>
-                </div>
 
-                <!-- Bonus Points -->
-                <div v-if="option.points && option.points > 0" class="ml-4 flex-shrink-0">
-                    <span class="text-xs font-semibold text-primary bg-primary/15 px-2 py-1 rounded">
-                        +{{ option.points }} bonus {{ option.points === 1 ? 'pt' : 'pts' }}
+                    <!-- Bonus Points -->
+                    <span v-if="option.points && option.points > 0" class="text-xs font-semibold text-primary bg-primary/15 px-2 py-1 rounded">
+                        +{{ option.points }} bonus {{ option.points === 1 ? 'point' : 'points' }}
                     </span>
                 </div>
             </div>
         </div>
-
-        <!-- Points Hint -->
-        <p v-if="points && hasBonus" class="text-xs text-subtle mt-2">
-            Base: {{ points }} {{ points === 1 ? 'pt' : 'pts' }} + any bonus shown
-        </p>
 
         <!-- Error Message -->
         <p v-if="error" class="text-sm text-danger mt-2">
@@ -142,11 +135,6 @@ const normalizedOptions = computed(() => {
             points: option.points || option.bonus || 0,
         };
     });
-});
-
-// Check if any option has bonus points
-const hasBonus = computed(() => {
-    return normalizedOptions.value.some(opt => opt.points > 0);
 });
 
 function getLetter(index) {
