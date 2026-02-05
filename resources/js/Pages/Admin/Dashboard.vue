@@ -1,8 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import StatCard from '@/Components/StatCard.vue';
+import Icon from '@/Components/Base/Icon.vue';
 import { Head } from '@inertiajs/vue3';
-import { CogIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     adminStats: Object,
@@ -35,7 +35,7 @@ const groupsSubtitle = () => {
     <AuthenticatedLayout>
         <template #header>
             <div class="flex items-center gap-3">
-                <CogIcon class="h-6 w-6 text-muted" />
+                <Icon name="gear" size="lg" class="text-muted" />
                 <h2 class="font-semibold text-xl text-body leading-tight">
                     Admin Dashboard
                 </h2>

@@ -63,9 +63,9 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is an admin (or higher).
+     * Check if user has admin access (admin or manager role).
      */
-    public function isAdmin()
+    public function hasAdminAccess()
     {
         return in_array($this->role, ['admin', 'manager']);
     }

@@ -13,12 +13,12 @@
                 :aria-haspopup="true"
                 :disabled="disabled"
                 :class="[
-                    'flex items-center justify-between w-full rounded border transition-colors text-left',
-                    'focus:outline-none focus:ring-1',
+                    'flex items-center justify-between w-full rounded border transition-all text-left',
+                    'focus:outline-none focus-glow',
                     'bg-surface-elevated text-body',
                     error
-                        ? 'border-danger focus:border-danger focus:ring-danger'
-                        : 'border-border focus:border-primary focus:ring-primary',
+                        ? 'border-danger focus:border-transparent'
+                        : 'border-border focus:border-transparent',
                     disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
                     sizes[size]
                 ]"

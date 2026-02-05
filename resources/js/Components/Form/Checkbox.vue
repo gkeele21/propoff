@@ -11,8 +11,9 @@
                 :aria-describedby="error ? `${inputId}-error` : undefined"
                 :aria-invalid="!!error"
                 :class="[
-                    'rounded border-border text-primary mt-0.5',
-                    'focus:ring-primary focus:ring-offset-0',
+                    'rounded border-white/80 bg-surface-inset text-primary mt-0.5 transition-all',
+                    'focus-glow-sm focus:ring-primary focus:ring-offset-0 focus:ring-offset-surface',
+                    modelValue ? 'checked-glow' : '',
                     disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
                     error ? 'border-danger' : ''
                 ]"
@@ -53,8 +54,9 @@ const props = defineProps({
 defineEmits(['update:modelValue']);
 
 const labelVariants = {
-    default: 'text-gray-dark',
+    default: 'text-body',
     inverse: 'text-white',
+    muted: 'text-muted',
 };
 
 const inputId = computed(() => `checkbox-${Math.random().toString(36).substr(2, 9)}`);

@@ -21,7 +21,7 @@ class IsAdmin
         }
 
         // Check if user is an admin or manager
-        if (!auth()->user()->isAdmin()) {
+        if (!auth()->user()->hasAdminAccess()) {
             abort(403, 'Unauthorized. Admin access required.');
         }
 

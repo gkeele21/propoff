@@ -50,13 +50,16 @@ class UserTest extends TestCase
     }
 
     /** @test */
-    public function is_admin_returns_true_for_admin_users()
+    public function has_admin_access_returns_true_for_admin_and_manager_users()
     {
         $admin = User::factory()->admin()->create();
-        $this->assertTrue($admin->isAdmin());
+        $this->assertTrue($admin->hasAdminAccess());
+
+        $manager = User::factory()->create(['role' => 'manager']);
+        $this->assertTrue($manager->hasAdminAccess());
 
         $user = User::factory()->create(['role' => 'user']);
-        $this->assertFalse($user->isAdmin());
+        $this->assertFalse($user->hasAdminAccess());
     }
 
     /** @test */

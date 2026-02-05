@@ -1,9 +1,14 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link, useForm, router } from '@inertiajs/vue3';
+import { Head, useForm, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import PageHeader from '@/Components/PageHeader.vue';
-import ToastNotification from '@/Components/ToastNotification.vue';
+import Button from '@/Components/Base/Button.vue';
+import Badge from '@/Components/Base/Badge.vue';
+import Icon from '@/Components/Base/Icon.vue';
+import TextField from '@/Components/Form/TextField.vue';
+import DatePicker from '@/Components/Form/DatePicker.vue';
+import Toast from '@/Components/Feedback/Toast.vue';
 
 const props = defineProps({
     event: {
@@ -86,12 +91,19 @@ const copyUrl = (url) => {
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 <!-- Info Banner -->
-                <div class="bg-primary/10 border border-primary/30 rounded-lg p-4">
-                    <h3 class="text-sm font-semibold text-primary mb-2">About Captain Invitations</h3>
-                    <p class="text-sm text-primary">
-                        Captain invitations allow users to create groups and become captains for this event.
-                        Share the invitation URL with users who should have captain privileges.
-                    </p>
+                <div class="bg-primary/10 border-l-4 border-primary/30 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <Icon name="circle-info" class="text-primary" />
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-semibold text-primary mb-1">About Captain Invitations</h3>
+                            <p class="text-sm text-primary">
+                                Captain invitations allow users to create groups and become captains for this event.
+                                Share the invitation URL with users who should have captain privileges.
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Create Invitation -->
@@ -103,45 +115,33 @@ const copyUrl = (url) => {
 
                         <form @submit.prevent="submitCreate" class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-semibold text-muted mb-2">
-                                        Max Uses (Optional)
-                                    </label>
-                                    <input
-                                        v-model="createForm.max_uses"
-                                        type="number"
-                                        min="1"
-                                        class="w-full border-border bg-surface-inset text-body focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
-                                        placeholder="Unlimited"
-                                    />
-                                    <p class="text-xs text-subtle mt-1">
-                                        Leave empty for unlimited uses
-                                    </p>
-                                </div>
+                                <TextField
+                                    v-model="createForm.max_uses"
+                                    type="number"
+                                    label="Max Uses (Optional)"
+                                    placeholder="Unlimited"
+                                    hint="Leave empty for unlimited uses"
+                                    :error="createForm.errors.max_uses"
+                                />
 
-                                <div>
-                                    <label class="block text-sm font-semibold text-muted mb-2">
-                                        Expires At (Optional)
-                                    </label>
-                                    <input
-                                        v-model="createForm.expires_at"
-                                        type="datetime-local"
-                                        class="w-full border-border bg-surface-inset text-body focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
-                                    />
-                                    <p class="text-xs text-subtle mt-1">
-                                        Leave empty for no expiration
-                                    </p>
-                                </div>
+                                <DatePicker
+                                    v-model="createForm.expires_at"
+                                    label="Expires At (Optional)"
+                                    hint="Leave empty for no expiration"
+                                    enable-time
+                                    :error="createForm.errors.expires_at"
+                                />
                             </div>
 
                             <div class="flex justify-end">
-                                <button
+                                <Button
                                     type="submit"
-                                    :disabled="createForm.processing"
-                                    class="bg-primary hover:bg-primary/80 text-white px-4 py-2 rounded font-semibold disabled:opacity-50"
+                                    variant="primary"
+                                    icon="link"
+                                    :loading="createForm.processing"
                                 >
                                     Generate Link
-                                </button>
+                                </Button>
                             </div>
                         </form>
                     </div>
@@ -167,47 +167,82 @@ const copyUrl = (url) => {
                                     <div class="flex-1">
                                         <!-- Status Badge -->
                                         <div class="flex gap-2 mb-3">
-                                            <span
+                                            <Badge
                                                 v-if="invitation.is_active && invitation.can_be_used"
-                                                class="px-2 py-1 text-xs font-semibold rounded bg-success/10 text-success"
+                                                variant="success-soft"
+                                                size="sm"
                                             >
+                                                <Icon name="circle-check" size="xs" class="mr-1" />
                                                 Active
-                                            </span>
-                                            <span
+                                            </Badge>
+                                            <Badge
                                                 v-else
-                                                class="px-2 py-1 text-xs font-semibold rounded bg-danger/10 text-danger"
+                                                variant="danger-soft"
+                                                size="sm"
                                             >
+                                                <Icon name="circle-xmark" size="xs" class="mr-1" />
                                                 Inactive
-                                            </span>
-                                            <span
+                                            </Badge>
+                                            <Badge
                                                 v-if="invitation.max_uses"
-                                                class="px-2 py-1 text-xs font-semibold rounded bg-primary/10 text-primary"
+                                                variant="primary-soft"
+                                                size="sm"
                                             >
                                                 {{ invitation.times_used }} / {{ invitation.max_uses }} uses
-                                            </span>
-                                            <span
+                                            </Badge>
+                                            <Badge
                                                 v-else
-                                                class="px-2 py-1 text-xs font-semibold rounded bg-primary/10 text-primary"
+                                                variant="primary-soft"
+                                                size="sm"
                                             >
                                                 {{ invitation.times_used }} uses
-                                            </span>
+                                            </Badge>
                                         </div>
 
                                         <!-- Invitation URL -->
                                         <div class="mb-3">
                                             <label class="text-xs text-muted block mb-1">Invitation URL</label>
                                             <div class="flex gap-2">
-                                                <input
-                                                    :value="invitation.url"
+                                                <TextField
+                                                    :model-value="invitation.url"
                                                     readonly
-                                                    class="flex-1 text-sm border-border rounded-md bg-surface-inset text-body font-mono"
+                                                    class="flex-1 font-mono text-sm"
                                                 />
-                                                <button
+                                                <Button
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    icon="copy"
                                                     @click="copyUrl(invitation.url)"
-                                                    class="bg-surface-overlay hover:bg-surface-elevated text-body px-3 py-1 rounded text-sm font-semibold border border-border"
                                                 >
                                                     Copy
-                                                </button>
+                                                </Button>
+                                                <Button
+                                                    v-if="invitation.is_active"
+                                                    variant="accent"
+                                                    size="sm"
+                                                    icon="pause"
+                                                    @click="deactivateInvitation(invitation.id)"
+                                                >
+                                                    Deactivate
+                                                </Button>
+                                                <Button
+                                                    v-else
+                                                    variant="success"
+                                                    size="sm"
+                                                    icon="play"
+                                                    @click="reactivateInvitation(invitation.id)"
+                                                >
+                                                    Reactivate
+                                                </Button>
+                                                <Button
+                                                    v-if="invitation.times_used === 0"
+                                                    variant="danger"
+                                                    size="sm"
+                                                    icon="trash"
+                                                    @click="deleteInvitation(invitation.id)"
+                                                >
+                                                    Delete
+                                                </Button>
                                             </div>
                                         </div>
 
@@ -227,31 +262,6 @@ const copyUrl = (url) => {
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- Actions -->
-                                    <div class="flex flex-col gap-2 ml-4">
-                                        <button
-                                            v-if="invitation.is_active"
-                                            @click="deactivateInvitation(invitation.id)"
-                                            class="text-sm bg-warning hover:bg-warning/80 text-white px-3 py-1 rounded"
-                                        >
-                                            Deactivate
-                                        </button>
-                                        <button
-                                            v-else
-                                            @click="reactivateInvitation(invitation.id)"
-                                            class="text-sm bg-success hover:bg-success text-white px-3 py-1 rounded"
-                                        >
-                                            Reactivate
-                                        </button>
-                                        <button
-                                            v-if="invitation.times_used === 0"
-                                            @click="deleteInvitation(invitation.id)"
-                                            class="text-sm bg-danger hover:bg-danger/80 text-white px-3 py-1 rounded"
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -261,6 +271,6 @@ const copyUrl = (url) => {
         </div>
 
         <!-- Toast Notification -->
-        <ToastNotification :show="showCopiedToast" message="Invitation URL copied to clipboard!" />
+        <Toast :show="showCopiedToast" variant="success" message="Invitation URL copied to clipboard!" />
     </AuthenticatedLayout>
 </template>

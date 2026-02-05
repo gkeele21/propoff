@@ -20,7 +20,7 @@ class MyHomeController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $isAdmin = $user->role === 'admin';
+        $isAdmin = $user->hasAdminAccess();
         $isCaptain = $user->captainGroups()->exists();
 
         return Inertia::render('MyHome', [

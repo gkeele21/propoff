@@ -49,12 +49,12 @@ function handleInput(event) {
             :aria-describedby="descriptionId"
             :aria-invalid="!!error"
             :class="[
-                'w-full px-4 py-2 border rounded-lg transition-colors',
-                'focus:outline-none focus:ring-1',
+                'w-full px-4 py-2 border rounded-lg transition-all',
+                'focus:outline-none focus-glow',
                 'bg-surface-inset text-body placeholder:text-muted',
                 error
-                    ? 'border-danger focus:border-danger focus:ring-danger'
-                    : 'border-border focus:border-primary focus:ring-primary',
+                    ? 'border-danger focus:border-transparent'
+                    : 'border-border focus:border-transparent',
                 disabled ? 'opacity-50 cursor-not-allowed' : ''
             ]"
         />

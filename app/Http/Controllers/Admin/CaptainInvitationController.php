@@ -248,6 +248,6 @@ class CaptainInvitationController extends Controller
             'is_active' => true,
         ]);
 
-        return back()->with('success', "Group '{$group->name}' created! You are now a captain.");
+        return redirect()->route('dashboard')->with('success', "Group '{$group->name}' created! You are now a captain.");
     }
 }

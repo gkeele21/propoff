@@ -24,39 +24,28 @@
                 <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg mb-6 border border-border">
                     <div class="p-6">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <input
-                                    type="text"
-                                    v-model="form.search"
-                                    @input="debouncedFilter"
-                                    placeholder="Search templates..."
-                                    class="w-full rounded-md bg-surface-elevated border-border text-body placeholder-muted shadow-sm focus:border-primary focus:ring-primary/50"
-                                />
-                            </div>
-                            <div>
-                                <select
-                                    v-model="form.type"
-                                    @change="filterTemplates"
-                                    class="w-full rounded-md bg-surface-elevated border-border text-body shadow-sm focus:border-primary focus:ring-primary/50"
-                                >
-                                    <option value="">All Types</option>
-                                    <option value="multiple_choice">Multiple Choice</option>
-                                    <option value="yes_no">Yes/No</option>
-                                    <option value="numeric">Numeric</option>
-                                    <option value="text">Text</option>
-                                    <option value="ranked_answers">Ranked Answers</option>
-                                </select>
-                            </div>
-                            <div>
-                                <select
-                                    v-model="form.category"
-                                    @change="filterTemplates"
-                                    class="w-full rounded-md bg-surface-elevated border-border text-body shadow-sm focus:border-primary focus:ring-primary/50"
-                                >
-                                    <option value="">All Categories</option>
-                                    <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
-                                </select>
-                            </div>
+                            <TextField
+                                v-model="form.search"
+                                placeholder="Search templates..."
+                                icon-left="magnifying-glass"
+                                @input="debouncedFilter"
+                            />
+                            <Select
+                                v-model="form.type"
+                                :options="typeOptions"
+                                placeholder="All Types"
+                                allow-empty
+                                empty-label="All Types"
+                                @change="filterTemplates"
+                            />
+                            <Select
+                                v-model="form.category"
+                                :options="categoryOptions"
+                                placeholder="All Categories"
+                                allow-empty
+                                empty-label="All Categories"
+                                @change="filterTemplates"
+                            />
                         </div>
                     </div>
                 </div>
@@ -130,7 +119,7 @@
                 <!-- Empty State -->
                 <div v-if="templates.data.length === 0" class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-12 text-center">
-                        <DocumentTextIcon class="mx-auto h-12 w-12 text-muted" />
+                        <Icon name="file-lines" size="3x" class="mx-auto text-muted" />
                         <h3 class="mt-2 text-sm font-medium text-body">No templates found</h3>
                         <p class="mt-1 text-sm text-muted">Get started by creating a new question template.</p>
                         <div class="mt-6">
@@ -154,9 +143,11 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import PageHeader from '@/Components/PageHeader.vue';
 import Button from '@/Components/Base/Button.vue';
 import Badge from '@/Components/Base/Badge.vue';
+import Icon from '@/Components/Base/Icon.vue';
+import TextField from '@/Components/Form/TextField.vue';
+import Select from '@/Components/Form/Select.vue';
 import Pagination from '@/Components/Pagination.vue';
 import { ref, computed, watch } from 'vue';
-import { DocumentTextIcon } from '@heroicons/vue/24/outline';
 import { debounce } from 'lodash';
 
 const props = defineProps({
@@ -171,6 +162,20 @@ const form = ref({
     type: props.filters?.type || '',
     category: props.filters?.category || '',
 });
+
+// Options for type select
+const typeOptions = [
+    { value: 'multiple_choice', label: 'Multiple Choice' },
+    { value: 'yes_no', label: 'Yes/No' },
+    { value: 'numeric', label: 'Numeric' },
+    { value: 'text', label: 'Text' },
+    { value: 'ranked_answers', label: 'Ranked Answers' },
+];
+
+// Options for category select
+const categoryOptions = computed(() =>
+    props.categories.map(cat => ({ value: cat, label: cat }))
+);
 
 // Server-side filter function
 const filterTemplates = () => {

@@ -11,14 +11,11 @@
                 ]"
             >
                 <template #metadata>
-                    <span :class="[
-                        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                        user.role === 'admin' ? 'bg-danger/10 text-danger' : 'bg-gray-100 text-gray-700'
-                    ]">
+                    <Badge :variant="user.role === 'admin' ? 'danger-soft' : user.role === 'manager' ? 'warning-soft' : 'default'" size="sm">
                         {{ user.role }}
-                    </span>
-                    <span class="text-gray-400 mx-2">•</span>
-                    <span>{{ user.email }}</span>
+                    </Badge>
+                    <span class="text-muted mx-2">•</span>
+                    <span class="text-muted">{{ user.email }}</span>
                 </template>
             </PageHeader>
         </template>
@@ -26,85 +23,84 @@
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 <!-- User Information -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold mb-4">User Information</h3>
+                        <h3 class="text-lg font-semibold text-body mb-4">User Information</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="text-sm font-medium text-gray-500">Name</label>
-                                <p class="text-gray-900">{{ user.name }}</p>
+                                <label class="text-sm font-medium text-muted">Name</label>
+                                <p class="text-body">{{ user.name }}</p>
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-gray-500">Email</label>
-                                <p class="text-gray-900">{{ user.email }}</p>
+                                <label class="text-sm font-medium text-muted">Email</label>
+                                <p class="text-body">{{ user.email }}</p>
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-gray-500">Role</label>
-                                <span :class="[
-                                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                                    user.role === 'admin' ? 'bg-danger/10 text-danger' : 'bg-gray-100 text-gray-700'
-                                ]">
-                                    {{ user.role }}
-                                </span>
+                                <label class="text-sm font-medium text-muted">Role</label>
+                                <div class="mt-1">
+                                    <Badge :variant="user.role === 'admin' ? 'danger-soft' : user.role === 'manager' ? 'warning-soft' : 'default'" size="sm">
+                                        {{ user.role }}
+                                    </Badge>
+                                </div>
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-gray-500">Member Since</label>
-                                <p class="text-gray-900">{{ new Date(user.created_at).toLocaleDateString() }}</p>
+                                <label class="text-sm font-medium text-muted">Member Since</label>
+                                <p class="text-body">{{ new Date(user.created_at).toLocaleDateString() }}</p>
                             </div>
                         </div>
-                        <div class="mt-4 pt-4 border-t border-gray-200">
-                            <button @click="showRoleModal = true" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80 mr-2">
+                        <div class="mt-4 pt-4 border-t border-border flex gap-2">
+                            <Button variant="primary" @click="showRoleModal = true">
                                 Change Role
-                            </button>
-                            <button @click="confirmDelete" class="px-4 py-2 bg-danger text-white rounded-md hover:bg-danger/80">
+                            </Button>
+                            <Button variant="danger" @click="confirmDelete">
                                 Delete User
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Statistics -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                         <div class="p-6">
                             <div class="flex items-center">
-                                <TrophyIcon class="w-8 h-8 text-warning mr-3" />
+                                <Icon name="trophy" size="2x" class="text-warning mr-3" />
                                 <div>
-                                    <p class="text-sm text-gray-500">Total Entries</p>
-                                    <p class="text-2xl font-bold text-gray-900">{{ stats?.total_entries || 0 }}</p>
+                                    <p class="text-sm text-muted">Total Entries</p>
+                                    <p class="text-2xl font-bold text-body">{{ stats?.total_entries || 0 }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                         <div class="p-6">
                             <div class="flex items-center">
-                                <UserGroupIcon class="w-8 h-8 text-warning mr-3" />
+                                <Icon name="users" size="2x" class="text-warning mr-3" />
                                 <div>
-                                    <p class="text-sm text-gray-500">Groups</p>
-                                    <p class="text-2xl font-bold text-gray-900">{{ stats?.groups_joined || 0 }}</p>
+                                    <p class="text-sm text-muted">Groups</p>
+                                    <p class="text-2xl font-bold text-body">{{ stats?.groups_joined || 0 }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                         <div class="p-6">
                             <div class="flex items-center">
-                                <ChartBarIcon class="w-8 h-8 text-success mr-3" />
+                                <Icon name="chart-simple" size="2x" class="text-success mr-3" />
                                 <div>
-                                    <p class="text-sm text-gray-500">Average Score</p>
-                                    <p class="text-2xl font-bold text-gray-900">{{ Number(stats?.average_score || 0).toFixed(1) }}%</p>
+                                    <p class="text-sm text-muted">Average Score</p>
+                                    <p class="text-2xl font-bold text-body">{{ Number(stats?.average_score || 0).toFixed(1) }}%</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                         <div class="p-6">
                             <div class="flex items-center">
-                                <StarIcon class="w-8 h-8 text-success mr-3" />
+                                <Icon name="star" size="2x" class="text-success mr-3" />
                                 <div>
-                                    <p class="text-sm text-gray-500">Best Score</p>
-                                    <p class="text-2xl font-bold text-gray-900">{{ Number(stats?.best_score || 0).toFixed(1) }}%</p>
+                                    <p class="text-sm text-muted">Best Score</p>
+                                    <p class="text-2xl font-bold text-body">{{ Number(stats?.best_score || 0).toFixed(1) }}%</p>
                                 </div>
                             </div>
                         </div>
@@ -112,39 +108,36 @@
                 </div>
 
                 <!-- Recent Entries -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold mb-4">Recent Entries</h3>
-                        <div v-if="!recentEntries || recentEntries.length === 0" class="text-center py-6 text-gray-500">
+                        <h3 class="text-lg font-semibold text-body mb-4">Recent Entries</h3>
+                        <div v-if="!recentEntries || recentEntries.length === 0" class="text-center py-6 text-muted">
                             No entries yet
                         </div>
                         <div v-else class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
+                            <table class="min-w-full divide-y divide-border">
                                 <thead>
                                     <tr>
-                                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th>
-                                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group</th>
-                                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
-                                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th class="px-6 py-3 bg-surface-elevated text-left text-xs font-medium text-subtle uppercase tracking-wider">Event</th>
+                                        <th class="px-6 py-3 bg-surface-elevated text-left text-xs font-medium text-subtle uppercase tracking-wider">Group</th>
+                                        <th class="px-6 py-3 bg-surface-elevated text-left text-xs font-medium text-subtle uppercase tracking-wider">Score</th>
+                                        <th class="px-6 py-3 bg-surface-elevated text-left text-xs font-medium text-subtle uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 bg-surface-elevated text-left text-xs font-medium text-subtle uppercase tracking-wider">Date</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="entry in recentEntries" :key="entry.id">
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ entry.event?.name || 'N/A' }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ entry.group?.name || 'N/A' }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
+                                <tbody class="bg-surface divide-y divide-border">
+                                    <tr v-for="entry in recentEntries" :key="entry.id" class="hover:bg-surface-elevated">
+                                        <td class="px-6 py-4 whitespace-nowrap text-body">{{ entry.event?.name || 'N/A' }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-body">{{ entry.group?.name || 'N/A' }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-body">
                                             <span class="font-semibold">{{ entry.total_score }}</span> / {{ entry.possible_points }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span :class="[
-                                                'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                                                entry.is_complete ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
-                                            ]">
+                                            <Badge :variant="entry.is_complete ? 'success-soft' : 'warning-soft'" size="sm">
                                                 {{ entry.is_complete ? 'Complete' : 'In Progress' }}
-                                            </span>
+                                            </Badge>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">
                                             {{ new Date(entry.submitted_at || entry.updated_at).toLocaleDateString() }}
                                         </td>
                                     </tr>
@@ -155,20 +148,20 @@
                 </div>
 
                 <!-- Leaderboard Positions -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold mb-4">Top Leaderboard Positions</h3>
-                        <div v-if="!leaderboardPositions || leaderboardPositions.length === 0" class="text-center py-6 text-gray-500">
+                        <h3 class="text-lg font-semibold text-body mb-4">Top Leaderboard Positions</h3>
+                        <div v-if="!leaderboardPositions || leaderboardPositions.length === 0" class="text-center py-6 text-muted">
                             No leaderboard entries yet
                         </div>
                         <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div v-for="position in leaderboardPositions" :key="position.id" class="border border-gray-200 rounded-lg p-4">
+                            <div v-for="position in leaderboardPositions" :key="position.id" class="border border-border rounded-lg p-4 bg-surface-elevated">
                                 <div class="flex justify-between items-start mb-2">
-                                    <h4 class="font-semibold text-gray-900">{{ position.event?.name || 'Unknown Event' }}</h4>
+                                    <h4 class="font-semibold text-body">{{ position.event?.name || 'Unknown Event' }}</h4>
                                     <span class="text-lg font-bold text-success">#{{ position.rank }}</span>
                                 </div>
-                                <p class="text-sm text-gray-500">Group: {{ position.group?.name || 'N/A' }}</p>
-                                <p class="text-sm text-gray-600 mt-2">
+                                <p class="text-sm text-muted">Group: {{ position.group?.name || 'N/A' }}</p>
+                                <p class="text-sm text-body mt-2">
                                     Score: <span class="font-semibold">{{ position.percentage?.toFixed(1) || 0 }}%</span>
                                     ({{ position.total_score }}/{{ position.possible_points }})
                                 </p>
@@ -180,28 +173,27 @@
         </div>
 
         <!-- Role Change Modal -->
-        <div v-if="showRoleModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-                <h3 class="text-lg font-semibold mb-4">Change User Role</h3>
+        <Modal :show="showRoleModal" max-width="md" @close="showRoleModal = false">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-body mb-4">Change User Role</h3>
                 <form @submit.prevent="updateRole">
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Select Role</label>
-                        <select v-model="roleForm.role" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary/50">
-                            <option value="user">User</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </div>
-                    <div class="flex justify-end space-x-2">
-                        <button type="button" @click="showRoleModal = false" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                    <Select
+                        v-model="roleForm.role"
+                        label="Select Role"
+                        :options="roleOptions"
+                        required
+                    />
+                    <div class="mt-6 flex justify-end gap-2">
+                        <Button variant="outline" @click="showRoleModal = false">
                             Cancel
-                        </button>
-                        <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80">
+                        </Button>
+                        <Button variant="primary" type="submit" :loading="roleForm.processing">
                             Update Role
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </div>
-        </div>
+        </Modal>
     </AuthenticatedLayout>
 </template>
 
@@ -209,8 +201,12 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import { TrophyIcon, UserGroupIcon, ChartBarIcon, StarIcon } from '@heroicons/vue/24/outline';
 import PageHeader from '@/Components/PageHeader.vue';
+import Button from '@/Components/Base/Button.vue';
+import Badge from '@/Components/Base/Badge.vue';
+import Icon from '@/Components/Base/Icon.vue';
+import Modal from '@/Components/Base/Modal.vue';
+import Select from '@/Components/Form/Select.vue';
 
 const props = defineProps({
     user: Object,
@@ -223,6 +219,12 @@ const showRoleModal = ref(false);
 const roleForm = useForm({
     role: props.user.role,
 });
+
+const roleOptions = [
+    { value: 'user', label: 'User' },
+    { value: 'admin', label: 'Admin' },
+    { value: 'manager', label: 'Manager' },
+];
 
 const updateRole = () => {
     roleForm.post(route('admin.users.updateRole', props.user.id), {

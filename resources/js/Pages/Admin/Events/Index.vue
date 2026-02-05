@@ -4,9 +4,7 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import Button from '@/Components/Base/Button.vue';
 import Badge from '@/Components/Base/Badge.vue';
-import Card from '@/Components/Base/Card.vue';
 import Icon from '@/Components/Base/Icon.vue';
-import PageHeader from '@/Components/Base/PageHeader.vue';
 
 const props = defineProps({
     events: Object,
@@ -50,23 +48,13 @@ const getStatusVariant = (status) => {
 <template>
     <Head title="Manage Events" />
 
-    <AuthenticatedLayout>
-        <template #header>
-            <PageHeader
-                title="Manage Events"
-                subtitle="View and manage all events"
-                :crumbs="[
-                                        { label: 'Events' }
-                ]"
-            >
-                <template #actions>
-                    <Link :href="route('admin.events.create')">
-                        <Button variant="primary" icon="plus">
-                            Create Event
-                        </Button>
-                    </Link>
-                </template>
-            </PageHeader>
+    <AuthenticatedLayout title="Events">
+        <template #actions>
+            <Link :href="route('admin.events.create')">
+                <Button variant="primary" size="sm" icon="plus">
+                    Create Event
+                </Button>
+            </Link>
         </template>
 
         <div class="py-12">

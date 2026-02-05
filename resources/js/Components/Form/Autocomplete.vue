@@ -28,12 +28,12 @@
                     aria-autocomplete="list"
                     autocomplete="off"
                     :class="[
-                        'w-full rounded border transition-colors',
-                        'focus:outline-none focus:ring-1',
+                        'w-full rounded border transition-all',
+                        'focus:outline-none focus-glow',
                         'bg-surface-elevated text-body placeholder:text-subtle',
                         error
-                            ? 'border-danger focus:border-danger focus:ring-danger'
-                            : 'border-border focus:border-primary focus:ring-primary',
+                            ? 'border-danger focus:border-transparent'
+                            : 'border-border focus:border-transparent',
                         disabled ? 'opacity-50 cursor-not-allowed' : '',
                         sizes[size],
                         'pr-10'

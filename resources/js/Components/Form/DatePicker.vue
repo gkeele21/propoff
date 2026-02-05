@@ -115,9 +115,18 @@ const descriptionId = computed(() => (props.error || props.hint) ? `${inputId.va
 <style>
 /* Custom styling to match our design system */
 .dp__input {
-    @apply rounded border border-border bg-surface-elevated text-body pr-3;
-    @apply focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none;
+    @apply rounded border border-border bg-surface-inset text-body pr-3;
     padding-left: 2.5rem; /* Make room for the calendar icon */
+    transition: all 0.15s ease;
+}
+
+.dp__input:focus {
+    outline: none;
+    border-color: transparent;
+    box-shadow:
+        0 0 0 1px rgb(var(--color-text)),
+        0 0 0 3px rgb(var(--color-primary)),
+        0 0 15px rgb(var(--color-primary) / 0.3);
 }
 
 /* Size variants - match TextField sizing */
@@ -134,7 +143,7 @@ const descriptionId = computed(() => (props.error || props.hint) ? `${inputId.va
 }
 
 .dp-error .dp__input {
-    @apply border-danger focus:border-danger focus:ring-danger;
+    @apply border-danger focus:border-transparent;
 }
 
 .dp-disabled .dp__input {

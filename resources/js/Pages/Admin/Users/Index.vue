@@ -2,13 +2,24 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import {
-    MagnifyingGlassIcon,
-    FunnelIcon,
-    DocumentArrowDownIcon,
-    TrashIcon,
-} from '@heroicons/vue/24/outline';
 import PageHeader from '@/Components/PageHeader.vue';
+import Button from '@/Components/Base/Button.vue';
+import Icon from '@/Components/Base/Icon.vue';
+import TextField from '@/Components/Form/TextField.vue';
+import Select from '@/Components/Form/Select.vue';
+
+const roleFilterOptions = [
+    { value: 'all', label: 'All Roles' },
+    { value: 'manager', label: 'Manager' },
+    { value: 'admin', label: 'Admin' },
+    { value: 'user', label: 'User' },
+];
+
+const roleOptions = [
+    { value: 'user', label: 'User' },
+    { value: 'admin', label: 'Admin' },
+    { value: 'manager', label: 'Manager' },
+];
 
 const props = defineProps({
     users: Object,
@@ -93,21 +104,21 @@ const formatDate = (dateString) => {
                 ]"
             >
                 <template #actions>
-                    <button
+                    <Button
                         v-if="selectedUsers.length > 0"
+                        variant="danger"
+                        icon="trash"
                         @click="bulkDelete"
-                        class="inline-flex items-center px-4 py-2 bg-danger border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-danger/80"
                     >
-                        <TrashIcon class="w-4 h-4 mr-2" />
                         Delete Selected ({{ selectedUsers.length }})
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                        variant="secondary"
+                        icon="file-arrow-down"
                         @click="exportCSV"
-                        class="inline-flex items-center px-4 py-2 bg-surface-elevated border border-border rounded-md font-semibold text-xs text-body uppercase tracking-widest hover:bg-surface-overlay"
                     >
-                        <DocumentArrowDownIcon class="w-4 h-4 mr-2" />
                         Export CSV
-                    </button>
+                    </Button>
                 </template>
             </PageHeader>
         </template>
@@ -119,34 +130,20 @@ const formatDate = (dateString) => {
                     <div class="p-6">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div class="col-span-2">
-                                <label class="block text-sm font-medium text-body mb-2">
-                                    <MagnifyingGlassIcon class="w-4 h-4 inline mr-1" />
-                                    Search
-                                </label>
-                                <input
+                                <TextField
                                     v-model="search"
-                                    @input="filterUsers"
-                                    type="text"
+                                    label="Search"
                                     placeholder="Search by name or email..."
-                                    class="w-full bg-surface-elevated border-border text-body placeholder-muted rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
+                                    icon-left="magnifying-glass"
+                                    @input="filterUsers"
                                 />
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-body mb-2">
-                                    <FunnelIcon class="w-4 h-4 inline mr-1" />
-                                    Role
-                                </label>
-                                <select
-                                    v-model="roleFilter"
-                                    @change="filterUsers"
-                                    class="w-full bg-surface-elevated border-border text-body rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
-                                >
-                                    <option value="all">All Roles</option>
-                                    <option value="manager">Manager</option>
-                                    <option value="admin">Admin</option>
-                                    <option value="user">User</option>
-                                </select>
-                            </div>
+                            <Select
+                                v-model="roleFilter"
+                                label="Role"
+                                :options="roleFilterOptions"
+                                @change="filterUsers"
+                            />
                         </div>
                     </div>
                 </div>
@@ -162,7 +159,7 @@ const formatDate = (dateString) => {
                                             type="checkbox"
                                             @change="toggleSelectAll"
                                             :checked="selectedUsers.length === users.data.length && users.data.length > 0"
-                                            class="rounded border-border text-primary shadow-sm focus:border-primary focus:ring focus:ring-primary/50 focus:ring-opacity-50"
+                                            class="rounded border-border bg-surface-inset text-primary focus-glow-sm"
                                         />
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-subtle uppercase tracking-wider">
@@ -195,7 +192,7 @@ const formatDate = (dateString) => {
                                             v-model="selectedUsers"
                                             :value="user.id"
                                             type="checkbox"
-                                            class="rounded border-border text-primary shadow-sm focus:border-primary focus:ring focus:ring-primary/50 focus:ring-opacity-50"
+                                            class="rounded border-border bg-surface-inset text-primary focus-glow-sm"
                                         />
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -213,7 +210,7 @@ const formatDate = (dateString) => {
                                         <select
                                             :value="user.role"
                                             @change="updateRole(user, $event.target.value)"
-                                            class="text-sm bg-surface-elevated border-border text-body rounded-md"
+                                            class="text-sm bg-surface-inset border border-border text-body rounded-md px-2 py-1 focus:outline-none focus-glow-sm"
                                         >
                                             <option value="user">User</option>
                                             <option value="admin">Admin</option>

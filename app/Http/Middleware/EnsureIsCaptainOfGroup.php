@@ -25,8 +25,8 @@ class EnsureIsCaptainOfGroup
             abort(401, 'Unauthenticated');
         }
 
-        // Admins have full access
-        if ($user->role === 'admin') {
+        // Admins and managers have full access
+        if ($user->hasAdminAccess()) {
             return $next($request);
         }
 

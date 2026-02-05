@@ -41,7 +41,7 @@ class QuestionTemplateSeeder extends Seeder
                     ['label' => '{anthem_duration} or more', 'points' => 0]
                 ],
                 'variables' => ['anthem_singer', 'anthem_duration'],
-                'category' => 'Super Bowl,Football',
+                'category' => 'Super Bowl',
                 'default_points' => 1,
             ],
 
@@ -55,7 +55,7 @@ class QuestionTemplateSeeder extends Seeder
                     ['label' => 'Tails', 'points' => 0]
                 ],
                 'variables' => [],
-                'category' => 'Super Bowl,Football',
+                'category' => 'Super Bowl',
                 'default_points' => 1,
             ],
 
@@ -70,7 +70,7 @@ class QuestionTemplateSeeder extends Seeder
                     ['label' => 'Any other color or no liquid poured', 'points' => 0]
                 ],
                 'variables' => ['liquid_color_1', 'liquid_color_2'],
-                'category' => 'Super Bowl,Football',
+                'category' => 'Super Bowl',
                 'default_points' => 1,
             ],
 
@@ -85,7 +85,7 @@ class QuestionTemplateSeeder extends Seeder
                     ['label' => 'Any other player', 'points' => 0]
                 ],
                 'variables' => ['afc_qb_or_visitor_qb', 'afc_team_or_visitor_team', 'nfc_qb_or_home_qb', 'nfc_team_or_home_team'],
-                'category' => 'Super Bowl,Football',
+                'category' => 'Super Bowl',
                 'default_points' => 3,
             ],
 
@@ -100,7 +100,7 @@ class QuestionTemplateSeeder extends Seeder
                     ['label' => 'Any other result', 'points' => 0]
                 ],
                 'variables' => [],
-                'category' => 'Super Bowl,Football',
+                'category' => 'Super Bowl',
                 'default_points' => 1,
             ],
 
@@ -648,7 +648,7 @@ class QuestionTemplateSeeder extends Seeder
                     ['label' => 'Toyota', 'points' => 0]
                 ],
                 'variables' => [],
-                'category' => 'Super Bowl,Football,Commercials',
+                'category' => 'Super Bowl',
                 'default_points' => 1,
             ],
 
@@ -664,7 +664,7 @@ class QuestionTemplateSeeder extends Seeder
                     ['label' => 'Michelob Ultra', 'points' => 0]
                 ],
                 'variables' => [],
-                'category' => 'Super Bowl,Football,Commercials',
+                'category' => 'Super Bowl',
                 'default_points' => 1,
             ],
 
@@ -680,7 +680,7 @@ class QuestionTemplateSeeder extends Seeder
                     ['label' => 'Snickers', 'points' => 0]
                 ],
                 'variables' => [],
-                'category' => 'Super Bowl,Football,Commercials',
+                'category' => 'Super Bowl',
                 'default_points' => 1,
             ],
 
@@ -696,7 +696,7 @@ class QuestionTemplateSeeder extends Seeder
                     ['label' => 'Tostitos', 'points' => 0]
                 ],
                 'variables' => [],
-                'category' => 'Super Bowl,Football,Commercials',
+                'category' => 'Super Bowl',
                 'default_points' => 1,
             ],
 
@@ -712,7 +712,7 @@ class QuestionTemplateSeeder extends Seeder
                     ['label' => 'Taco Bell', 'points' => 0]
                 ],
                 'variables' => [],
-                'category' => 'Super Bowl,Football,Commercials',
+                'category' => 'Super Bowl',
                 'default_points' => 1,
             ],
 
@@ -728,7 +728,7 @@ class QuestionTemplateSeeder extends Seeder
                     ['label' => 'Uber Eats', 'points' => 0]
                 ],
                 'variables' => [],
-                'category' => 'Super Bowl,Football,Commercials',
+                'category' => 'Super Bowl',
                 'default_points' => 1,
             ],
 
@@ -744,7 +744,7 @@ class QuestionTemplateSeeder extends Seeder
                     ['label' => 'State Farm', 'points' => 0]
                 ],
                 'variables' => [],
-                'category' => 'Super Bowl,Football,Commercials',
+                'category' => 'Super Bowl',
                 'default_points' => 1,
             ],
 
@@ -760,7 +760,7 @@ class QuestionTemplateSeeder extends Seeder
                     ['label' => 'Pepsi', 'points' => 0]
                 ],
                 'variables' => [],
-                'category' => 'Super Bowl,Football,Commercials',
+                'category' => 'Super Bowl',
                 'default_points' => 1,
             ],
 
@@ -776,7 +776,7 @@ class QuestionTemplateSeeder extends Seeder
                     ['label' => 'Peacock', 'points' => 0]
                 ],
                 'variables' => [],
-                'category' => 'Super Bowl,Football,Commercials',
+                'category' => 'Super Bowl',
                 'default_points' => 1,
             ],
 
@@ -792,7 +792,7 @@ class QuestionTemplateSeeder extends Seeder
                     ['label' => 'Verizon', 'points' => 0]
                 ],
                 'variables' => [],
-                'category' => 'Super Bowl,Football,Commercials',
+                'category' => 'Super Bowl',
                 'default_points' => 1,
             ],
         ];

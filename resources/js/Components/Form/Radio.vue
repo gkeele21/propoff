@@ -2,10 +2,10 @@
     <label
         :for="inputId"
         :class="[
-            'flex items-start gap-3 p-4 border rounded-lg transition-colors',
+            'flex items-start gap-3 p-4 border rounded-lg transition-all',
             disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
             modelValue === value
-                ? 'border-primary bg-primary/10'
+                ? 'border-primary bg-primary/10 checked-glow'
                 : 'border-border bg-surface-inset hover:border-border-strong hover:bg-surface-overlay'
         ]"
     >
@@ -26,7 +26,7 @@
                 'w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors',
                 modelValue === value
                     ? 'border-primary bg-primary'
-                    : 'border-border-strong bg-transparent'
+                    : 'border-white/80 bg-transparent'
             ]"
         >
             <div

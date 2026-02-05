@@ -260,6 +260,20 @@ class EventQuestionController extends Controller
     }
 
     /**
+     * Remove all questions from an event.
+     */
+    public function destroyAll(Event $event)
+    {
+        $count = $event->eventQuestions()->count();
+
+        // Delete all questions (cascades to group questions via foreign key)
+        $event->eventQuestions()->delete();
+
+        return redirect()->route('admin.events.import-questions', $event)
+            ->with('success', "{$count} questions deleted successfully!");
+    }
+
+    /**
      * Reorder questions (drag and drop).
      * Supports two formats:
      * 1. Simple format: {question_id: X, new_order: Y}

@@ -22,7 +22,7 @@ class GroupPolicy
     public function view(User $user, Group $group): bool
     {
         // Admin, captain, or member can view
-        return $user->isAdmin()
+        return $user->hasAdminAccess()
             || $user->isCaptainOf($group->id)
             || $group->members->contains($user->id);
     }
@@ -42,7 +42,7 @@ class GroupPolicy
     public function update(User $user, Group $group): bool
     {
         // Admin or captain can update
-        return $user->isAdmin() || $user->isCaptainOf($group->id);
+        return $user->hasAdminAccess() || $user->isCaptainOf($group->id);
     }
 
     /**
@@ -51,7 +51,7 @@ class GroupPolicy
     public function delete(User $user, Group $group): bool
     {
         // Admin or captain can delete
-        return $user->isAdmin() || $user->isCaptainOf($group->id);
+        return $user->hasAdminAccess() || $user->isCaptainOf($group->id);
     }
 
     /**
@@ -60,7 +60,7 @@ class GroupPolicy
     public function restore(User $user, Group $group): bool
     {
         // Admin or captain can restore
-        return $user->isAdmin() || $user->isCaptainOf($group->id);
+        return $user->hasAdminAccess() || $user->isCaptainOf($group->id);
     }
 
     /**
@@ -69,7 +69,7 @@ class GroupPolicy
     public function forceDelete(User $user, Group $group): bool
     {
         // Only admin can force delete
-        return $user->isAdmin();
+        return $user->hasAdminAccess();
     }
 
     /**
@@ -78,7 +78,7 @@ class GroupPolicy
     public function addUser(User $user, Group $group): bool
     {
         // Admin or captain can add users
-        return $user->isAdmin() || $user->isCaptainOf($group->id);
+        return $user->hasAdminAccess() || $user->isCaptainOf($group->id);
     }
 
     /**
@@ -87,7 +87,7 @@ class GroupPolicy
     public function removeUser(User $user, Group $group): bool
     {
         // Admin or captain can remove users
-        return $user->isAdmin() || $user->isCaptainOf($group->id);
+        return $user->hasAdminAccess() || $user->isCaptainOf($group->id);
     }
 
     /**
@@ -96,7 +96,7 @@ class GroupPolicy
     public function manageQuestions(User $user, Group $group): bool
     {
         // Admin or captain can manage questions
-        return $user->isAdmin() || $user->isCaptainOf($group->id);
+        return $user->hasAdminAccess() || $user->isCaptainOf($group->id);
     }
 
     /**
@@ -105,7 +105,7 @@ class GroupPolicy
     public function grade(User $user, Group $group): bool
     {
         // Admin or captain can grade
-        return $user->isAdmin() || $user->isCaptainOf($group->id);
+        return $user->hasAdminAccess() || $user->isCaptainOf($group->id);
     }
 
     /**
@@ -114,6 +114,6 @@ class GroupPolicy
     public function manageMembers(User $user, Group $group): bool
     {
         // Admin or captain can manage members
-        return $user->isAdmin() || $user->isCaptainOf($group->id);
+        return $user->hasAdminAccess() || $user->isCaptainOf($group->id);
     }
 }

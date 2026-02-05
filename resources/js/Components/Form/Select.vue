@@ -2,32 +2,102 @@
     <div>
         <FormLabel v-if="label" :html-for="inputId" :required="required">{{ label }}</FormLabel>
 
-        <select
-            :id="inputId"
-            :value="modelValue"
-            @change="handleChange"
-            :required="required"
-            :disabled="disabled"
-            :class="[
-                'block rounded border transition-colors appearance-none bg-no-repeat',
-                'focus:outline-none focus:ring-2',
-                variantClasses,
-                disabled ? 'cursor-not-allowed opacity-50' : '',
-                sizes[size],
-                shouldBeFullWidth ? 'w-full' : '',
-            ]"
-            :style="arrowStyle"
-        >
-            <option v-if="placeholder" value="" disabled>{{ placeholder }}</option>
-            <option v-if="allowEmpty" :value="emptyValue">{{ emptyLabel }}</option>
-            <option
-                v-for="option in normalizedOptions"
-                :key="option.value"
-                :value="option.value"
+        <div class="relative" ref="containerRef">
+            <!-- Trigger button -->
+            <button
+                ref="triggerRef"
+                :id="inputId"
+                type="button"
+                @click="toggleDropdown"
+                @keydown.down.prevent="openAndHighlightFirst"
+                @keydown.up.prevent="openAndHighlightLast"
+                @keydown.enter.prevent="toggleDropdown"
+                @keydown.space.prevent="toggleDropdown"
+                @keydown.escape="closeDropdown"
+                :disabled="disabled"
+                :class="[
+                    'flex items-center justify-between rounded border transition-all text-left',
+                    'focus:outline-none focus-glow',
+                    variantClasses,
+                    disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+                    sizes[size],
+                    shouldBeFullWidth ? 'w-full' : '',
+                ]"
             >
-                {{ option.label }}
-            </option>
-        </select>
+                <span :class="[selectedLabel ? 'text-body' : 'text-muted']">
+                    {{ selectedLabel || placeholder || 'Select...' }}
+                </span>
+                <Icon
+                    :name="isOpen ? 'chevron-up' : 'chevron-down'"
+                    size="sm"
+                    class="text-muted ml-2 flex-shrink-0"
+                />
+            </button>
+
+            <!-- Dropdown panel (teleported to body) -->
+            <teleport to="body">
+                <Transition
+                    enter-active-class="transition ease-out duration-100"
+                    enter-from-class="transform opacity-0 scale-95"
+                    enter-to-class="transform opacity-100 scale-100"
+                    leave-active-class="transition ease-in duration-75"
+                    leave-from-class="transform opacity-100 scale-100"
+                    leave-to-class="transform opacity-0 scale-95"
+                >
+                    <div
+                        v-if="isOpen"
+                        ref="dropdownRef"
+                        class="fixed z-[9999] bg-surface border border-primary rounded-lg shadow-lg max-h-60 overflow-auto"
+                        :style="dropdownStyle"
+                        @keydown.down.prevent="highlightNext"
+                        @keydown.up.prevent="highlightPrev"
+                        @keydown.enter.prevent="selectHighlighted"
+                        @keydown.escape="closeDropdown"
+                        tabindex="-1"
+                    >
+                        <!-- Empty option -->
+                        <div
+                            v-if="allowEmpty"
+                            @click="selectOption(emptyValue)"
+                            @mouseenter="highlightedIndex = -1"
+                            :class="[
+                                'px-3 py-2 cursor-pointer text-sm transition-colors',
+                                highlightedIndex === -1 && modelValue === emptyValue
+                                    ? 'bg-primary text-white'
+                                    : modelValue === emptyValue
+                                        ? 'bg-primary/30 text-primary'
+                                        : 'hover:bg-surface-overlay text-muted'
+                            ]"
+                        >
+                            {{ emptyLabel }}
+                        </div>
+
+                        <!-- Options list -->
+                        <div
+                            v-for="(option, index) in normalizedOptions"
+                            :key="option.value"
+                            @click="selectOption(option.value)"
+                            @mouseenter="highlightedIndex = index"
+                            :class="[
+                                'px-3 py-2 cursor-pointer text-sm transition-colors',
+                                highlightedIndex === index
+                                    ? 'bg-primary text-white'
+                                    : modelValue === option.value
+                                        ? 'bg-primary/30 text-primary'
+                                        : 'hover:bg-surface-overlay text-body'
+                            ]"
+                        >
+                            {{ option.label }}
+                        </div>
+
+                        <!-- No options -->
+                        <div v-if="normalizedOptions.length === 0 && !allowEmpty" class="px-3 py-2 text-sm text-muted">
+                            No options available
+                        </div>
+                    </div>
+                </Transition>
+            </teleport>
+        </div>
 
         <p v-if="error" class="mt-1 text-sm text-danger">{{ error }}</p>
         <p v-else-if="hint" class="mt-1 text-sm text-subtle">{{ hint }}</p>
@@ -35,7 +105,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
+import Icon from '@/Components/Base/Icon.vue';
 import FormLabel from '@/Components/Form/FormLabel.vue';
 
 const props = defineProps({
@@ -62,10 +133,17 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'change']);
 
+const isOpen = ref(false);
+const highlightedIndex = ref(-1);
+const containerRef = ref(null);
+const triggerRef = ref(null);
+const dropdownRef = ref(null);
+const dropdownPosition = ref({ top: 0, left: 0, width: 0 });
+
 const sizes = {
-    sm: 'py-1.5 pl-3 pr-8 text-sm',
-    md: 'py-2 pl-3 pr-8 text-base',
-    lg: 'py-3 pl-3 pr-8 text-lg',
+    sm: 'py-1.5 px-3 text-sm',
+    md: 'py-2 px-3 text-base',
+    lg: 'py-3 px-3 text-lg',
 };
 
 const inputId = computed(() => `select-${Math.random().toString(36).substr(2, 9)}`);
@@ -73,33 +151,20 @@ const inputId = computed(() => `select-${Math.random().toString(36).substr(2, 9)
 // Determine if full width should be applied
 const shouldBeFullWidth = computed(() => !props.autoWidth);
 
-// Arrow color based on variant
-const arrowStyle = computed(() => {
-    const color = props.variant === 'outline-light' ? 'white' : '%23a3a3a3'; // %23 = # for URL encoding (muted gray for dark mode)
-    const svg = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='${color}' d='M5 6L0 0h10z'/%3E%3C/svg%3E")`;
-    return {
-        backgroundImage: svg,
-        backgroundPosition: 'right 0.6rem center',
-        backgroundSize: '8px 5px',
-    };
-});
-
 const variantClasses = computed(() => {
     if (props.error) {
-        return 'border-danger focus:border-danger focus:ring-danger bg-surface-elevated text-body';
+        return 'border-danger focus:border-transparent bg-surface-inset';
     }
 
     switch (props.variant) {
         case 'outline-light':
-            // For dark backgrounds (e.g., primary header)
-            return 'bg-transparent text-white border-white focus:ring-white/50 [&>option]:text-black [&>option]:bg-white';
+            return 'bg-transparent text-white border-white focus:border-transparent';
         default:
             return props.disabled
-                ? 'bg-surface border-border focus:border-primary focus:ring-primary text-muted'
-                : 'bg-surface-elevated border-border focus:border-primary focus:ring-primary text-body';
+                ? 'bg-surface border-border focus:border-transparent'
+                : 'bg-surface-inset border-border focus:border-transparent';
     }
 });
-
 
 const normalizedOptions = computed(() => {
     return props.options.map(option => {
@@ -126,14 +191,126 @@ const normalizedOptions = computed(() => {
     });
 });
 
-function handleChange(event) {
-    const value = event.target.value;
-    // Convert to number if it looks like a number and original modelValue was a number
-    // But keep empty string as empty string (for "All" options)
+const selectedLabel = computed(() => {
+    if (props.modelValue === props.emptyValue && props.allowEmpty) {
+        return props.emptyLabel;
+    }
+    const option = normalizedOptions.value.find(o => o.value === props.modelValue);
+    return option?.label || '';
+});
+
+const dropdownStyle = computed(() => ({
+    top: `${dropdownPosition.value.top}px`,
+    left: `${dropdownPosition.value.left}px`,
+    width: `${dropdownPosition.value.width}px`,
+}));
+
+function updateDropdownPosition() {
+    if (!triggerRef.value) return;
+    const rect = triggerRef.value.getBoundingClientRect();
+    // Use viewport coordinates directly since we're using fixed positioning
+    dropdownPosition.value = {
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+    };
+}
+
+function toggleDropdown() {
+    if (props.disabled) return;
+    isOpen.value = !isOpen.value;
+    if (isOpen.value) {
+        // Set highlight to current selection
+        const currentIndex = normalizedOptions.value.findIndex(o => o.value === props.modelValue);
+        highlightedIndex.value = currentIndex >= 0 ? currentIndex : 0;
+        nextTick(() => {
+            updateDropdownPosition();
+            dropdownRef.value?.focus();
+        });
+    }
+}
+
+function openAndHighlightFirst() {
+    if (!isOpen.value) {
+        isOpen.value = true;
+        highlightedIndex.value = 0;
+        nextTick(() => {
+            updateDropdownPosition();
+            dropdownRef.value?.focus();
+        });
+    } else {
+        highlightNext();
+    }
+}
+
+function openAndHighlightLast() {
+    if (!isOpen.value) {
+        isOpen.value = true;
+        highlightedIndex.value = normalizedOptions.value.length - 1;
+        nextTick(() => {
+            updateDropdownPosition();
+            dropdownRef.value?.focus();
+        });
+    } else {
+        highlightPrev();
+    }
+}
+
+function closeDropdown() {
+    isOpen.value = false;
+    triggerRef.value?.focus();
+}
+
+function selectOption(value) {
     const parsedValue = value !== '' && !isNaN(value) && typeof props.modelValue === 'number'
         ? Number(value)
         : value;
     emit('update:modelValue', parsedValue);
     emit('change', parsedValue);
+    closeDropdown();
 }
+
+function highlightNext() {
+    if (normalizedOptions.value.length === 0) return;
+    highlightedIndex.value = (highlightedIndex.value + 1) % normalizedOptions.value.length;
+}
+
+function highlightPrev() {
+    if (normalizedOptions.value.length === 0) return;
+    highlightedIndex.value = highlightedIndex.value <= 0
+        ? normalizedOptions.value.length - 1
+        : highlightedIndex.value - 1;
+}
+
+function selectHighlighted() {
+    if (highlightedIndex.value >= 0 && highlightedIndex.value < normalizedOptions.value.length) {
+        selectOption(normalizedOptions.value[highlightedIndex.value].value);
+    }
+}
+
+// Close on outside click
+function handleClickOutside(event) {
+    const clickedInContainer = containerRef.value?.contains(event.target);
+    const clickedInDropdown = dropdownRef.value?.contains(event.target);
+    if (!clickedInContainer && !clickedInDropdown) {
+        isOpen.value = false;
+    }
+}
+
+// Close on scroll
+function handleScroll() {
+    if (isOpen.value) {
+        isOpen.value = false;
+    }
+}
+
+onMounted(() => {
+    document.addEventListener('click', handleClickOutside);
+    window.addEventListener('scroll', handleScroll, true);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside);
+    window.removeEventListener('scroll', handleScroll, true);
+});
 </script>

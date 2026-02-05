@@ -1,78 +1,87 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, useSlots } from 'vue';
 import Logo from '@/Components/Domain/Logo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
+import Breadcrumbs from '@/Components/Base/Breadcrumbs.vue';
+import PreferencesModal from '@/Components/PreferencesModal.vue';
 import { usePage } from '@inertiajs/vue3';
 import { useTheme } from '@/composables/useTheme';
+
+const props = defineProps({
+    title: { type: String, default: '' },
+    breadcrumbs: { type: Array, default: () => [] },
+});
 
 // Initialize theme from localStorage on app load
 useTheme();
 
 const showingNavigationDropdown = ref(false);
+const showPreferences = ref(false);
+const slots = useSlots();
 
 const page = usePage();
 const isManager = computed(() => page.props.auth.user?.role === 'manager');
 const isAdmin = computed(() => ['admin', 'manager'].includes(page.props.auth.user?.role));
+
+const showHeader = computed(() => props.title || props.breadcrumbs.length > 0 || slots.actions);
 </script>
 
 <template>
     <div>
         <div class="min-h-screen bg-bg">
-            <nav class="bg-surface border-b border-border shadow-lg">
+            <nav class="bg-surface border-b border-border shadow-lg sticky top-0 z-50">
                 <!-- Primary Navigation Menu -->
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="flex justify-between h-16">
-                        <div class="flex">
-                            <!-- Logo -->
-                            <div class="shrink-0 flex items-center">
-                                <Logo size="sm" link-to="/" />
-                            </div>
-
-                            <!-- Navigation Links -->
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    :href="route('dashboard')"
-                                    :active="route().current('dashboard')"
-                                >
-                                    My Home
-                                </NavLink>
-                                <NavLink
-                                    v-if="isAdmin"
-                                    :href="route('admin.events.index')"
-                                    :active="route().current('admin.events.*')"
-                                >
-                                    Events
-                                </NavLink>
-                                <NavLink
-                                    v-if="isManager"
-                                    :href="route('admin.question-templates.index')"
-                                    :active="route().current('admin.question-templates.*')"
-                                >
-                                    Templates
-                                </NavLink>
-                                <NavLink
-                                    v-if="isManager"
-                                    :href="route('admin.users.index')"
-                                    :active="route().current('admin.users.*')"
-                                >
-                                    Users
-                                </NavLink>
-                                <NavLink
-                                    v-if="isManager"
-                                    :href="route('admin.groups.index')"
-                                    :active="route().current('admin.groups.*')"
-                                >
-                                    Groups
-                                </NavLink>
-                            </div>
+                <div class="px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center h-16">
+                        <!-- Logo (Left) -->
+                        <div class="shrink-0 flex items-center">
+                            <Logo size="sm" link-to="/" />
                         </div>
 
-                        <div class="hidden sm:flex sm:items-center sm:ms-6">
-                            <!-- Settings Dropdown -->
-                            <div class="ms-3 relative">
+                        <!-- Navigation Links (Center) -->
+                        <div class="hidden sm:flex items-center space-x-8">
+                            <NavLink
+                                :href="route('dashboard')"
+                                :active="route().current('dashboard')"
+                            >
+                                My Home
+                            </NavLink>
+                            <NavLink
+                                v-if="isAdmin"
+                                :href="route('admin.events.index')"
+                                :active="route().current('admin.events.*')"
+                            >
+                                Events
+                            </NavLink>
+                            <NavLink
+                                v-if="isManager"
+                                :href="route('admin.question-templates.index')"
+                                :active="route().current('admin.question-templates.*')"
+                            >
+                                Templates
+                            </NavLink>
+                            <NavLink
+                                v-if="isManager"
+                                :href="route('admin.users.index')"
+                                :active="route().current('admin.users.*')"
+                            >
+                                Users
+                            </NavLink>
+                            <NavLink
+                                v-if="isManager"
+                                :href="route('admin.groups.index')"
+                                :active="route().current('admin.groups.*')"
+                            >
+                                Groups
+                            </NavLink>
+                        </div>
+
+                        <!-- Profile (Right) -->
+                        <div class="hidden sm:flex sm:items-center">
+                            <div class="relative">
                                 <Dropdown align="right" width="48">
                                     <template #trigger>
                                         <span class="inline-flex rounded-md">
@@ -99,6 +108,12 @@ const isAdmin = computed(() => ['admin', 'manager'].includes(page.props.auth.use
                                     </template>
 
                                     <template #content>
+                                        <button
+                                            @click="showPreferences = true"
+                                            class="block w-full px-4 py-2 text-start text-sm leading-5 text-body hover:bg-surface-overlay focus:outline-none focus:bg-surface-overlay transition duration-150 ease-in-out"
+                                        >
+                                            Preferences
+                                        </button>
                                         <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink>
                                         <DropdownLink :href="route('logout')" method="post" as="button">
                                             Log Out
@@ -190,6 +205,12 @@ const isAdmin = computed(() => ['admin', 'manager'].includes(page.props.auth.use
                         </div>
 
                         <div class="mt-3 space-y-1">
+                            <button
+                                @click="showPreferences = true; showingNavigationDropdown = false"
+                                class="block w-full ps-3 pe-4 py-2 text-start text-base font-medium text-body hover:bg-surface-overlay focus:outline-none focus:bg-surface-overlay transition duration-150 ease-in-out"
+                            >
+                                Preferences
+                            </button>
                             <ResponsiveNavLink :href="route('profile.edit')"> Profile </ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('logout')" method="post" as="button">
                                 Log Out
@@ -200,9 +221,22 @@ const isAdmin = computed(() => ['admin', 'manager'].includes(page.props.auth.use
             </nav>
 
             <!-- Page Heading -->
-            <header class="bg-surface shadow" v-if="$slots.header">
-                <div class="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8">
-                    <slot name="header" />
+            <header v-if="showHeader" class="bg-surface border-b border-border shadow sticky top-16 z-40">
+                <div class="py-3 px-4 sm:px-6 lg:px-8">
+                    <!-- Breadcrumbs -->
+                    <Breadcrumbs
+                        v-if="breadcrumbs.length > 0"
+                        :items="breadcrumbs"
+                        variant="light"
+                        class="mb-2"
+                    />
+                    <!-- Title + Actions -->
+                    <div class="flex justify-between items-center">
+                        <h1 v-if="title" class="text-xl font-bold text-body">{{ title }}</h1>
+                        <div v-if="slots.actions" class="flex items-center gap-3">
+                            <slot name="actions" />
+                        </div>
+                    </div>
                 </div>
             </header>
 
@@ -211,5 +245,8 @@ const isAdmin = computed(() => ['admin', 'manager'].includes(page.props.auth.use
                 <slot />
             </main>
         </div>
+
+        <!-- Preferences Modal -->
+        <PreferencesModal :show="showPreferences" @close="showPreferences = false" />
     </div>
 </template>

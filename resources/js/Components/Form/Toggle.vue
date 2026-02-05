@@ -10,9 +10,9 @@
             @click="toggle"
             :disabled="disabled"
             :class="[
-                'relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out',
-                'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
-                modelValue ? 'bg-primary' : 'bg-muted',
+                'relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-all duration-200 ease-in-out',
+                'focus:outline-none focus-glow-sm',
+                modelValue ? 'bg-primary checked-glow' : 'bg-muted',
                 disabled ? 'opacity-50 cursor-not-allowed' : '',
                 sizes[size].button
             ]"

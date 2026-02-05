@@ -93,6 +93,33 @@
     .text-themed-muted {
         color: rgb(var(--color-text-muted));
     }
+
+    /* ========================================
+     * Input Focus Glow Effect
+     * ======================================== */
+
+    .focus-glow:focus {
+        box-shadow:
+            0 0 0 1px rgb(var(--color-text)),
+            0 0 0 3px rgb(var(--color-primary)),
+            0 0 15px rgb(var(--color-primary) / 0.3) !important;
+        border-color: transparent !important;
+    }
+
+    /* Checked/Selected glow for small controls */
+    .checked-glow {
+        box-shadow:
+            0 0 0 2px rgb(var(--color-primary)),
+            0 0 10px rgb(var(--color-primary) / 0.4);
+    }
+
+    /* Focus glow for small controls (checkbox, toggle) - smaller version */
+    .focus-glow-sm:focus {
+        box-shadow:
+            0 0 0 2px rgb(var(--color-primary)),
+            0 0 8px rgb(var(--color-primary) / 0.4) !important;
+        outline: none !important;
+    }
 }
 
 /* ========================================

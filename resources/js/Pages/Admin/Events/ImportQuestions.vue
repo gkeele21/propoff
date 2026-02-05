@@ -1,31 +1,20 @@
 <template>
     <Head :title="`Import Questions - ${event.name}`" />
 
-    <AuthenticatedLayout>
-        <template #header>
-            <PageHeader
-                title="Import from Templates"
-                subtitle="Search and import questions from your template library"
-                :crumbs="[
-                    { label: 'Events', href: route('admin.events.index') },
-                    { label: event.name, href: route('admin.events.show', event.id) },
-                    { label: 'Import Templates' }
-                ]"
-            >
-                <template #metadata>
-                    <span class="font-medium text-gray-900">{{ event.name }}</span>
-                    <span class="text-gray-400 mx-2">•</span>
-                    <span>{{ currentQuestions.length }} questions</span>
-                </template>
-            </PageHeader>
-        </template>
-
+    <AuthenticatedLayout
+        title="Import from Templates"
+        :breadcrumbs="[
+            { text: 'Events', href: route('admin.events.index') },
+            { text: event.name, href: route('admin.events.show', event.id) },
+            { text: 'Import Templates' }
+        ]"
+    >
         <div class="py-12">
             <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
                 <!-- Event Context -->
                 <div class="bg-primary/10 border border-primary/30 rounded-lg p-4 mb-6">
                     <div class="flex items-start gap-3">
-                        <InformationCircleIcon class="w-5 h-5 text-primary mt-0.5" />
+                        <Icon name="circle-info" class="text-primary mt-0.5" />
                         <div>
                             <h3 class="font-semibold text-primary">{{ event.name }}</h3>
                             <p class="text-sm text-primary mt-1">
@@ -38,94 +27,94 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- LEFT: Template Search -->
                     <div class="lg:col-span-2">
-                        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                            <div class="border-b border-gray-200 p-6">
-                                <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                                    <DocumentPlusIcon class="w-5 h-5 inline mr-2" />
+                        <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
+                            <div class="border-b border-border p-6">
+                                <h3 class="text-lg font-semibold text-body mb-4">
+                                    <Icon name="file-circle-plus" class="inline mr-2" />
                                     Find Template Questions
                                 </h3>
 
                                 <!-- Category Search Input -->
                                 <div class="mb-6">
-                                    <label for="category-search" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Search by Category
-                                    </label>
-                                    <div class="flex gap-2">
-                                        <input
-                                            id="category-search"
-                                            type="text"
-                                            v-model="categorySearch"
-                                            @keyup.enter="findTemplatesByCategory"
-                                            class="flex-1 border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
-                                            placeholder="Enter category (e.g., football, nfl, sports)"
-                                        />
-                                        <button
-                                            @click="findTemplatesByCategory"
+                                    <div class="flex gap-2 items-end">
+                                        <div class="flex-1">
+                                            <TextField
+                                                v-model="categorySearch"
+                                                label="Search by Category"
+                                                placeholder="Enter category (e.g., football, nfl, sports)"
+                                                icon-left="magnifying-glass"
+                                                @keyup.enter="findTemplatesByCategory"
+                                            />
+                                        </div>
+                                        <Button
+                                            variant="primary"
+                                            size="md"
                                             :disabled="!categorySearch.trim() || isSearching"
-                                            class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-hover disabled:bg-primary/50 disabled:cursor-not-allowed"
+                                            :loading="isSearching"
+                                            @click="findTemplatesByCategory"
                                         >
-                                            {{ isSearching ? 'Searching...' : 'Find' }}
-                                        </button>
+                                            Find
+                                        </Button>
                                     </div>
                                 </div>
 
                                 <!-- Search Results -->
                                 <div v-if="searchPerformed">
-                                    <div v-if="filteredTemplates.length === 0" class="text-center py-8 text-gray-500">
+                                    <div v-if="filteredTemplates.length === 0" class="text-center py-8 text-muted">
                                         No templates found for category "{{ lastSearchTerm }}".
                                     </div>
 
                                     <div v-else class="space-y-3">
-                                        <p class="text-sm text-gray-700 mb-3">
+                                        <p class="text-sm text-body mb-3">
                                             Found {{ filteredTemplates.length }} template{{ filteredTemplates.length !== 1 ? 's' : '' }} for "{{ lastSearchTerm }}"
                                         </p>
 
                                         <!-- Select All / Deselect All -->
-                                        <div class="flex gap-2 pb-4 border-b">
-                                            <button @click="selectAllTemplates"
-                                                    class="px-3 py-1 text-sm bg-primary text-white rounded hover:bg-primary-hover">
+                                        <div class="flex gap-2 pb-4 border-b border-border">
+                                            <Button variant="primary" size="sm" @click="selectAllTemplates">
                                                 Select All
-                                            </button>
-                                            <button @click="deselectAllTemplates"
-                                                    class="px-3 py-1 text-sm bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                                            </Button>
+                                            <Button variant="secondary" size="sm" @click="deselectAllTemplates">
                                                 Deselect All
-                                            </button>
-                                            <button @click="bulkCreateSelected"
-                                                    :disabled="selectedTemplates.length === 0"
-                                                    class="ml-auto px-4 py-1 text-sm bg-success text-white rounded hover:bg-success/80 disabled:bg-success/50">
+                                            </Button>
+                                            <Button
+                                                variant="success"
+                                                size="sm"
+                                                class="ml-auto"
+                                                :disabled="selectedTemplates.length === 0"
+                                                @click="bulkCreateSelected"
+                                            >
                                                 Import {{ selectedTemplates.length }} Selected
-                                            </button>
+                                            </Button>
                                         </div>
 
                                         <!-- Template List -->
                                         <div class="space-y-2 max-h-[500px] overflow-y-auto">
                                             <div v-for="template in filteredTemplates" :key="template.id"
-                                                 class="flex items-start gap-3 p-3 border border-gray-200 rounded hover:bg-gray-50">
+                                                 class="p-3 border border-border rounded hover:bg-surface-overlay">
 
-                                                <!-- Checkbox -->
-                                                <input
-                                                    type="checkbox"
-                                                    :checked="isTemplateSelected(template.id)"
-                                                    @change="toggleTemplateSelection(template)"
-                                                    class="mt-1"
-                                                />
+                                                <!-- Header row: Checkbox + Title + Badge -->
+                                                <div class="flex items-center gap-3 mb-2">
+                                                    <Checkbox
+                                                        :model-value="isTemplateSelected(template.id)"
+                                                        @update:model-value="toggleTemplateSelection(template)"
+                                                    />
+                                                    <h4 class="font-semibold text-body">{{ template.title }}</h4>
+                                                    <Badge :variant="typeBadgeVariant(template.question_type)" size="sm">
+                                                        {{ formatType(template.question_type) }}
+                                                    </Badge>
+                                                </div>
 
-                                                <!-- Template Info -->
-                                                <div class="flex-1">
-                                                    <div class="flex items-center gap-2 mb-1">
-                                                        <h4 class="font-semibold text-gray-900">{{ template.title }}</h4>
-                                                        <span :class="['px-2 py-0.5 text-xs rounded', typeClass(template.question_type)]">
-                                                            {{ formatType(template.question_type) }}
-                                                        </span>
-                                                    </div>
-                                                    <p class="text-sm text-gray-600 mb-2">{{ template.question_text }}</p>
+                                                <!-- Template Info (indented to align with title) -->
+                                                <div class="pl-8">
+                                                    <p class="text-sm text-muted mb-2">{{ template.question_text }}</p>
 
                                                     <!-- Variables Badge -->
-                                                    <div v-if="template.variables?.length" class="text-xs">
-                                                        <span class="bg-warning/10 text-warning px-2 py-1 rounded">
+                                                    <div v-if="template.variables?.length">
+                                                        <Badge variant="warning-soft" size="sm">
                                                             {{ template.variables.length }} variable{{ template.variables.length !== 1 ? 's' : '' }}:
                                                             {{ template.variables.join(', ') }}
-                                                        </span>
+                                                        </Badge>
                                                     </div>
 
                                                     <!-- Template Answers Preview -->
@@ -145,7 +134,7 @@
                                     </div>
                                 </div>
 
-                                <div v-else class="text-center py-8 text-gray-500">
+                                <div v-else class="text-center py-8 text-muted">
                                     <p>Enter a category and click "Find" to search for template questions.</p>
                                 </div>
                             </div>
@@ -154,34 +143,45 @@
 
                     <!-- RIGHT: Current Questions -->
                     <div>
-                        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border relative">
+                            <Button
+                                v-if="currentQuestions.length > 0"
+                                variant="danger"
+                                size="xs"
+                                class="absolute top-3 right-3"
+                                @click="deleteAllQuestions"
+                            >
+                                Delete All
+                            </Button>
                             <div class="p-6">
-                                <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                                    <ListBulletIcon class="w-5 h-5 inline mr-2" />
+                                <h3 class="text-lg font-semibold text-body mb-4">
+                                    <Icon name="list" class="inline mr-2" />
                                     Current Questions ({{ currentQuestions.length }})
                                 </h3>
 
-                                <div v-if="currentQuestions.length === 0" class="text-center py-8 text-gray-500">
+                                <div v-if="currentQuestions.length === 0" class="text-center py-8 text-muted">
                                     <p>No questions added yet.</p>
                                     <p class="text-sm mt-2">Search and import templates to get started.</p>
                                 </div>
 
                                 <div v-else class="space-y-2 max-h-96 overflow-y-auto">
                                     <div v-for="(question, index) in currentQuestions" :key="question.id"
-                                         class="p-2 bg-gray-50 rounded border border-gray-200 text-sm">
+                                         class="p-2 bg-surface-elevated rounded border border-border text-sm">
 
                                         <div class="flex justify-between items-start gap-2">
                                             <div class="flex-1">
-                                                <p class="font-semibold text-gray-900 line-clamp-2">
+                                                <p class="font-semibold text-body line-clamp-2">
                                                     {{ question.question_text }}
                                                 </p>
-                                                <p class="text-xs text-gray-500 mt-1">
+                                                <p class="text-xs text-muted mt-1">
                                                     Order: {{ question.display_order }} | {{ question.points }} {{ question.points === 1 ? 'point' : 'points' }}
                                                 </p>
                                             </div>
-                                            <button @click="deleteQuestion(question.id)"
-                                                    class="text-danger hover:text-danger/80 flex-shrink-0">
-                                                <TrashIcon class="w-4 h-4" />
+                                            <button
+                                                @click="deleteQuestion(question.id)"
+                                                class="text-danger hover:text-danger/80 flex-shrink-0"
+                                            >
+                                                <Icon name="trash" size="sm" />
                                             </button>
                                         </div>
                                     </div>
@@ -191,86 +191,47 @@
                     </div>
                 </div>
 
-                <!-- Removed manual question form - use the modal on the Events Show page instead -->
-
                 <!-- Consolidated Variable Input Modal -->
-                <div v-if="showConsolidatedVariableModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                    <!-- Backdrop -->
-                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeConsolidatedVariableModal"></div>
+                <Modal :show="showConsolidatedVariableModal" max-width="3xl" @close="closeConsolidatedVariableModal">
+                    <div class="p-6">
+                        <!-- Header -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-body">
+                                Fill in Variables for {{ selectedTemplates.length }} Question{{ selectedTemplates.length !== 1 ? 's' : '' }}
+                            </h3>
+                            <p class="mt-1 text-sm text-muted">
+                                The following variables were found across your selected templates.
+                                Fill them out once, and they'll be applied to all questions.
+                            </p>
+                        </div>
 
-                    <!-- Modal -->
-                    <div class="flex min-h-full items-center justify-center p-4">
-                        <div class="relative bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-                            <!-- Header -->
-                            <div class="border-b border-gray-200 px-6 py-4">
-                                <div class="flex items-center justify-between">
-                                    <h3 class="text-lg font-semibold text-gray-900">
-                                        Fill in Variables for {{ selectedTemplates.length }} Question{{ selectedTemplates.length !== 1 ? 's' : '' }}
-                                    </h3>
-                                    <button @click="closeConsolidatedVariableModal" class="text-gray-400 hover:text-gray-500">
-                                        <XMarkIcon class="w-6 h-6" />
-                                    </button>
-                                </div>
-                                <p class="mt-1 text-sm text-gray-500">
-                                    The following variables were found across your selected templates.
-                                    Fill them out once, and they'll be applied to all questions.
-                                </p>
-                            </div>
+                        <!-- Body -->
+                        <div class="space-y-4 max-h-[50vh] overflow-y-auto px-1">
+                            <TextField
+                                v-for="variable in distinctVariables"
+                                :key="variable"
+                                v-model="consolidatedVariables[variable]"
+                                :label="variable"
+                                :hint="`Used in ${getTemplateCountForVariable(variable)} question(s)`"
+                                :placeholder="`Enter value for ${variable}`"
+                            />
+                        </div>
 
-                            <!-- Body - Scrollable -->
-                            <div class="flex-1 overflow-y-auto px-6 py-4">
-                                <div class="space-y-4">
-                                    <div
-                                        v-for="variable in distinctVariables"
-                                        :key="variable"
-                                        class="variable-input-group"
-                                    >
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                                            {{ variable }}
-                                        </label>
-
-                                        <!-- Show which templates use this variable -->
-                                        <p class="text-xs text-gray-500 mb-2">
-                                            Used in {{ getTemplateCountForVariable(variable) }} question(s)
-                                        </p>
-
-                                        <input
-                                            type="text"
-                                            v-model="consolidatedVariables[variable]"
-                                            :placeholder="`Enter value for ${variable}`"
-                                            class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
-                                        />
-                                    </div>
-                                </div>
-
-                                <!-- Preview Section -->
-                                <div v-if="previewQuestion" class="mt-6 p-4 bg-gray-50 rounded border border-gray-200">
-                                    <h4 class="text-sm font-semibold text-gray-700 mb-2">Preview (first question):</h4>
-                                    <p class="text-gray-900">{{ previewQuestionText }}</p>
-                                </div>
-                            </div>
-
-                            <!-- Footer -->
-                            <div class="border-t border-gray-200 px-6 py-4 flex items-center justify-end gap-3">
-                                <button
-                                    @click="closeConsolidatedVariableModal"
-                                    type="button"
-                                    class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    @click="submitConsolidatedImport"
-                                    type="button"
-                                    :disabled="!allVariablesFilled"
-                                    class="px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Import {{ selectedTemplates.length }} Question{{ selectedTemplates.length !== 1 ? 's' : '' }}
-                                </button>
-                            </div>
+                        <!-- Footer -->
+                        <div class="mt-6 flex items-center justify-end gap-3">
+                            <Button variant="outline" @click="closeConsolidatedVariableModal">
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="primary"
+                                :disabled="!allVariablesFilled"
+                                @click="submitConsolidatedImport"
+                            >
+                                Import {{ selectedTemplates.length }} Question{{ selectedTemplates.length !== 1 ? 's' : '' }}
+                            </Button>
                         </div>
                     </div>
-                </div>
+                </Modal>
             </div>
         </div>
     </AuthenticatedLayout>
@@ -281,14 +242,12 @@ import { ref, computed } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import {
-    InformationCircleIcon,
-    DocumentPlusIcon,
-    ListBulletIcon,
-    TrashIcon,
-    XMarkIcon,
-} from '@heroicons/vue/24/outline';
-import PageHeader from '@/Components/PageHeader.vue';
+import TextField from '@/Components/Form/TextField.vue';
+import Checkbox from '@/Components/Form/Checkbox.vue';
+import Button from '@/Components/Base/Button.vue';
+import Badge from '@/Components/Base/Badge.vue';
+import Modal from '@/Components/Base/Modal.vue';
+import Icon from '@/Components/Base/Icon.vue';
 import axios from 'axios';
 
 const props = defineProps({
@@ -330,26 +289,6 @@ const allVariablesFilled = computed(() => {
         return consolidatedVariables.value[variable] &&
                consolidatedVariables.value[variable].trim() !== '';
     });
-});
-
-// Computed: Preview question with variables replaced
-const previewQuestion = computed(() => {
-    return selectedTemplates.value.find(t => t.variables && t.variables.length > 0) || null;
-});
-
-const previewQuestionText = computed(() => {
-    if (!previewQuestion.value) return '';
-
-    let text = previewQuestion.value.question_text;
-
-    Object.keys(consolidatedVariables.value).forEach(variable => {
-        const value = consolidatedVariables.value[variable];
-        if (value) {
-            text = text.replace(new RegExp(`\\{${variable}\\}`, 'g'), value);
-        }
-    });
-
-    return text;
 });
 
 // Methods
@@ -523,6 +462,20 @@ const deleteQuestion = (questionId) => {
     }
 };
 
+// Delete all questions
+const deleteAllQuestions = () => {
+    if (confirm(`Delete all ${props.currentQuestions.length} questions? This cannot be undone.`)) {
+        router.delete(
+            route('admin.events.event-questions.destroyAll', props.event.id),
+            {
+                onSuccess: () => {
+                    router.visit(route('admin.events.import-questions', props.event.id));
+                }
+            }
+        );
+    }
+};
+
 // Format type
 const formatType = (type) => {
     if (!type) return 'Unknown';
@@ -541,16 +494,16 @@ const formatDate = (date) => {
     });
 };
 
-// Type class
-const typeClass = (type) => {
-    if (!type) return 'bg-gray-100 text-gray-800';
-    const classes = {
-        multiple_choice: 'bg-primary/10 text-primary',
-        yes_no: 'bg-success/10 text-success',
-        numeric: 'bg-warning/10 text-warning',
-        text: 'bg-gray-100 text-gray-800',
-        ranked_answers: 'bg-warning/10 text-warning',
+// Badge variant for question type
+const typeBadgeVariant = (type) => {
+    if (!type) return 'default';
+    const variants = {
+        multiple_choice: 'primary-soft',
+        yes_no: 'success-soft',
+        numeric: 'warning-soft',
+        text: 'default',
+        ranked_answers: 'warning-soft',
     };
-    return classes[type] || 'bg-gray-100 text-gray-800';
+    return variants[type] || 'default';
 };
 </script>

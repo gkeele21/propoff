@@ -32,7 +32,7 @@ class EventQuestionPolicy
     public function create(User $user): bool
     {
         // Only admins can create event questions
-        return $user->isAdmin();
+        return $user->hasAdminAccess();
     }
 
     /**
@@ -41,7 +41,7 @@ class EventQuestionPolicy
     public function update(User $user, EventQuestion $eventQuestion): bool
     {
         // Only admins can update event questions
-        return $user->isAdmin();
+        return $user->hasAdminAccess();
     }
 
     /**
@@ -50,7 +50,7 @@ class EventQuestionPolicy
     public function delete(User $user, EventQuestion $eventQuestion): bool
     {
         // Only admins can delete event questions
-        return $user->isAdmin();
+        return $user->hasAdminAccess();
     }
 
     /**
@@ -59,7 +59,7 @@ class EventQuestionPolicy
     public function restore(User $user, EventQuestion $eventQuestion): bool
     {
         // Only admins can restore event questions
-        return $user->isAdmin();
+        return $user->hasAdminAccess();
     }
 
     /**
@@ -68,6 +68,6 @@ class EventQuestionPolicy
     public function forceDelete(User $user, EventQuestion $eventQuestion): bool
     {
         // Only admins can permanently delete event questions
-        return $user->isAdmin();
+        return $user->hasAdminAccess();
     }
 }
