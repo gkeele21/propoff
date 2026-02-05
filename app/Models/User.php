@@ -55,11 +55,19 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is an admin.
+     * Check if user is a manager (super user).
+     */
+    public function isManager()
+    {
+        return $this->role === 'manager';
+    }
+
+    /**
+     * Check if user is an admin (or higher).
      */
     public function isAdmin()
     {
-        return $this->role === 'admin';
+        return in_array($this->role, ['admin', 'manager']);
     }
 
     /**

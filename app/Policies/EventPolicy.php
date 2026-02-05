@@ -30,7 +30,7 @@ class EventPolicy
     public function create(User $user): bool
     {
         // Only admins can create events
-        return $user->role === 'admin';
+        return $user->isAdmin();
     }
 
     /**
@@ -39,7 +39,7 @@ class EventPolicy
     public function update(User $user, Event $event): bool
     {
         // User must be the creator or an admin
-        return $user->id === $event->created_by || $user->role === 'admin';
+        return $user->id === $event->created_by || $user->isAdmin();
     }
 
     /**
@@ -48,7 +48,7 @@ class EventPolicy
     public function delete(User $user, Event $event): bool
     {
         // User must be the creator or an admin
-        return $user->id === $event->created_by || $user->role === 'admin';
+        return $user->id === $event->created_by || $user->isAdmin();
     }
 
     /**
@@ -56,7 +56,7 @@ class EventPolicy
      */
     public function restore(User $user, Event $event): bool
     {
-        return $user->role === 'admin';
+        return $user->isAdmin();
     }
 
     /**
@@ -64,7 +64,7 @@ class EventPolicy
      */
     public function forceDelete(User $user, Event $event): bool
     {
-        return $user->role === 'admin';
+        return $user->isAdmin();
     }
 
     /**
@@ -91,6 +91,6 @@ class EventPolicy
     public function viewResults(User $user, Event $event): bool
     {
         // Results are visible when event is completed or admin at any time
-        return $event->status === 'completed' || $user->role === 'admin';
+        return $event->status === 'completed' || $user->isAdmin();
     }
 }

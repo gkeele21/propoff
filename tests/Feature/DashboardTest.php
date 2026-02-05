@@ -23,7 +23,7 @@ class DashboardTest extends TestCase
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
-            ->component('Dashboard')
+            ->component('MyHome')
             ->has('userGroups')
             ->has('captainGroups')
             ->has('activeEvents')
@@ -48,7 +48,7 @@ class DashboardTest extends TestCase
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
-            ->component('Dashboard')
+            ->component('MyHome')
             ->where('userGroups', function ($userGroups) use ($group1, $group2) {
                 return count($userGroups) === 2 &&
                     collect($userGroups)->pluck('id')->contains($group1->id) &&

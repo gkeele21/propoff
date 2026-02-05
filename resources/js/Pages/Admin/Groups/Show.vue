@@ -6,22 +6,17 @@
             <PageHeader
                 :title="group.name"
                 :crumbs="[
-                    { label: 'Admin Dashboard', href: route('admin.dashboard') },
                     { label: 'Groups', href: route('admin.groups.index') },
                     { label: group.name }
                 ]"
             >
                 <template #metadata>
-                    <span>{{ stats.members_count }} members</span>
-                    <span class="text-gray-400 mx-2">•</span>
+                    <span>{{ stats.total_members }} members</span>
+                    <span class="text-subtle mx-2">•</span>
                     <span>Code: <span class="font-mono font-bold">{{ group.code }}</span></span>
-                </template>
-                <template #actions>
-                    <Link :href="route('admin.groups.edit', group.id)">
-                        <Button variant="primary">
-                            <PencilIcon class="w-4 h-4 mr-2" />
-                            Edit Group
-                        </Button>
+                    <span class="text-subtle mx-2">•</span>
+                    <Link :href="route('admin.groups.edit', group.id)" class="text-primary hover:text-primary-hover transition-colors">
+                        Edit
                     </Link>
                 </template>
             </PageHeader>
@@ -30,202 +25,227 @@
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 <!-- Group Information -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="mb-6">
-                            <h3 class="text-2xl font-bold text-gray-900">{{ group.name }}</h3>
-                            <p class="text-gray-600 mt-1">Join Code: <span class="font-mono font-bold">{{ group.code }}</span></p>
-                        </div>
+                <Card>
+                    <div class="mb-6">
+                        <h3 class="text-2xl font-bold text-body">{{ group.name }}</h3>
+                        <p class="text-muted mt-1">Join Code: <span class="font-mono font-bold text-body">{{ group.code }}</span></p>
+                    </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <div class="text-sm text-gray-600">Members</div>
-                                <div class="text-2xl font-bold text-gray-900">{{ stats.members_count }}</div>
-                            </div>
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <div class="text-sm text-gray-600">Total Entries</div>
-                                <div class="text-2xl font-bold text-gray-900">{{ stats.total_entries }}</div>
-                            </div>
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <div class="text-sm text-gray-600">Events Played</div>
-                                <div class="text-2xl font-bold text-gray-900">{{ stats.events_count }}</div>
-                            </div>
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <div class="text-sm text-gray-600">Avg Score</div>
-                                <div class="text-2xl font-bold text-gray-900">{{ stats.average_score }}%</div>
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+                        <div class="bg-surface-inset p-4 rounded-lg border-t-2 border-primary">
+                            <div class="text-sm text-muted">Members</div>
+                            <div class="text-2xl font-bold text-primary">{{ stats.total_members }}</div>
                         </div>
-
-                        <div class="mt-6 pt-6 border-t border-gray-200">
-                            <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">Created By</dt>
-                                    <dd class="mt-1 text-sm text-gray-900">{{ group.created_by?.name || 'Unknown' }}</dd>
-                                </div>
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">Created</dt>
-                                    <dd class="mt-1 text-sm text-gray-900">{{ formatDate(group.created_at) }}</dd>
-                                </div>
-                            </dl>
+                        <div class="bg-surface-inset p-4 rounded-lg border-t-2 border-info">
+                            <div class="text-sm text-muted">Total Entries</div>
+                            <div class="text-2xl font-bold text-info">{{ stats.total_entries }}</div>
+                        </div>
+                        <div class="bg-surface-inset p-4 rounded-lg border-t-2 border-warning">
+                            <div class="text-sm text-muted">Events Played</div>
+                            <div class="text-2xl font-bold text-warning">{{ stats.total_events_played }}</div>
+                        </div>
+                        <div class="bg-surface-inset p-4 rounded-lg border-t-2 border-success">
+                            <div class="text-sm text-muted">Avg Score</div>
+                            <div class="text-2xl font-bold text-success">{{ Math.round(stats.average_score) }}%</div>
                         </div>
                     </div>
-                </div>
+
+                    <div class="mt-6 pt-6 border-t border-border">
+                        <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <dt class="text-sm font-medium text-muted">Created By</dt>
+                                <dd class="mt-1 text-sm text-body">{{ group.created_by?.name || 'Unknown' }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-muted">Created</dt>
+                                <dd class="mt-1 text-sm text-body">{{ formatDate(group.created_at) }}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </Card>
 
                 <!-- Members -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-semibold text-gray-900">Members</h3>
-                            <button
-                                @click="showAddMember = true"
-                                class="px-4 py-2 bg-primary text-white text-sm rounded-md hover:bg-primary/80"
-                            >
+                <Card :body-padding="false">
+                    <template #header>
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-body">Members</h3>
+                            <Button variant="primary" size="sm" @click="showAddMember = true">
+                                <Icon name="user-plus" class="mr-2" size="sm" />
                                 Add Member
-                            </button>
+                            </Button>
                         </div>
+                    </template>
 
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
-                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="member in members" :key="member.id">
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-gray-900">{{ member.name }}</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-500">{{ member.email }}</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span :class="[
-                                                'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
-                                                member.role === 'admin' ? 'bg-danger/10 text-danger' : 'bg-gray-100 text-gray-700'
-                                            ]">
-                                                {{ member.role }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ formatDate(member.pivot.created_at) }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button
-                                                @click="removeMember(member.id)"
-                                                class="text-danger hover:text-danger/80"
-                                            >
-                                                Remove
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-border">
+                            <thead class="bg-surface-header">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">Email</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">Role</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">Joined</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-muted uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-surface divide-y divide-border">
+                                <tr v-for="member in (members || [])" :key="member.id" class="hover:bg-surface-overlay transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-body">{{ member.name }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-muted">{{ member.email }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <Badge :variant="member.pivot?.is_captain ? 'warning-soft' : 'default'" size="sm">
+                                            {{ member.pivot?.is_captain ? 'Captain' : 'Member' }}
+                                        </Badge>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">
+                                        {{ formatDate(member.pivot?.joined_at || member.pivot?.created_at) }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button
+                                            @click="confirmRemoveMember(member)"
+                                            class="text-danger hover:text-danger/80 transition-colors"
+                                        >
+                                            Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr v-if="!members || members.length === 0">
+                                    <td colspan="5" class="px-6 py-12 text-center text-muted">
+                                        <Icon name="users" size="2x" class="text-subtle mb-2" />
+                                        <p>No members yet</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
+                </Card>
 
                 <!-- Recent Activity -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Entries</h3>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Event</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Score</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="entry in recent_entries" :key="entry.id">
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-gray-900">{{ entry.user.name }}</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900">{{ entry.event.title }}</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900">{{ entry.percentage }}%</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span :class="[
-                                                'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
-                                                entry.status === 'completed' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
-                                            ]">
-                                                {{ entry.status }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ formatDate(entry.submitted_at || entry.created_at) }}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                <Card :body-padding="false">
+                    <template #header>
+                        <h3 class="text-lg font-semibold text-body">Recent Entries</h3>
+                    </template>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-border">
+                            <thead class="bg-surface-header">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">User</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">Event</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">Score</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-surface divide-y divide-border">
+                                <tr v-for="entry in (recentEntries || [])" :key="entry.id" class="hover:bg-surface-overlay transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-body">{{ entry.user?.name }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-body">{{ entry.event?.name }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-body">{{ Math.round(entry.percentage || 0) }}%</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <Badge :variant="entry.is_complete ? 'success-soft' : 'warning-soft'" size="sm">
+                                            {{ entry.is_complete ? 'Completed' : 'In Progress' }}
+                                        </Badge>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">
+                                        {{ formatDate(entry.submitted_at || entry.created_at) }}
+                                    </td>
+                                </tr>
+                                <tr v-if="!recentEntries || recentEntries.length === 0">
+                                    <td colspan="5" class="px-6 py-12 text-center text-muted">
+                                        <Icon name="clipboard-list" size="2x" class="text-subtle mb-2" />
+                                        <p>No entries yet</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
 
         <!-- Add Member Modal -->
-        <div v-if="showAddMember" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg p-6 max-w-md w-full">
-                <h3 class="text-lg font-semibold mb-4">Add Member to Group</h3>
+        <Modal :show="showAddMember" @close="showAddMember = false" maxWidth="sm">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-body mb-4">Add Member to Group</h3>
+
                 <form @submit.prevent="addMember">
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">User Email</label>
-                        <input
-                            v-model="addMemberForm.email"
-                            type="email"
-                            required
-                            class="w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
-                        />
-                    </div>
-                    <div class="flex justify-end space-x-2">
-                        <button
-                            type="button"
-                            @click="showAddMember = false"
-                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                        >
+                    <TextField
+                        v-model="addMemberForm.email"
+                        label="User Email"
+                        type="email"
+                        :error="addMemberForm.errors.email"
+                        placeholder="Enter user's email address"
+                        required
+                        autofocus
+                    />
+
+                    <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-border">
+                        <Button type="button" variant="outline" class="!border-primary !text-primary hover:!bg-primary/10" @click="showAddMember = false">
                             Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80"
-                        >
+                        </Button>
+                        <Button type="submit" variant="primary" :loading="addMemberForm.processing">
+                            <Icon name="user-plus" class="mr-2" size="sm" />
                             Add Member
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </div>
-        </div>
+        </Modal>
+
+        <!-- Remove Member Confirmation -->
+        <Confirm
+            :show="showRemoveConfirm"
+            title="Remove Member?"
+            :message="`Are you sure you want to remove '${memberToRemove?.name}' from this group?`"
+            variant="danger"
+            icon="user-minus"
+            @confirm="removeMember"
+            @close="showRemoveConfirm = false"
+        />
     </AuthenticatedLayout>
 </template>
 
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
-import { PencilIcon } from '@heroicons/vue/24/outline';
+import { ref, computed } from 'vue';
 import Button from '@/Components/Base/Button.vue';
+import Card from '@/Components/Base/Card.vue';
+import Badge from '@/Components/Base/Badge.vue';
+import Icon from '@/Components/Base/Icon.vue';
+import Modal from '@/Components/Base/Modal.vue';
+import TextField from '@/Components/Form/TextField.vue';
+import Confirm from '@/Components/Feedback/Confirm.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 
 const props = defineProps({
     group: Object,
-    stats: Object,
-    members: Array,
-    recent_entries: Array,
+    stats: {
+        type: Object,
+        default: () => ({ total_members: 0, total_entries: 0, total_events_played: 0, average_score: 0 }),
+    },
+    recentEntries: {
+        type: Array,
+        default: () => [],
+    },
 });
 
+// Computed to get members from group.users
+const members = computed(() => props.group?.users || []);
+
 const showAddMember = ref(false);
+const showRemoveConfirm = ref(false);
+const memberToRemove = ref(null);
 
 const addMemberForm = useForm({
     email: '',
@@ -248,9 +268,19 @@ const addMember = () => {
     });
 };
 
-const removeMember = (userId) => {
-    if (confirm('Remove this member from the group?')) {
-        router.delete(route('admin.groups.remove-user', { group: props.group.id, user: userId }));
+const confirmRemoveMember = (member) => {
+    memberToRemove.value = member;
+    showRemoveConfirm.value = true;
+};
+
+const removeMember = () => {
+    if (memberToRemove.value) {
+        router.delete(route('admin.groups.remove-user', { group: props.group.id, user: memberToRemove.value.id }), {
+            onSuccess: () => {
+                showRemoveConfirm.value = false;
+                memberToRemove.value = null;
+            },
+        });
     }
 };
 </script>

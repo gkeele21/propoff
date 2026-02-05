@@ -252,7 +252,6 @@ onUnmounted(() => {
                 title="Host Game"
                 :subtitle="event?.name"
                 :crumbs="[
-                    { label: 'Admin Dashboard', href: route('admin.dashboard') },
                     { label: 'Events', href: route('admin.events.index') },
                     { label: event?.name || 'Event', href: route('admin.events.show', event?.id) },
                     { label: 'Host Game' }

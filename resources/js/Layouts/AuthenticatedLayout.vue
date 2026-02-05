@@ -1,17 +1,21 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import Logo from '@/Components/Domain/Logo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
 import { useTheme } from '@/composables/useTheme';
 
 // Initialize theme from localStorage on app load
 useTheme();
 
 const showingNavigationDropdown = ref(false);
+
+const page = usePage();
+const isManager = computed(() => page.props.auth.user?.role === 'manager');
+const isAdmin = computed(() => ['admin', 'manager'].includes(page.props.auth.user?.role));
 </script>
 
 <template>
@@ -33,14 +37,35 @@ const showingNavigationDropdown = ref(false);
                                     :href="route('dashboard')"
                                     :active="route().current('dashboard')"
                                 >
-                                    Dashboard
+                                    My Home
                                 </NavLink>
                                 <NavLink
-                                    v-if="$page.props.auth.user.role === 'admin'"
-                                    :href="route('admin.dashboard')"
-                                    :active="route().current('admin.dashboard')"
+                                    v-if="isAdmin"
+                                    :href="route('admin.events.index')"
+                                    :active="route().current('admin.events.*')"
                                 >
-                                    Admin
+                                    Events
+                                </NavLink>
+                                <NavLink
+                                    v-if="isManager"
+                                    :href="route('admin.question-templates.index')"
+                                    :active="route().current('admin.question-templates.*')"
+                                >
+                                    Templates
+                                </NavLink>
+                                <NavLink
+                                    v-if="isManager"
+                                    :href="route('admin.users.index')"
+                                    :active="route().current('admin.users.*')"
+                                >
+                                    Users
+                                </NavLink>
+                                <NavLink
+                                    v-if="isManager"
+                                    :href="route('admin.groups.index')"
+                                    :active="route().current('admin.groups.*')"
+                                >
+                                    Groups
                                 </NavLink>
                             </div>
                         </div>
@@ -123,14 +148,35 @@ const showingNavigationDropdown = ref(false);
                 >
                     <div class="pt-2 pb-3 space-y-1">
                         <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                            Dashboard
+                            My Home
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
-                            v-if="$page.props.auth.user.role === 'admin'"
-                            :href="route('admin.dashboard')"
-                            :active="route().current('admin.dashboard')"
+                            v-if="isAdmin"
+                            :href="route('admin.events.index')"
+                            :active="route().current('admin.events.*')"
                         >
-                            Admin
+                            Events
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            v-if="isManager"
+                            :href="route('admin.question-templates.index')"
+                            :active="route().current('admin.question-templates.*')"
+                        >
+                            Templates
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            v-if="isManager"
+                            :href="route('admin.users.index')"
+                            :active="route().current('admin.users.*')"
+                        >
+                            Users
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            v-if="isManager"
+                            :href="route('admin.groups.index')"
+                            :active="route().current('admin.groups.*')"
+                        >
+                            Groups
                         </ResponsiveNavLink>
                     </div>
 

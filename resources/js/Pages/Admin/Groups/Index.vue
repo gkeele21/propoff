@@ -2,15 +2,14 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import {
-    MagnifyingGlassIcon,
-    DocumentArrowDownIcon,
-    TrashIcon,
-    UsersIcon,
-    PlusIcon,
-} from '@heroicons/vue/24/outline';
 import PageHeader from '@/Components/PageHeader.vue';
 import Button from '@/Components/Base/Button.vue';
+import Card from '@/Components/Base/Card.vue';
+import Badge from '@/Components/Base/Badge.vue';
+import Icon from '@/Components/Base/Icon.vue';
+import TextField from '@/Components/Form/TextField.vue';
+import DataTable from '@/Components/Base/DataTable.vue';
+import Confirm from '@/Components/Feedback/Confirm.vue';
 
 const props = defineProps({
     groups: Object,
@@ -19,6 +18,9 @@ const props = defineProps({
 
 const search = ref(props.filters.search || '');
 const selectedGroups = ref([]);
+const showDeleteConfirm = ref(false);
+const groupToDelete = ref(null);
+const showBulkDeleteConfirm = ref(false);
 
 const filterGroups = () => {
     router.get(route('admin.groups.index'), {
@@ -29,26 +31,36 @@ const filterGroups = () => {
     });
 };
 
-const deleteGroup = (group) => {
-    if (confirm(`Are you sure you want to delete ${group.name}? This action cannot be undone.`)) {
-        router.delete(route('admin.groups.destroy', group.id));
+const confirmDelete = (group) => {
+    groupToDelete.value = group;
+    showDeleteConfirm.value = true;
+};
+
+const deleteGroup = () => {
+    if (groupToDelete.value) {
+        router.delete(route('admin.groups.destroy', groupToDelete.value.id), {
+            onSuccess: () => {
+                showDeleteConfirm.value = false;
+                groupToDelete.value = null;
+            },
+        });
     }
 };
 
+const confirmBulkDelete = () => {
+    if (selectedGroups.value.length === 0) return;
+    showBulkDeleteConfirm.value = true;
+};
+
 const bulkDelete = () => {
-    if (selectedGroups.value.length === 0) {
-        alert('Please select groups to delete');
-        return;
-    }
-    if (confirm(`Delete ${selectedGroups.value.length} groups? This action cannot be undone.`)) {
-        router.post(route('admin.groups.bulkDelete'), {
-            group_ids: selectedGroups.value
-        }, {
-            onSuccess: () => {
-                selectedGroups.value = [];
-            }
-        });
-    }
+    router.post(route('admin.groups.bulkDelete'), {
+        group_ids: selectedGroups.value
+    }, {
+        onSuccess: () => {
+            selectedGroups.value = [];
+            showBulkDeleteConfirm.value = false;
+        }
+    });
 };
 
 const toggleSelectAll = (event) => {
@@ -80,33 +92,32 @@ const formatDate = (dateString) => {
             <PageHeader
                 title="Manage Groups"
                 subtitle="View and manage all groups"
-                :crumbs="[
-                    { label: 'Admin Dashboard', href: route('admin.dashboard') },
-                    { label: 'Groups' }
-                ]"
+                :crumbs="[{ label: 'Groups' }]"
             >
                 <template #actions>
+                    <Button
+                        v-if="selectedGroups.length > 0"
+                        variant="danger"
+                        size="sm"
+                        @click="confirmBulkDelete"
+                    >
+                        <Icon name="trash" class="mr-2" size="sm" />
+                        Delete Selected ({{ selectedGroups.length }})
+                    </Button>
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        @click="exportCSV"
+                    >
+                        <Icon name="file-arrow-down" class="mr-2" size="sm" />
+                        Export CSV
+                    </Button>
                     <Link :href="route('admin.groups.create')">
-                        <Button variant="primary">
-                            <PlusIcon class="w-4 h-4 mr-2" />
+                        <Button variant="primary" size="sm">
+                            <Icon name="plus" class="mr-2" size="sm" />
                             Create Group
                         </Button>
                     </Link>
-                    <button
-                        v-if="selectedGroups.length > 0"
-                        @click="bulkDelete"
-                        class="inline-flex items-center px-4 py-2 bg-danger border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-danger/80"
-                    >
-                        <TrashIcon class="w-4 h-4 mr-2" />
-                        Delete Selected ({{ selectedGroups.length }})
-                    </button>
-                    <button
-                        @click="exportCSV"
-                        class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50"
-                    >
-                        <DocumentArrowDownIcon class="w-4 h-4 mr-2" />
-                        Export CSV
-                    </button>
                 </template>
             </PageHeader>
         </template>
@@ -114,121 +125,110 @@ const formatDate = (dateString) => {
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <!-- Search -->
-                <div class="bg-white shadow-sm sm:rounded-lg mb-6">
-                    <div class="p-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            <MagnifyingGlassIcon class="w-4 h-4 inline mr-1" />
-                            Search
-                        </label>
-                        <input
-                            v-model="search"
-                            @input="filterGroups"
-                            type="text"
-                            placeholder="Search by name or code..."
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
-                        />
-                    </div>
-                </div>
+                <Card class="mb-6">
+                    <TextField
+                        v-model="search"
+                        @input="filterGroups"
+                        label="Search"
+                        icon="magnifying-glass"
+                        placeholder="Search by name or code..."
+                    />
+                </Card>
 
                 <!-- Groups Table -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <Card :body-padding="false">
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                        <table class="min-w-full divide-y divide-border">
+                            <thead class="bg-surface-header">
                                 <tr>
                                     <th class="px-6 py-3 text-left">
                                         <input
                                             type="checkbox"
                                             @change="toggleSelectAll"
                                             :checked="selectedGroups.length === groups.data.length && groups.data.length > 0"
-                                            class="rounded border-gray-300 text-primary shadow-sm focus:border-primary focus:ring focus:ring-primary/50 focus:ring-opacity-50"
+                                            class="rounded border-border text-primary bg-surface-inset focus:ring-primary focus:ring-offset-0"
                                         />
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                                         Name
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                                         Code
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                                         Members
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                                         Entries
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                                         Created
                                     </th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-muted uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="group in groups.data" :key="group.id" class="hover:bg-gray-50">
+                            <tbody class="bg-surface divide-y divide-border">
+                                <tr v-for="group in groups.data" :key="group.id" class="hover:bg-surface-overlay transition-colors">
                                     <td class="px-6 py-4">
                                         <input
                                             v-model="selectedGroups"
                                             :value="group.id"
                                             type="checkbox"
-                                            class="rounded border-gray-300 text-primary shadow-sm focus:border-primary focus:ring focus:ring-primary/50 focus:ring-opacity-50"
+                                            class="rounded border-border text-primary bg-surface-inset focus:ring-primary focus:ring-offset-0"
                                         />
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <Link
                                             :href="route('admin.groups.show', group.id)"
-                                            class="text-sm font-medium text-gray-900 hover:text-primary/80"
+                                            class="text-sm font-medium text-body hover:text-primary transition-colors"
                                         >
                                             {{ group.name }}
                                         </Link>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        <Badge variant="default" size="sm">
                                             {{ group.code }}
-                                        </span>
+                                        </Badge>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <div class="flex items-center">
-                                            <UsersIcon class="w-4 h-4 mr-1 text-gray-400" />
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">
+                                        <div class="flex items-center gap-1">
+                                            <Icon name="users" size="sm" class="text-subtle" />
                                             {{ group.users_count }}
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">
                                         {{ group.entries_count }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">
                                         {{ formatDate(group.created_at) }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                                         <Link
                                             :href="route('admin.groups.show', group.id)"
-                                            class="text-primary hover:text-primary/80 mr-3"
+                                            class="text-primary hover:text-primary-hover transition-colors"
                                         >
                                             View
                                         </Link>
                                         <Link
                                             :href="route('admin.groups.edit', group.id)"
-                                            class="text-primary hover:text-primary/80 mr-3"
+                                            class="text-primary hover:text-primary-hover transition-colors"
                                         >
                                             Edit
                                         </Link>
-                                        <!-- <Link
-                                            :href="route('admin.groups.members', group.id)"
-                                            class="text-gray-600 hover:text-gray-900 mr-3"
-                                        >
-                                            Members
-                                        </Link> -->
                                         <button
-                                            @click="deleteGroup(group)"
-                                            class="text-danger hover:text-danger/80"
+                                            @click="confirmDelete(group)"
+                                            class="text-danger hover:text-danger/80 transition-colors"
                                         >
                                             Delete
                                         </button>
                                     </td>
                                 </tr>
                                 <tr v-if="groups.data.length === 0">
-                                    <td colspan="7" class="px-6 py-12 text-center text-gray-500">
-                                        No groups found
+                                    <td colspan="7" class="px-6 py-12 text-center text-muted">
+                                        <Icon name="users" size="2x" class="text-subtle mb-2" />
+                                        <p>No groups found</p>
                                     </td>
                                 </tr>
                             </tbody>
@@ -236,7 +236,7 @@ const formatDate = (dateString) => {
                     </div>
 
                     <!-- Pagination -->
-                    <div v-if="groups.links.length > 3" class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                    <div v-if="groups.links.length > 3" class="px-4 py-3 border-t border-border">
                         <div class="flex justify-center">
                             <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                                 <component
@@ -244,11 +244,11 @@ const formatDate = (dateString) => {
                                     :key="index"
                                     :is="link.url ? Link : 'span'"
                                     :href="link.url"
-                                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium"
+                                    class="relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors"
                                     :class="{
                                         'bg-primary/10 border-primary text-primary': link.active,
-                                        'bg-white text-gray-700 hover:bg-gray-50': !link.active && link.url,
-                                        'bg-gray-100 text-gray-400 cursor-not-allowed': !link.url,
+                                        'bg-surface border-border text-body hover:bg-surface-overlay': !link.active && link.url,
+                                        'bg-surface-inset border-border text-subtle cursor-not-allowed': !link.url,
                                         'rounded-l-md': index === 0,
                                         'rounded-r-md': index === groups.links.length - 1,
                                     }"
@@ -257,8 +257,30 @@ const formatDate = (dateString) => {
                             </nav>
                         </div>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
+
+        <!-- Delete Confirmation -->
+        <Confirm
+            :show="showDeleteConfirm"
+            title="Delete Group?"
+            :message="`Are you sure you want to delete '${groupToDelete?.name}'? This action cannot be undone.`"
+            variant="danger"
+            icon="triangle-exclamation"
+            @confirm="deleteGroup"
+            @close="showDeleteConfirm = false"
+        />
+
+        <!-- Bulk Delete Confirmation -->
+        <Confirm
+            :show="showBulkDeleteConfirm"
+            title="Delete Selected Groups?"
+            :message="`Are you sure you want to delete ${selectedGroups.length} groups? This action cannot be undone.`"
+            variant="danger"
+            icon="triangle-exclamation"
+            @confirm="bulkDelete"
+            @close="showBulkDeleteConfirm = false"
+        />
     </AuthenticatedLayout>
 </template>

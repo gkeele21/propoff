@@ -2,7 +2,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import Button from '@/Components/Base/Button.vue';
+import Card from '@/Components/Base/Card.vue';
+import Icon from '@/Components/Base/Icon.vue';
 import TextField from '@/Components/Form/TextField.vue';
+import Select from '@/Components/Form/Select.vue';
+import Radio from '@/Components/Form/Radio.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 
 const props = defineProps({
@@ -18,6 +22,11 @@ const form = useForm({
 const submit = () => {
     form.post(route('admin.groups.store'));
 };
+
+const eventOptions = props.events.map(event => ({
+    value: event.id,
+    label: `${event.name} (${new Date(event.event_date).toLocaleDateString()})`,
+}));
 </script>
 
 <template>
@@ -29,7 +38,6 @@ const submit = () => {
                 title="Create New Group"
                 subtitle="Set up a new group"
                 :crumbs="[
-                    { label: 'Admin Dashboard', href: route('admin.dashboard') },
                     { label: 'Groups', href: route('admin.groups.index') },
                     { label: 'Create' }
                 ]"
@@ -38,8 +46,8 @@ const submit = () => {
 
         <div class="py-12">
             <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <form @submit.prevent="submit" class="p-6 space-y-6">
+                <Card>
+                    <form @submit.prevent="submit" class="space-y-6">
                         <!-- Name -->
                         <TextField
                             v-model="form.name"
@@ -51,72 +59,73 @@ const submit = () => {
                         />
 
                         <!-- Event -->
-                        <div>
-                            <label for="event_id" class="block text-sm font-medium text-gray-700 mb-1">Event</label>
-                            <select
-                                id="event_id"
-                                v-model="form.event_id"
-                                class="mt-1 block w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
-                                required
-                            >
-                                <option value="">Select an event...</option>
-                                <option v-for="event in events" :key="event.id" :value="event.id">
-                                    {{ event.name }} ({{ new Date(event.event_date).toLocaleDateString() }})
-                                </option>
-                            </select>
-                            <p v-if="form.errors.event_id" class="text-danger text-sm mt-1">{{ form.errors.event_id }}</p>
-                            <p class="mt-1 text-sm text-gray-500">
-                                Select the event this group will participate in
-                            </p>
-                        </div>
+                        <Select
+                            v-model="form.event_id"
+                            label="Event"
+                            :options="eventOptions"
+                            :error="form.errors.event_id"
+                            placeholder="Select an event..."
+                            hint="Select the event this group will participate in"
+                            required
+                        />
 
                         <!-- Grading Source -->
                         <div>
-                            <label for="grading_source" class="block text-sm font-medium text-gray-700 mb-1">Grading Mode</label>
-                            <select
-                                id="grading_source"
-                                v-model="form.grading_source"
-                                class="mt-1 block w-full border-gray-300 focus:border-primary focus:ring-primary/50 rounded-md shadow-sm"
-                                required
-                            >
-                                <option value="admin">Admin Grading - Use admin-set event answers</option>
-                                <option value="captain">Captain Grading - Captain sets correct answers</option>
-                            </select>
-                            <p v-if="form.errors.grading_source" class="text-danger text-sm mt-1">{{ form.errors.grading_source }}</p>
-                            <p class="mt-1 text-sm text-gray-500">
-                                Choose who will provide the correct answers for grading
+                            <label class="block text-sm font-semibold text-muted mb-3">Grading Mode</label>
+                            <div class="space-y-3">
+                                <Radio
+                                    v-model="form.grading_source"
+                                    name="grading_source"
+                                    value="admin"
+                                    label="Admin Grading"
+                                    description="Use admin-set event answers for grading"
+                                />
+                                <Radio
+                                    v-model="form.grading_source"
+                                    name="grading_source"
+                                    value="captain"
+                                    label="Captain Grading"
+                                    description="Captain sets correct answers for their group"
+                                />
+                            </div>
+                            <p v-if="form.errors.grading_source" class="text-danger text-sm mt-2">
+                                {{ form.errors.grading_source }}
                             </p>
                         </div>
 
                         <!-- Info Box -->
-                        <div class="bg-primary/10 border border-primary/30 rounded-lg p-4">
-                            <h4 class="font-medium text-primary mb-2">What happens next?</h4>
-                            <ul class="text-sm text-primary space-y-1">
-                                <li>• A unique group code will be automatically generated</li>
-                                <li>• You can add members manually or share the group code</li>
-                                <li>• Members can join using the group code</li>
-                                <li>• You can generate event invitations for this group</li>
+                        <div class="bg-info/10 border border-info/30 rounded-lg p-4">
+                            <h4 class="font-semibold text-info mb-2 flex items-center gap-2">
+                                <Icon name="circle-info" size="sm" />
+                                What happens next?
+                            </h4>
+                            <ul class="text-sm text-info/80 space-y-1 ml-6 list-disc">
+                                <li>A unique group code will be automatically generated</li>
+                                <li>You can add members manually or share the group code</li>
+                                <li>Members can join using the group code</li>
+                                <li>You can generate event invitations for this group</li>
                             </ul>
                         </div>
 
                         <!-- Buttons -->
-                        <div class="flex items-center justify-between pt-4 border-t">
+                        <div class="flex items-center justify-between pt-4 border-t border-border">
                             <Link
                                 :href="route('admin.groups.index')"
-                                class="text-gray-600 hover:text-gray-900"
+                                class="text-muted hover:text-body transition-colors"
                             >
                                 Cancel
                             </Link>
                             <Button
                                 variant="primary"
                                 type="submit"
-                                :disabled="form.processing"
+                                :loading="form.processing"
                             >
+                                <Icon name="users" class="mr-2" size="sm" />
                                 Create Group
                             </Button>
                         </div>
                     </form>
-                </div>
+                </Card>
             </div>
         </div>
     </AuthenticatedLayout>

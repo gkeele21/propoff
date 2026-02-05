@@ -46,9 +46,9 @@ const joinGroup = () => {
             <div v-if="canLogin" class="fixed top-0 right-0 p-6 text-end z-10">
                 <Link
                     v-if="$page.props.auth.user"
-                    :href="$page.props.auth.user.role === 'admin' ? route('admin.dashboard') : route('dashboard')"
+                    :href="['admin', 'manager'].includes($page.props.auth.user.role) ? route('admin.events.index') : route('dashboard')"
                     class="font-semibold text-muted hover:text-body transition-colors"
-                >Dashboard</Link>
+                >My Home</Link>
                 <Link
                     v-if="$page.props.auth.user"
                     :href="route('logout')"
@@ -166,10 +166,10 @@ const joinGroup = () => {
                     </Link>
                     <Link
                         v-else
-                        :href="$page.props.auth.user.role === 'admin' ? route('admin.dashboard') : route('dashboard')"
+                        :href="['admin', 'manager'].includes($page.props.auth.user.role) ? route('admin.events.index') : route('dashboard')"
                         class="btn-success px-8 py-4 text-white font-bold text-lg rounded-lg"
                     >
-                        Go to Dashboard
+                        Go to My Home
                     </Link>
                 </div>
             </div>

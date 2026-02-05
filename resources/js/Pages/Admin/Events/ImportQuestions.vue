@@ -7,7 +7,6 @@
                 title="Import from Templates"
                 subtitle="Search and import questions from your template library"
                 :crumbs="[
-                    { label: 'Admin Dashboard', href: route('admin.dashboard') },
                     { label: 'Events', href: route('admin.events.index') },
                     { label: event.name, href: route('admin.events.show', event.id) },
                     { label: 'Import Templates' }

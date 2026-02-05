@@ -104,7 +104,6 @@ const exportDetailedCSV = (groupId = null) => {
                 title="Grading"
                 subtitle="Grade entries and set answers for groups"
                 :crumbs="[
-                    { label: 'Admin Dashboard', href: route('admin.dashboard') },
                     { label: 'Events', href: route('admin.events.index') },
                     { label: event.title, href: route('admin.events.show', event.id) },
                     { label: 'Grading' }

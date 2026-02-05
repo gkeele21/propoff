@@ -18,13 +18,13 @@ class DatabaseSeeder extends Seeder
             'name' => 'Bert Keele',
             'email' => 'bertkeele@gmail.com',
             'password' => Hash::make('myPROPOFF#1'),
-            'role' => 'admin',
+            'role' => 'manager',
         ]);
 
         // Seed question templates
         $this->call(QuestionTemplateSeeder::class);
 
         // Seed Super Bowl LX event, group, and questions
-        $this->call(SuperBowlLXSeeder::class);
+        //$this->call(SuperBowlLXSeeder::class);
     }
 }

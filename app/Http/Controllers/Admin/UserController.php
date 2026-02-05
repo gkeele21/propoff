@@ -89,12 +89,12 @@ class UserController extends Controller
     public function updateRole(Request $request, User $user)
     {
         $validated = $request->validate([
-            'role' => 'required|in:admin,user',
+            'role' => 'required|in:manager,admin,user',
         ]);
 
         // Prevent demoting yourself
-        if ($user->id === auth()->id() && $validated['role'] !== 'admin') {
-            return back()->with('error', 'You cannot demote yourself!');
+        if ($user->id === auth()->id() && $validated['role'] !== auth()->user()->role) {
+            return back()->with('error', 'You cannot change your own role!');
         }
 
         $user->update(['role' => $validated['role']]);
@@ -226,6 +226,7 @@ class UserController extends Controller
     {
         $stats = [
             'total_users' => User::count(),
+            'manager_count' => User::where('role', 'manager')->count(),
             'admin_count' => User::where('role', 'admin')->count(),
             'regular_users' => User::where('role', 'user')->count(),
             'verified_users' => User::whereNotNull('email_verified_at')->count(),

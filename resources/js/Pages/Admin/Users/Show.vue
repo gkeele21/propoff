@@ -6,7 +6,6 @@
             <PageHeader
                 :title="user.name"
                 :crumbs="[
-                    { label: 'Admin Dashboard', href: route('admin.dashboard') },
                     { label: 'Users', href: route('admin.users.index') },
                     { label: user.name }
                 ]"

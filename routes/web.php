@@ -53,7 +53,7 @@ Route::get('/guest/{guestToken}', [GuestController::class, 'login'])->name('gues
 Route::get('/groups/join', [GroupController::class, 'showJoinForm'])->name('groups.join.form');
 Route::post('/groups/join', [GroupController::class, 'join'])->name('groups.join');
 
-Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/my-home', [App\Http\Controllers\MyHomeController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     // Profile routes
@@ -134,12 +134,14 @@ Route::prefix('captain')->name('captain.')->group(function () {
 });
 
 
-// Admin routes
+// Admin routes (accessible to admin and manager roles)
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
-    // Admin Dashboard
-    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+    // Redirect old dashboard to events
+    Route::get('/dashboard', function () {
+        return redirect()->route('admin.events.index');
+    })->name('dashboard');
 
-    // Events
+    // Events (admin + manager)
     Route::resource('events', AdminEventController::class);
     Route::post('/events/{event}/update-status', [AdminEventController::class, 'updateStatus'])->name('events.updateStatus');
     Route::post('/events/{event}/duplicate', [AdminEventController::class, 'duplicate'])->name('events.duplicate');
@@ -148,11 +150,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Event Invitations
     Route::post('/events/{event}/generate-invitation', [AdminEventController::class, 'generateInvitation'])->name('events.generateInvitation');
     Route::post('/events/{event}/invitations/{invitation}/deactivate', [AdminEventController::class, 'deactivateInvitation'])->name('events.deactivateInvitation');
-
-    // Question Templates
-    Route::resource('question-templates', QuestionTemplateController::class);
-    Route::post('/question-templates/{template}/preview', [QuestionTemplateController::class, 'preview'])->name('question-templates.preview');
-    Route::post('/question-templates/{template}/duplicate', [QuestionTemplateController::class, 'duplicate'])->name('question-templates.duplicate');
 
     // Event Questions
     Route::get('/events/{event}/import-questions', [AdminEventQuestionController::class, 'importQuestions'])->name('events.import-questions');
@@ -178,31 +175,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/events/{event}/groups/{group}/export-detailed-csv', [GradingController::class, 'exportDetailedCSV'])->name('events.grading.exportDetailedCSVByGroup');
     Route::get('/events/{event}/groups/{group}/summary', [GradingController::class, 'groupSummary'])->name('events.grading.groupSummary');
 
-    // Users
-    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
-    Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
-    Route::post('/users/{user}/update-role', [AdminUserController::class, 'updateRole'])->name('users.updateRole');
-    Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
-    Route::get('/users/{user}/activity', [AdminUserController::class, 'activity'])->name('users.activity');
-    Route::get('/users/export/csv', [AdminUserController::class, 'exportCSV'])->name('users.exportCSV');
-    Route::post('/users/bulk-delete', [AdminUserController::class, 'bulkDelete'])->name('users.bulkDelete');
-    Route::get('/users-statistics', [AdminUserController::class, 'statistics'])->name('users.statistics');
-
-    // Groups
-    Route::get('/groups', [AdminGroupController::class, 'index'])->name('groups.index');
-    Route::get('/groups/create', [AdminGroupController::class, 'create'])->name('groups.create');
-    Route::post('/groups', [AdminGroupController::class, 'store'])->name('groups.store');
-    Route::get('/groups/{group}', [AdminGroupController::class, 'show'])->name('groups.show');
-    Route::get('/groups/{group}/edit', [AdminGroupController::class, 'edit'])->name('groups.edit');
-    Route::patch('/groups/{group}', [AdminGroupController::class, 'update'])->name('groups.update');
-    Route::delete('/groups/{group}', [AdminGroupController::class, 'destroy'])->name('groups.destroy');
-    Route::post('/groups/{group}/add-user', [AdminGroupController::class, 'addUser'])->name('groups.addUser');
-    Route::delete('/groups/{group}/users/{user}', [AdminGroupController::class, 'removeUser'])->name('groups.removeUser');
-    Route::get('/groups/export/csv', [AdminGroupController::class, 'exportCSV'])->name('groups.exportCSV');
-    Route::get('/groups-statistics', [AdminGroupController::class, 'statistics'])->name('groups.statistics');
-    Route::get('/groups/{group}/members', [AdminGroupController::class, 'members'])->name('groups.members');
-    Route::post('/groups/bulk-delete', [AdminGroupController::class, 'bulkDelete'])->name('groups.bulkDelete');
-
     // Captain Invitations
     Route::get('/events/{event}/captain-invitations', [\App\Http\Controllers\Admin\CaptainInvitationController::class, 'index'])->name('events.captain-invitations.index');
     Route::post('/events/{event}/captain-invitations', [\App\Http\Controllers\Admin\CaptainInvitationController::class, 'store'])->name('events.captain-invitations.store');
@@ -225,6 +197,39 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
                 'event' => $event,
             ]);
         })->name('host-game');
+    });
+
+    // Manager-only routes (Question Templates, Users, Groups)
+    Route::middleware('manager')->group(function () {
+        // Question Templates
+        Route::resource('question-templates', QuestionTemplateController::class);
+        Route::post('/question-templates/{template}/preview', [QuestionTemplateController::class, 'preview'])->name('question-templates.preview');
+        Route::post('/question-templates/{template}/duplicate', [QuestionTemplateController::class, 'duplicate'])->name('question-templates.duplicate');
+
+        // Users
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+        Route::post('/users/{user}/update-role', [AdminUserController::class, 'updateRole'])->name('users.updateRole');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+        Route::get('/users/{user}/activity', [AdminUserController::class, 'activity'])->name('users.activity');
+        Route::get('/users/export/csv', [AdminUserController::class, 'exportCSV'])->name('users.exportCSV');
+        Route::post('/users/bulk-delete', [AdminUserController::class, 'bulkDelete'])->name('users.bulkDelete');
+        Route::get('/users-statistics', [AdminUserController::class, 'statistics'])->name('users.statistics');
+
+        // Groups
+        Route::get('/groups', [AdminGroupController::class, 'index'])->name('groups.index');
+        Route::get('/groups/create', [AdminGroupController::class, 'create'])->name('groups.create');
+        Route::post('/groups', [AdminGroupController::class, 'store'])->name('groups.store');
+        Route::get('/groups/{group}', [AdminGroupController::class, 'show'])->name('groups.show');
+        Route::get('/groups/{group}/edit', [AdminGroupController::class, 'edit'])->name('groups.edit');
+        Route::patch('/groups/{group}', [AdminGroupController::class, 'update'])->name('groups.update');
+        Route::delete('/groups/{group}', [AdminGroupController::class, 'destroy'])->name('groups.destroy');
+        Route::post('/groups/{group}/add-user', [AdminGroupController::class, 'addUser'])->name('groups.addUser');
+        Route::delete('/groups/{group}/users/{user}', [AdminGroupController::class, 'removeUser'])->name('groups.removeUser');
+        Route::get('/groups/export/csv', [AdminGroupController::class, 'exportCSV'])->name('groups.exportCSV');
+        Route::get('/groups-statistics', [AdminGroupController::class, 'statistics'])->name('groups.statistics');
+        Route::get('/groups/{group}/members', [AdminGroupController::class, 'members'])->name('groups.members');
+        Route::post('/groups/bulk-delete', [AdminGroupController::class, 'bulkDelete'])->name('groups.bulkDelete');
     });
 });
 

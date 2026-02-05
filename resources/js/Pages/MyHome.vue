@@ -81,12 +81,12 @@ const copyMagicLink = (link) => {
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head title="My Home" />
 
     <AuthenticatedLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-body leading-tight">
-                Dashboard
+                My Home
             </h2>
         </template>
 

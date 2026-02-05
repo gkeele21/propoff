@@ -69,6 +69,7 @@ class Kernel extends HttpKernel
 
         // Custom middleware
         'admin' => \App\Http\Middleware\IsAdmin::class,
+        'manager' => \App\Http\Middleware\IsManager::class,
         'event.accessible' => \App\Http\Middleware\EventAccessible::class,
         'entry.editable' => \App\Http\Middleware\EntryEditable::class,
     ];

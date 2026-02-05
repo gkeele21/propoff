@@ -89,7 +89,6 @@ const formatDate = (dateString) => {
                 title="Manage Users"
                 subtitle="View and manage all users"
                 :crumbs="[
-                    { label: 'Admin Dashboard', href: route('admin.dashboard') },
                     { label: 'Users' }
                 ]"
             >
@@ -143,6 +142,7 @@ const formatDate = (dateString) => {
                                     class="w-full bg-surface-elevated border-border text-body rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
                                 >
                                     <option value="all">All Roles</option>
+                                    <option value="manager">Manager</option>
                                     <option value="admin">Admin</option>
                                     <option value="user">User</option>
                                 </select>
@@ -217,6 +217,7 @@ const formatDate = (dateString) => {
                                         >
                                             <option value="user">User</option>
                                             <option value="admin">Admin</option>
+                                            <option value="manager">Manager</option>
                                         </select>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">

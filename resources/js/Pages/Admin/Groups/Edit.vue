@@ -2,6 +2,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import Button from '@/Components/Base/Button.vue';
+import Card from '@/Components/Base/Card.vue';
+import Icon from '@/Components/Base/Icon.vue';
 import TextField from '@/Components/Form/TextField.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 
@@ -27,22 +29,21 @@ const submit = () => {
             <PageHeader
                 title="Edit Group"
                 :crumbs="[
-                    { label: 'Admin Dashboard', href: route('admin.dashboard') },
                     { label: 'Groups', href: route('admin.groups.index') },
                     { label: group.name, href: route('admin.groups.show', group.id) },
                     { label: 'Edit' }
                 ]"
             >
                 <template #metadata>
-                    <span class="font-medium text-gray-900">{{ group.name }}</span>
+                    <span class="font-medium text-body">{{ group.name }}</span>
                 </template>
             </PageHeader>
         </template>
 
         <div class="py-12">
             <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <form @submit.prevent="submit" class="p-6 space-y-6">
+                <Card>
+                    <form @submit.prevent="submit" class="space-y-6">
                         <!-- Name -->
                         <TextField
                             v-model="form.name"
@@ -67,43 +68,47 @@ const submit = () => {
 
                         <!-- Warning Box -->
                         <div class="bg-warning/10 border border-warning/30 rounded-lg p-4">
-                            <h4 class="font-medium text-warning mb-2">⚠️ Important</h4>
-                            <ul class="text-sm text-warning space-y-1">
-                                <li>• Changing the group code will invalidate the old code</li>
-                                <li>• Members will need the new code to join</li>
-                                <li>• Existing members will not be affected</li>
+                            <h4 class="font-semibold text-warning mb-2 flex items-center gap-2">
+                                <Icon name="triangle-exclamation" size="sm" />
+                                Important
+                            </h4>
+                            <ul class="text-sm text-warning/80 space-y-1 ml-6 list-disc">
+                                <li>Changing the group code will invalidate the old code</li>
+                                <li>Members will need the new code to join</li>
+                                <li>Existing members will not be affected</li>
                             </ul>
                         </div>
 
                         <!-- Group Info -->
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <h4 class="text-sm font-medium text-gray-900 mb-2">Group Information</h4>
-                            <dl class="text-sm text-gray-600 space-y-1">
+                        <div class="bg-surface-inset rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-body mb-2">Group Information</h4>
+                            <dl class="text-sm text-muted space-y-1">
                                 <div class="flex justify-between">
                                     <dt>Created:</dt>
-                                    <dd>{{ new Date(group.created_at).toLocaleDateString() }}</dd>
+                                    <dd class="text-body">{{ new Date(group.created_at).toLocaleDateString() }}</dd>
                                 </div>
                             </dl>
                         </div>
 
                         <!-- Buttons -->
-                        <div class="flex items-center justify-between pt-4 border-t">
+                        <div class="flex items-center justify-between pt-4 border-t border-border">
                             <Link
                                 :href="route('admin.groups.show', group.id)"
-                                class="text-gray-600 hover:text-gray-900"
+                                class="text-muted hover:text-body transition-colors"
                             >
                                 Cancel
                             </Link>
                             <Button
                                 variant="primary"
                                 type="submit"
-                                :disabled="form.processing"
+                                :loading="form.processing"
                             >
+                                <Icon name="check" class="mr-2" size="sm" />
                                 Update Group
                             </Button>
                         </div>
                     </form>
-                </div>
+                </Card>
             </div>
         </div>
     </AuthenticatedLayout>

@@ -70,7 +70,6 @@ const copyUrl = (url) => {
                 title="Captain Invitations"
                 subtitle="Manage captain invitation links for this event"
                 :crumbs="[
-                    { label: 'Admin Dashboard', href: route('admin.dashboard') },
                     { label: 'Events', href: route('admin.events.index') },
                     { label: event.name, href: route('admin.events.show', event.id) },
                     { label: 'Captain Invitations' }

@@ -56,8 +56,7 @@ const getStatusVariant = (status) => {
                 title="Manage Events"
                 subtitle="View and manage all events"
                 :crumbs="[
-                    { label: 'Admin Dashboard', href: route('admin.dashboard') },
-                    { label: 'Events' }
+                                        { label: 'Events' }
                 ]"
             >
                 <template #actions>

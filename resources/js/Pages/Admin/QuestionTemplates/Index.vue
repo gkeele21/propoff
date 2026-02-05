@@ -7,8 +7,7 @@
                 title="Question Templates"
                 subtitle="Manage reusable question templates"
                 :crumbs="[
-                    { label: 'Admin Dashboard', href: route('admin.dashboard') },
-                    { label: 'Question Templates' }
+                                        { label: 'Question Templates' }
                 ]"
             >
                 <template #actions>

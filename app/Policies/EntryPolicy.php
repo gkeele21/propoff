@@ -24,7 +24,7 @@ class EntryPolicy
         // User can view their own entries, or event creator can view all entries for their event
         return $user->id === $entry->user_id
             || $user->id === $entry->event->created_by
-            || $user->role === 'admin';
+            || $user->isAdmin();
     }
 
     /**
@@ -72,7 +72,7 @@ class EntryPolicy
      */
     public function restore(User $user, Entry $entry): bool
     {
-        return $user->role === 'admin';
+        return $user->isAdmin();
     }
 
     /**
@@ -80,6 +80,6 @@ class EntryPolicy
      */
     public function forceDelete(User $user, Entry $entry): bool
     {
-        return $user->role === 'admin';
+        return $user->isAdmin();
     }
 }

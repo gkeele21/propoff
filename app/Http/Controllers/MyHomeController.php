@@ -12,10 +12,10 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class DashboardController extends Controller
+class MyHomeController extends Controller
 {
     /**
-     * Display the unified dashboard.
+     * Display the user's home page.
      */
     public function index(Request $request)
     {
@@ -23,7 +23,7 @@ class DashboardController extends Controller
         $isAdmin = $user->role === 'admin';
         $isCaptain = $user->captainGroups()->exists();
 
-        return Inertia::render('Dashboard', [
+        return Inertia::render('MyHome', [
             'isAdmin' => $isAdmin,
             'isCaptain' => $isCaptain,
             'userGroups' => $this->getUserGroups($user),

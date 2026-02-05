@@ -45,6 +45,16 @@ class UserFactory extends Factory
     }
 
     /**
+     * Indicate that the user is a manager (super user).
+     */
+    public function manager(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'manager',
+        ]);
+    }
+
+    /**
      * Indicate that the user is an admin.
      */
     public function admin(): static
