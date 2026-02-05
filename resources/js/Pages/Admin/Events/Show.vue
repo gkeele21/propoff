@@ -142,6 +142,8 @@ const handleDeleteFromModal = (question) => {
 
 // Drag and drop reordering
 const draggedQuestion = ref(null);
+const dropTarget = ref(null);
+const dropPosition = ref(null); // 'before' or 'after'
 let scrollInterval = null;
 
 const handleDragStart = (question) => {
@@ -184,15 +186,52 @@ const handleDragEnd = () => {
         scrollInterval = null;
     }
     draggedQuestion.value = null;
+    dropTarget.value = null;
+    dropPosition.value = null;
 };
 
-const handleDragOver = (e) => {
+const handleDragOver = (e, question) => {
     e.preventDefault();
+    if (!draggedQuestion.value || draggedQuestion.value.id === question.id) {
+        dropTarget.value = null;
+        dropPosition.value = null;
+        return;
+    }
+
+    // Determine if dropping before or after based on mouse position
+    const rect = e.currentTarget.getBoundingClientRect();
+    const midpoint = rect.top + rect.height / 2;
+    dropTarget.value = question.id;
+    dropPosition.value = e.clientY < midpoint ? 'before' : 'after';
 };
+
+const handleDragLeave = (e) => {
+    // Only clear if leaving the element entirely (not entering a child)
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+        dropTarget.value = null;
+        dropPosition.value = null;
+    }
+};
+
+const recentlyDroppedId = ref(null);
 
 const handleDrop = (targetQuestion) => {
+    // Store values before clearing
+    const currentDropPosition = dropPosition.value;
+    const droppedQuestionId = draggedQuestion.value?.id;
+
+    // Clear visual indicators
+    dropTarget.value = null;
+    dropPosition.value = null;
+
     if (!draggedQuestion.value || draggedQuestion.value.id === targetQuestion.id) {
         return;
+    }
+
+    // Calculate new order based on drop position
+    let newOrder = targetQuestion.display_order;
+    if (currentDropPosition === 'after') {
+        newOrder = targetQuestion.display_order + 1;
     }
 
     // Reorder on backend
@@ -200,11 +239,25 @@ const handleDrop = (targetQuestion) => {
         route('admin.events.event-questions.reorder', props.event.id),
         {
             question_id: draggedQuestion.value.id,
-            new_order: targetQuestion.display_order,
+            new_order: newOrder,
         },
         {
+            preserveScroll: false,
             onSuccess: () => {
                 showToastMessage('Questions reordered');
+                // Mark the dropped question for highlight effect
+                recentlyDroppedId.value = droppedQuestionId;
+                // Scroll to the dropped question after page refresh settles
+                setTimeout(() => {
+                    const element = document.getElementById(`question-${droppedQuestionId}`);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    // Clear highlight after animation
+                    setTimeout(() => {
+                        recentlyDroppedId.value = null;
+                    }, 1500);
+                }, 300);
             },
         }
     );
@@ -341,28 +394,44 @@ const submitCreateGroup = () => {
                 </template>
 
                 <!-- Questions List -->
-                <div class="space-y-6 p-6">
+                <div class="space-y-4 p-6">
                     <div
                         v-for="(question, index) in questions"
                         :key="question.id"
-                        class="bg-surface-elevated border border-border rounded-lg p-6 transition-opacity"
-                        :class="{ 'opacity-50': draggedQuestion?.id === question.id }"
-                        draggable="true"
-                        @dragstart="handleDragStart(question)"
-                        @drag="handleDrag"
-                        @dragend="handleDragEnd"
-                        @dragover="handleDragOver"
-                        @drop="handleDrop(question)"
+                        :id="`question-${question.id}`"
+                        class="relative"
                     >
+                        <!-- Drop indicator - before -->
+                        <div
+                            v-if="dropTarget === question.id && dropPosition === 'before'"
+                            class="absolute -top-2 left-0 right-0 h-1 bg-primary rounded-full z-10"
+                        />
+
+                        <!-- Question Card -->
+                        <div
+                            class="bg-surface-elevated border border-border rounded-lg p-6 transition-all"
+                            :class="{
+                                'opacity-50': draggedQuestion?.id === question.id,
+                                'border-primary/50': dropTarget === question.id,
+                                'ring-2 ring-primary ring-offset-2 ring-offset-surface': recentlyDroppedId === question.id,
+                            }"
+                            draggable="true"
+                            @dragstart="handleDragStart(question)"
+                            @drag="handleDrag"
+                            @dragend="handleDragEnd"
+                            @dragover="handleDragOver($event, question)"
+                            @dragleave="handleDragLeave"
+                            @drop="handleDrop(question)"
+                        >
                         <!-- Question Header -->
-                        <div class="flex items-start gap-4 mb-4">
+                        <div class="flex items-start gap-3 mb-4">
                             <!-- Drag Handle -->
-                            <div class="flex-shrink-0 cursor-move text-muted hover:text-body" title="Drag to reorder">
+                            <div class="flex-shrink-0 cursor-move text-muted hover:text-body mt-0.5" title="Drag to reorder">
                                 <Icon name="grip-vertical" size="lg" />
                             </div>
 
                             <!-- Question Info -->
-                            <div class="flex-1">
+                            <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap">
                                     <h3 class="text-lg font-semibold text-body">{{ index + 1 }}. {{ question.question_text }}</h3>
                                     <Badge
@@ -374,7 +443,7 @@ const submitCreateGroup = () => {
                                         {{ question.question_type?.replace('_', ' ') }}
                                     </Badge>
                                     <Badge v-if="question.is_void" variant="danger" size="sm">Voided</Badge>
-                                    <span class="text-sm text-subtle">{{ question.points }} pts</span>
+                                    <span class="text-sm text-subtle">{{ question.points }} {{ question.points === 1 ? 'pt' : 'pts' }}</span>
                                 </div>
                             </div>
 
@@ -410,12 +479,19 @@ const submitCreateGroup = () => {
                             />
                         </div>
 
-                        <!-- Save Answer Button (conditional) -->
-                        <div v-if="hasSelectedAnswer(question.id)" class="flex justify-end">
-                            <Button variant="secondary" class="!bg-info !text-white !border-info hover:!bg-info/80" @click="saveAnswer(question)">
-                                Save Answer
-                            </Button>
+                            <!-- Save Answer Button (conditional) -->
+                            <div v-if="hasSelectedAnswer(question.id)" class="flex justify-end">
+                                <Button variant="secondary" class="!bg-info !text-white !border-info hover:!bg-info/80" @click="saveAnswer(question)">
+                                    Save Answer
+                                </Button>
+                            </div>
                         </div>
+
+                        <!-- Drop indicator - after -->
+                        <div
+                            v-if="dropTarget === question.id && dropPosition === 'after'"
+                            class="absolute -bottom-2 left-0 right-0 h-1 bg-primary rounded-full z-10"
+                        />
                     </div>
 
                     <!-- Empty State -->

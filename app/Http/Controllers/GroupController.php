@@ -140,12 +140,36 @@ class GroupController extends Controller
 
         // For captains, provide detailed stats and member data
         if ($isCaptain) {
+            // Load questions with their answers for inline display
+            $questions = $group->groupQuestions()
+                ->where('is_active', true)
+                ->with('groupQuestionAnswer')
+                ->orderBy('display_order')
+                ->get()
+                ->map(function ($question) {
+                    $answer = $question->groupQuestionAnswer;
+                    return [
+                        'id' => $question->id,
+                        'question_text' => $question->question_text,
+                        'question_type' => $question->question_type,
+                        'options' => $question->options,
+                        'points' => $question->points,
+                        'display_order' => $question->display_order,
+                        'is_custom' => $question->is_custom,
+                        'correct_answer' => $answer?->correct_answer,
+                        'is_void' => $answer?->is_void ?? false,
+                    ];
+                });
+
+            $data['questions'] = $questions;
+
             $data['stats'] = [
                 'total_members' => $group->members()->count(),
                 'total_captains' => $group->captains()->count(),
-                'total_questions' => $group->groupQuestions()->where('is_active', true)->count(),
+                'total_questions' => $questions->count(),
                 'total_entries' => $group->entries()->where('is_complete', true)->count(),
                 'answered_questions' => $group->groupQuestionAnswers()->count(),
+                'total_points' => $group->groupQuestions()->where('is_active', true)->sum('points'),
             ];
 
             // Format group data for captain view

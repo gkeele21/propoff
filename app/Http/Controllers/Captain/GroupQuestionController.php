@@ -17,56 +17,17 @@ class GroupQuestionController extends Controller
      */
     public function index(Request $request, Group $group)
     {
-        $questions = $group->groupQuestions()
-            ->with('eventQuestion')
-            ->orderBy('display_order')
-            ->get()
-            ->map(function ($question) {
-                return [
-                    'id' => $question->id,
-                    'question_text' => $question->question_text,
-                    'question_type' => $question->question_type,
-                    'options' => $question->options,
-                    'points' => $question->points,
-                    'display_order' => $question->display_order,
-                    'is_active' => $question->is_active,
-                    'is_custom' => $question->is_custom,
-                    'event_question_id' => $question->event_question_id,
-                    'has_answer' => $question->groupQuestionAnswer()->exists(),
-                ];
-            });
-
-        return Inertia::render('Groups/Questions/Index', [
-            'group' => [
-                'id' => $group->id,
-                'name' => $group->name,
-                'event' => $group->event ? [
-                    'id' => $group->event->id,
-                    'name' => $group->event->name,
-                ] : null,
-            ],
-            'questions' => $questions,
-        ]);
+        // Questions are now managed on the Group Show page
+        return redirect()->route('groups.show', $group);
     }
 
     /**
      * Show the form for creating a new custom question.
+     * Redirects to Group Show page where the modal handles creation.
      */
     public function create(Request $request, Group $group)
     {
-        $nextOrder = $group->groupQuestions()->max('display_order') + 1 ?? 1;
-
-        return Inertia::render('Groups/Questions/Create', [
-            'group' => [
-                'id' => $group->id,
-                'name' => $group->name,
-                'event' => $group->event ? [
-                    'id' => $group->event->id,
-                    'name' => $group->event->name,
-                ] : null,
-            ],
-            'currentQuestionCount' => $group->groupQuestions()->count(),
-        ]);
+        return redirect()->route('groups.show', $group);
     }
 
     /**
@@ -86,40 +47,17 @@ class GroupQuestionController extends Controller
             'is_custom' => true, // Mark as custom
         ]);
 
-        return redirect()->route('groups.questions.index', $group)
+        return redirect()->route('groups.show', $group)
             ->with('success', 'Custom question added successfully!');
     }
 
     /**
      * Show the form for editing the specified question.
+     * Redirects to Group Show page where the modal handles editing.
      */
     public function edit(Request $request, Group $group, GroupQuestion $groupQuestion)
     {
-        // Ensure question belongs to this group
-        if ($groupQuestion->group_id !== $group->id) {
-            abort(404);
-        }
-
-        return Inertia::render('Groups/Questions/Edit', [
-            'group' => [
-                'id' => $group->id,
-                'name' => $group->name,
-                'event' => $group->event ? [
-                    'id' => $group->event->id,
-                    'name' => $group->event->name,
-                ] : null,
-            ],
-            'question' => [
-                'id' => $groupQuestion->id,
-                'question_text' => $groupQuestion->question_text,
-                'question_type' => $groupQuestion->question_type,
-                'options' => $groupQuestion->options,
-                'points' => $groupQuestion->points,
-                'display_order' => $groupQuestion->display_order,
-                'is_active' => $groupQuestion->is_active,
-                'is_custom' => $groupQuestion->is_custom,
-            ],
-        ]);
+        return redirect()->route('groups.show', $group);
     }
 
     /**
@@ -141,7 +79,7 @@ class GroupQuestionController extends Controller
             'is_active' => $request->is_active ?? true,
         ]);
 
-        return redirect()->route('groups.questions.index', $group)
+        return redirect()->route('groups.show', $group)
             ->with('success', 'Question updated successfully!');
     }
 
@@ -170,7 +108,7 @@ class GroupQuestionController extends Controller
             ->where('display_order', '>', $groupQuestion->display_order)
             ->decrement('display_order');
 
-        return redirect()->route('groups.questions.index', $group)
+        return redirect()->route('groups.show', $group)
             ->with('success', 'Question deleted successfully!');
     }
 
@@ -195,9 +133,47 @@ class GroupQuestionController extends Controller
 
     /**
      * Reorder questions.
+     *
+     * Supports two formats:
+     * 1. Single question reorder (drag-and-drop): { question_id, new_order }
+     * 2. Bulk reorder: { order: [id1, id2, ...] }
      */
     public function reorder(Request $request, Group $group)
     {
+        // Check if using single-question format (drag-and-drop)
+        if ($request->has('question_id') && $request->has('new_order')) {
+            $validated = $request->validate([
+                'question_id' => 'required|exists:group_questions,id',
+                'new_order' => 'required|integer|min:1',
+            ]);
+
+            $question = GroupQuestion::where('id', $validated['question_id'])
+                ->where('group_id', $group->id)
+                ->firstOrFail();
+
+            $oldOrder = $question->display_order;
+            $newOrder = $validated['new_order'];
+
+            if ($oldOrder < $newOrder) {
+                // Moving down - shift up questions in between
+                GroupQuestion::where('group_id', $group->id)
+                    ->where('display_order', '>', $oldOrder)
+                    ->where('display_order', '<=', $newOrder)
+                    ->decrement('display_order');
+            } elseif ($oldOrder > $newOrder) {
+                // Moving up - shift down questions in between
+                GroupQuestion::where('group_id', $group->id)
+                    ->where('display_order', '<', $oldOrder)
+                    ->where('display_order', '>=', $newOrder)
+                    ->increment('display_order');
+            }
+
+            $question->update(['display_order' => $newOrder]);
+
+            return back()->with('success', 'Questions reordered successfully!');
+        }
+
+        // Bulk reorder format
         $validated = $request->validate([
             'order' => 'required|array',
             'order.*' => 'required|exists:group_questions,id',

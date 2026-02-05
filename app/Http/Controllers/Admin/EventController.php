@@ -48,7 +48,7 @@ class EventController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Admin/Events/Create');
+        return Inertia::render('Admin/Events/EventForm');
     }
 
     /**
@@ -136,7 +136,7 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
-        return Inertia::render('Admin/Events/Edit', [
+        return Inertia::render('Admin/Events/EventForm', [
             'event' => $event,
         ]);
     }

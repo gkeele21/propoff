@@ -25,48 +25,11 @@ class GradingController extends Controller
 
     /**
      * Display the grading interface for the group.
+     * Redirects to Group Show page where grading is now handled inline.
      */
     public function index(Request $request, Group $group)
     {
-        // Get all group questions with their answers
-        $questions = $group->groupQuestions()
-            ->active()
-            ->with('groupQuestionAnswer')
-            ->orderBy('display_order')
-            ->get()
-            ->map(function ($question) {
-                $answer = $question->groupQuestionAnswer;
-
-                return [
-                    'id' => $question->id,
-                    'question_text' => $question->question_text,
-                    'question_type' => $question->question_type,
-                    'options' => $question->options,
-                    'points' => $question->points,
-                    'order' => $question->display_order,
-                    'is_custom' => $question->is_custom,
-                    'answer' => $answer ? [
-                        'id' => $answer->id,
-                        'correct_answer' => $answer->correct_answer,
-                        'points_awarded' => $answer->points_awarded,
-                        'is_void' => $answer->is_void,
-                    ] : null,
-                ];
-            });
-
-        return Inertia::render('Groups/Grading/Index', [
-            'group' => [
-                'id' => $group->id,
-                'name' => $group->name,
-                'grading_source' => $group->grading_source,
-                'event' => [
-                    'id' => $group->event->id,
-                    'name' => $group->event->name,
-                    'status' => $group->event->status,
-                ],
-            ],
-            'questions' => $questions,
-        ]);
+        return redirect()->route('groups.show', $group);
     }
 
     /**

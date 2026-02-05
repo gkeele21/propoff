@@ -42,7 +42,7 @@ class GroupController extends Controller
             ->orderBy('event_date', 'desc')
             ->get();
 
-        return Inertia::render('Admin/Groups/Create', [
+        return Inertia::render('Admin/Groups/GroupForm', [
             'events' => $events,
         ]);
     }
@@ -128,7 +128,7 @@ class GroupController extends Controller
      */
     public function edit(Group $group)
     {
-        return Inertia::render('Admin/Groups/Edit', [
+        return Inertia::render('Admin/Groups/GroupForm', [
             'group' => $group,
         ]);
     }

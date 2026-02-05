@@ -17,9 +17,21 @@ const props = defineProps({
         type: Object,
         default: null,
     },
+    // Context determines which routes to use
+    context: {
+        type: String,
+        default: 'event', // 'event' | 'group'
+        validator: (value) => ['event', 'group'].includes(value),
+    },
+    // For event context
     eventId: {
         type: [String, Number],
-        required: true,
+        default: null,
+    },
+    // For group context
+    groupId: {
+        type: [String, Number],
+        default: null,
     },
 });
 
@@ -78,12 +90,32 @@ const removeOption = (index) => {
     }
 };
 
+// Get the appropriate route based on context
+const getStoreRoute = () => {
+    if (props.context === 'group') {
+        return route('groups.questions.store', props.groupId);
+    }
+    return route('admin.events.event-questions.store', props.eventId);
+};
+
+const getUpdateRoute = () => {
+    if (props.context === 'group') {
+        return route('groups.questions.update', [props.groupId, props.question.id]);
+    }
+    return route('admin.events.event-questions.update', [props.eventId, props.question.id]);
+};
+
 // Form submission
 const submit = () => {
+    // Transform data for group context (needs question_type)
+    const transformedData = props.context === 'group'
+        ? { ...form.data(), question_type: 'multiple_choice', is_custom: true }
+        : form.data();
+
     if (isEditing.value) {
         // Update existing question
-        form.patch(
-            route('admin.events.event-questions.update', [props.eventId, props.question.id]),
+        form.transform(() => transformedData).patch(
+            getUpdateRoute(),
             {
                 onSuccess: () => {
                     emit('success');
@@ -93,8 +125,8 @@ const submit = () => {
         );
     } else {
         // Create new question
-        form.post(
-            route('admin.events.event-questions.store', props.eventId),
+        form.transform(() => transformedData).post(
+            getStoreRoute(),
             {
                 onSuccess: () => {
                     emit('success');

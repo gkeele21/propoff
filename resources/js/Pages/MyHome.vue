@@ -257,10 +257,11 @@ const copyMagicLink = (link) => {
                         </div>
 
                         <div v-else class="space-y-4">
-                            <div
+                            <Link
                                 v-for="group in userGroups"
                                 :key="group.id"
-                                class="border border-border bg-surface-elevated p-4 rounded-lg hover:shadow-md transition"
+                                :href="route('groups.show', group.id)"
+                                class="block border border-border bg-surface-elevated p-4 rounded-lg hover:shadow-md hover:border-primary/50 transition cursor-pointer"
                             >
                                 <!-- Group Header -->
                                 <div class="flex justify-between items-start mb-3">
@@ -269,7 +270,7 @@ const copyMagicLink = (link) => {
                                             {{ group.name }}
                                             <span
                                                 v-if="group.is_captain"
-                                                class="text-xs bg-primary text-white px-2 py-1 rounded-full font-bold"
+                                                class="text-xs bg-warning text-white px-2 py-1 rounded-full font-bold"
                                             >
                                                 CAPTAIN
                                             </span>
@@ -284,7 +285,7 @@ const copyMagicLink = (link) => {
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="text-right">
+                                    <div class="text-right" @click.prevent.stop>
                                         <p class="text-xs text-muted">Join Code</p>
                                         <button
                                             @click="copyJoinCode(group.code)"
@@ -296,7 +297,7 @@ const copyMagicLink = (link) => {
                                 </div>
 
                                 <!-- Group Actions -->
-                                <div class="mt-3 pt-3 border-t border-border flex gap-3 flex-wrap">
+                                <div class="mt-3 pt-3 border-t border-border flex gap-3 flex-wrap" @click.prevent.stop>
                                     <!-- Smart button based on entry status -->
                                     <button
                                         v-if="group.user_entry && group.user_entry.status === 'in_progress'"
@@ -305,13 +306,13 @@ const copyMagicLink = (link) => {
                                     >
                                         Continue
                                     </button>
-                                    <Link
+                                    <button
                                         v-else-if="group.user_entry && group.user_entry.status === 'completed'"
-                                        :href="route('entries.show', group.user_entry.id)"
+                                        @click="$inertia.visit(route('entries.show', group.user_entry.id))"
                                         class="inline-flex items-center px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 text-sm font-semibold"
                                     >
                                         View Entry
-                                    </Link>
+                                    </button>
                                     <button
                                         v-else-if="group.event.status === 'open'"
                                         @click="$inertia.post(route('entries.start', group.event.id), { group_id: group.id })"
@@ -319,22 +320,15 @@ const copyMagicLink = (link) => {
                                     >
                                         Enter Event
                                     </button>
-                                    <Link
+                                    <button
                                         v-if="group.has_leaderboard"
-                                        :href="route('groups.leaderboard', group.id)"
+                                        @click="$inertia.visit(route('groups.leaderboard', group.id))"
                                         class="inline-flex items-center px-4 py-2 bg-success text-white rounded hover:bg-success/80 text-sm font-semibold"
                                     >
                                         View Leaderboard
-                                    </Link>
-                                    <Link
-                                        v-if="group.is_captain"
-                                        :href="route('groups.show', group.id)"
-                                        class="inline-flex items-center px-4 py-2 bg-warning text-white rounded hover:bg-warning/80 text-sm font-semibold"
-                                    >
-                                        Manage Group
-                                    </Link>
+                                    </button>
                                 </div>
-                            </div>
+                            </Link>
                         </div>
                     </div>
                 </div>
