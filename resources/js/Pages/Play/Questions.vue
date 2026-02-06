@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Button from '@/Components/Base/Button.vue';
+import Badge from '@/Components/Base/Badge.vue';
 import Card from '@/Components/Base/Card.vue';
 import Icon from '@/Components/Base/Icon.vue';
 import PageHeader from '@/Components/PageHeader.vue';
@@ -11,8 +12,13 @@ import Toast from '@/Components/Feedback/Toast.vue';
 
 const props = defineProps({
     group: Object,
+    event: Object,
     entry: Object,
     questions: Array,
+    submittingFor: {
+        type: Object,
+        default: null,
+    },
 });
 
 // Track selected answers locally
@@ -29,7 +35,6 @@ props.questions.forEach((question) => {
 const showToast = ref(false);
 const toastMessage = ref('');
 const saving = ref(false);
-const submitting = ref(false);
 
 // Computed values
 const answeredCount = computed(() => {
@@ -40,10 +45,23 @@ const answeredCount = computed(() => {
 
 const totalQuestions = computed(() => props.questions.length);
 
-const breadcrumbs = computed(() => [
-    { label: props.group.name, href: route('play.hub', { code: props.group.code }) },
-    { label: 'Play' },
-]);
+const totalPoints = computed(() => {
+    return props.questions.reduce((sum, q) => sum + (q.points || 0), 0);
+});
+
+const breadcrumbs = computed(() => {
+    if (props.submittingFor) {
+        return [
+            { label: props.group.name, href: route('groups.show', { group: props.group.id }) },
+            { label: 'Members', href: route('groups.members.index', { group: props.group.id }) },
+            { label: `Play for ${props.submittingFor.name}` },
+        ];
+    }
+    return [
+        { label: props.group.name, href: route('play.hub', { code: props.group.code }) },
+        { label: 'Play' },
+    ];
+});
 
 // Handle answer selection
 const selectAnswer = (questionId, value) => {
@@ -70,9 +88,14 @@ const saveAnswers = () => {
         return;
     }
 
+    const routeParams = { code: props.group.code };
+    if (props.submittingFor) {
+        routeParams.for_user = props.submittingFor.id;
+    }
+
     router.post(
-        route('play.save', { code: props.group.code }),
-        { answers },
+        route('play.save', routeParams),
+        { answers, for_user: props.submittingFor?.id },
         {
             preserveScroll: true,
             onSuccess: () => {
@@ -83,46 +106,6 @@ const saveAnswers = () => {
             },
             onFinish: () => {
                 saving.value = false;
-            },
-        }
-    );
-};
-
-// Submit entry
-const submitEntry = () => {
-    if (submitting.value) return;
-
-    submitting.value = true;
-
-    // Save answers first, then submit
-    const answers = Object.entries(selectedAnswers.value)
-        .filter(([_, value]) => value !== null && value !== '')
-        .map(([questionId, answerText]) => ({
-            group_question_id: parseInt(questionId),
-            answer_text: answerText,
-        }));
-
-    router.post(
-        route('play.save', { code: props.group.code }),
-        { answers },
-        {
-            preserveScroll: true,
-            onSuccess: () => {
-                // Now submit
-                router.post(
-                    route('play.submit', { code: props.group.code }),
-                    {},
-                    {
-                        onError: () => {
-                            showToastMessage('Error submitting entry');
-                            submitting.value = false;
-                        },
-                    }
-                );
-            },
-            onError: () => {
-                showToastMessage('Error saving answers');
-                submitting.value = false;
             },
         }
     );
@@ -139,54 +122,104 @@ const showToastMessage = (message) => {
 </script>
 
 <template>
-    <Head :title="`Play - ${group.name}`" />
+    <Head :title="submittingFor ? `Play for ${submittingFor.name} - ${group.name}` : `Play - ${group.name}`" />
 
     <AuthenticatedLayout :group="group">
         <template #header>
-            <PageHeader :title="group.name" :crumbs="breadcrumbs">
+            <PageHeader :title="submittingFor ? `Play for ${submittingFor.name}` : group.name" :crumbs="breadcrumbs">
                 <template #metadata>
-                    {{ answeredCount }} of {{ totalQuestions }} answered
+                    <span class="text-warning font-medium">
+                        {{ answeredCount }} of {{ totalQuestions }} answered
+                    </span>
+                </template>
+                <template #actions>
+                    <Link :href="route('play.leaderboard', { code: group.code })">
+                        <Button variant="secondary" icon="trophy" size="sm">
+                            Leaderboard
+                        </Button>
+                    </Link>
                 </template>
             </PageHeader>
         </template>
 
         <!-- Main Content -->
         <div class="max-w-4xl mx-auto px-6 py-8">
-            <!-- Questions -->
-            <div class="space-y-4">
-                <div
-                    v-for="(question, index) in questions"
-                    :key="question.id"
-                >
-                    <QuestionCard
-                        :model-value="selectedAnswers[question.id]"
-                        @update:model-value="selectAnswer(question.id, $event)"
-                        :question="question.question_text"
-                        :options="question.options"
-                        :points="question.points"
-                        :question-number="index + 1"
-                        :show-letters="true"
-                    />
+            <!-- Captain Submitting For Banner -->
+            <div v-if="submittingFor" class="bg-info/10 border border-info/30 rounded-lg p-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <Icon name="user-pen" class="text-info" size="lg" />
+                    <div>
+                        <div class="font-semibold text-info">Captain Mode</div>
+                        <div class="text-sm text-muted">
+                            You are submitting answers on behalf of <span class="font-semibold text-body">{{ submittingFor.name }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Submit Section -->
-            <Card class="mt-8" border-color="warning">
-                <div class="flex justify-between items-center">
+            <!-- Already Submitted Banner -->
+            <div v-if="entry.is_complete && submittingFor" class="bg-warning/10 border border-warning/30 rounded-lg p-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <Icon name="circle-check" class="text-warning" size="lg" />
                     <div>
-                        <div class="font-semibold text-warning">Ready to submit?</div>
-                        <div class="text-sm text-muted">{{ answeredCount }} of {{ totalQuestions }} questions answered</div>
+                        <div class="font-semibold text-warning">Entry Already Submitted</div>
+                        <div class="text-sm text-muted">
+                            This entry has already been submitted. You can view but not modify the answers.
+                        </div>
                     </div>
-                    <Button
-                        variant="primary"
-                        :loading="submitting"
-                        :disabled="answeredCount === 0"
-                        @click="submitEntry"
-                    >
-                        Submit Final Answers
-                    </Button>
+                </div>
+            </div>
+
+            <!-- Intro Card -->
+            <Card v-if="event" class="mb-6" border-color="warning">
+                <div>
+                    <h2 class="text-xl font-bold text-body mb-2">{{ event.name }}</h2>
+                    <p v-if="event.description" class="text-muted mb-4">{{ event.description }}</p>
+                    <p class="text-sm text-muted">Make your picks below. Your answers auto-save as you go.</p>
                 </div>
             </Card>
+
+            <!-- Questions Section -->
+            <Card :header-padding="false" header-bg-class="bg-surface-header">
+                <template #header>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <h2 class="text-xl font-bold text-body">Questions</h2>
+                                <Badge variant="primary-soft" size="sm">{{ totalQuestions }}</Badge>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Questions List -->
+                <div class="space-y-4 p-6">
+                    <div
+                        v-for="(question, index) in questions"
+                        :key="question.id"
+                        class="bg-surface-elevated border border-border border-l-4 border-l-[#f5f3ef] rounded-lg p-6"
+                    >
+                        <QuestionCard
+                            :model-value="selectedAnswers[question.id]"
+                            @update:model-value="selectAnswer(question.id, $event)"
+                            :question="question.question_text"
+                            :options="question.options"
+                            :points="question.points"
+                            :question-number="index + 1"
+                            :show-letters="true"
+                            :disabled="entry.is_complete"
+                        />
+                    </div>
+
+                    <!-- Empty State -->
+                    <div v-if="questions.length === 0" class="text-center py-12 text-muted">
+                        <Icon name="circle-question" size="3x" class="mb-4 text-subtle" />
+                        <p class="text-lg mb-2">No questions yet</p>
+                        <p class="text-sm">Check back later for questions to answer.</p>
+                    </div>
+                </div>
+            </Card>
+
         </div>
 
         <!-- Toast Notification -->

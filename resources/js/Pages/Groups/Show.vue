@@ -356,7 +356,7 @@ const getTypeBadgeVariant = (type) => {
 
                             <!-- Question Card -->
                             <div
-                                class="bg-surface-elevated border border-border rounded-lg p-6 transition-all"
+                                class="bg-surface-elevated border border-border border-l-4 border-l-[#f5f3ef] rounded-lg p-6 transition-all"
                                 :class="{
                                     'opacity-50': draggedQuestion?.id === question.id,
                                     'border-primary/50': dropTarget === question.id,

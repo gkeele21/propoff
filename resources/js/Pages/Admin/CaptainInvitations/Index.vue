@@ -209,7 +209,7 @@ const copyUrl = (url) => {
                                                     class="flex-1 font-mono text-sm"
                                                 />
                                                 <Button
-                                                    variant="secondary"
+                                                    variant="muted"
                                                     size="sm"
                                                     icon="copy"
                                                     @click="copyUrl(invitation.url)"

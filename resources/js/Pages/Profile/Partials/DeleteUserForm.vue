@@ -72,7 +72,7 @@ const closeModal = () => {
                 </div>
 
                 <div class="mt-6 flex justify-end">
-                    <Button variant="secondary" @click="closeModal">Cancel</Button>
+                    <Button variant="outline" @click="closeModal">Cancel</Button>
 
                     <Button
                         variant="danger"

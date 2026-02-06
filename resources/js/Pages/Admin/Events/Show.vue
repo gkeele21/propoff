@@ -313,8 +313,8 @@ const submitCreateGroup = () => {
                 :title="event.name"
                 :subtitle="event.description"
                 :crumbs="[
-                    { text: 'Events', href: route('admin.events.index') },
-                    { text: event.name }
+                    { label: 'Events', href: route('admin.events.index') },
+                    { label: event.name }
                 ]"
             >
                 <template #metadata>
@@ -334,7 +334,7 @@ const submitCreateGroup = () => {
                     </div>
                 </template>
                 <template #actions>
-                    <Button variant="secondary" size="sm" class="!bg-info !text-white !border-info hover:!bg-info/80" @click="showCreateGroupModal = true">
+                    <Button variant="secondary" size="sm" @click="showCreateGroupModal = true">
                         <Icon name="users" class="mr-2" size="sm" />
                         Create My Group
                     </Button>
@@ -380,7 +380,7 @@ const submitCreateGroup = () => {
                                 <Badge variant="primary-soft" size="sm">{{ questions.length }}</Badge>
                             </div>
                             <div class="flex gap-2">
-                                <Button variant="secondary" size="sm" class="!bg-info !text-white !border-info hover:!bg-info/80" @click="navigateToImport">
+                                <Button variant="secondary" size="sm" @click="navigateToImport">
                                     <Icon name="file-import" class="mr-2" size="sm" />
                                     Import from Template
                                 </Button>
@@ -409,7 +409,7 @@ const submitCreateGroup = () => {
 
                         <!-- Question Card -->
                         <div
-                            class="bg-surface-elevated border border-border rounded-lg p-6 transition-all"
+                            class="bg-surface-elevated border border-border border-l-4 border-l-[#f5f3ef] rounded-lg p-6 transition-all"
                             :class="{
                                 'opacity-50': draggedQuestion?.id === question.id,
                                 'border-primary/50': dropTarget === question.id,
@@ -481,7 +481,7 @@ const submitCreateGroup = () => {
 
                             <!-- Save Answer Button (conditional) -->
                             <div v-if="hasSelectedAnswer(question.id)" class="flex justify-end">
-                                <Button variant="secondary" class="!bg-info !text-white !border-info hover:!bg-info/80" @click="saveAnswer(question)">
+                                <Button variant="secondary" @click="saveAnswer(question)">
                                     Save Answer
                                 </Button>
                             </div>
@@ -500,7 +500,7 @@ const submitCreateGroup = () => {
                         <p class="text-lg mb-2">No questions yet</p>
                         <p class="text-sm mb-4">Get started by adding a custom question or importing from a template</p>
                         <div class="flex justify-center gap-2">
-                            <Button variant="secondary" class="!bg-info !text-white !border-info hover:!bg-info/80" @click="navigateToImport">
+                            <Button variant="secondary" @click="navigateToImport">
                                 Import from Template
                             </Button>
                             <Button variant="primary" @click="openAddModal">
@@ -584,7 +584,7 @@ const submitCreateGroup = () => {
                         <Button type="button" variant="outline" class="!border-primary !text-primary hover:!bg-primary/10" @click="showCreateGroupModal = false">
                             Cancel
                         </Button>
-                        <Button type="submit" variant="secondary" class="!bg-info !text-white !border-info hover:!bg-info/80" :loading="createGroupForm.processing">
+                        <Button type="submit" variant="secondary" :loading="createGroupForm.processing">
                             <Icon name="users" class="mr-2" size="sm" />
                             Create Group
                         </Button>

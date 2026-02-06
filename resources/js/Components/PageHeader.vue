@@ -8,8 +8,9 @@
             <div class="flex justify-between items-center">
                 <!-- Left side: Title and optional subtitle/metadata -->
                 <div class="flex-1 min-w-0">
-                    <h1 class="font-bold text-xl text-body leading-tight">
+                    <h1 class="font-bold text-xl text-body leading-tight flex items-center gap-3">
                         {{ title }}
+                        <slot name="titleSuffix" />
                     </h1>
 
                     <!-- Subtitle text (if provided as prop) -->

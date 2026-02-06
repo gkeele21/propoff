@@ -115,7 +115,7 @@ const getStatusVariant = (status) => {
                                 class="block"
                             >
                                 <div
-                                    class="hover:bg-surface-elevated transition-all duration-200 cursor-pointer"
+                                    class="hover:bg-surface-elevated transition-all duration-200 cursor-pointer border-l-4 border-l-primary"
                                     :class="index !== events.data.length - 1 ? 'border-b border-border' : ''"
                                 >
                                     <div class="p-6">

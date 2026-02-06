@@ -51,7 +51,7 @@ const breadcrumbs = computed(() => [
                             {{ entry.user?.name }}
                             <Badge v-if="entry.user_id === userRow?.user_id" variant="primary-soft" size="sm" class="ml-2">You</Badge>
                         </div>
-                        <div class="font-semibold">{{ entry.total_score }} pts</div>
+                        <div class="font-semibold">{{ entry.total_score }} points</div>
                     </div>
 
                     <!-- Empty state -->

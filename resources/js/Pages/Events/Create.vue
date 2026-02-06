@@ -27,8 +27,8 @@ const submit = () => {
             <PageHeader
                 title="Create New Event"
                 :crumbs="[
-                    { text: 'Events', href: route('events.index') },
-                    { text: 'Create' }
+                    { label: 'Events', href: route('events.index') },
+                    { label: 'Create' }
                 ]"
             />
         </template>

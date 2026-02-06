@@ -4,27 +4,38 @@
         <div v-if="showHeader" class="flex items-start justify-between mb-4">
             <div class="flex items-start gap-2">
                 <span v-if="questionNumber" class="text-lg font-bold text-body">
-                    Q{{ questionNumber }}.
+                    {{ questionNumber }}.
                 </span>
                 <p class="text-lg text-body">{{ question }}</p>
             </div>
             <span v-if="points" class="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded flex-shrink-0">
-                {{ points }} {{ points === 1 ? 'pt' : 'pts' }}
+                {{ points }} {{ points === 1 ? 'point' : 'points' }}
             </span>
         </div>
 
         <!-- Options -->
         <div class="space-y-3">
-            <div
+            <label
                 v-for="(option, index) in normalizedOptions"
                 :key="index"
-                class="flex items-center justify-between p-4 border-2 rounded-lg transition"
+                :for="`${inputName}-${index}`"
+                class="flex items-center justify-between p-4 border-2 rounded-lg transition-all focus-within-glow"
                 :class="[
                     getOptionClasses(option),
                     disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
                 ]"
-                @click="!disabled && $emit('update:modelValue', option.value)"
             >
+                <!-- Hidden Radio Input for Keyboard Navigation -->
+                <input
+                    :id="`${inputName}-${index}`"
+                    type="radio"
+                    :name="inputName"
+                    :value="option.value"
+                    :checked="isSelected(option)"
+                    :disabled="disabled"
+                    @change="$emit('update:modelValue', option.value)"
+                    class="sr-only"
+                />
                 <div class="flex items-center flex-1 gap-3">
                     <!-- Result Icon (results mode only, when showResultIcons is true) -->
                     <div v-if="showResults && showResultIcons" class="w-5 flex-shrink-0">
@@ -82,7 +93,7 @@
                         +{{ option.points }} bonus {{ option.points === 1 ? 'point' : 'points' }}
                     </span>
                 </div>
-            </div>
+            </label>
         </div>
 
         <!-- Error Message -->
@@ -155,29 +166,29 @@ function getOptionClasses(option) {
         // Selection takes precedence (for pending selections)
         if (isSelected(option) && !isCorrect(option)) {
             return props.selectionColor === 'info'
-                ? 'border-info bg-info/10'
-                : 'border-primary bg-primary/10';
+                ? 'border-info bg-info/10 checked-glow'
+                : 'border-primary bg-primary/10 checked-glow';
         }
         if (isCorrect(option) && isSelected(option)) {
-            return 'border-success bg-success/10';
+            return 'border-success bg-success/10 checked-glow';
         }
         if (isCorrect(option) && !isSelected(option)) {
             return 'border-success bg-success/10';
         }
         if (!isCorrect(option) && isSelected(option)) {
             return props.selectionColor === 'info'
-                ? 'border-info bg-info/10'
-                : 'border-danger bg-danger/10';
+                ? 'border-info bg-info/10 checked-glow'
+                : 'border-danger bg-danger/10 checked-glow';
         }
-        return 'border-border bg-surface-inset';
+        return 'border-border bg-surface-inset hover:border-border-strong hover:bg-surface-overlay';
     }
 
     // Normal mode styling
     if (isSelected(option)) {
         return props.selectionColor === 'info'
-            ? 'border-info bg-info/10'
-            : 'border-primary bg-primary/10';
+            ? 'border-info bg-info/10 checked-glow'
+            : 'border-primary bg-primary/10 checked-glow';
     }
-    return 'border-border bg-surface-inset hover:border-border-strong hover:bg-surface-header';
+    return 'border-border bg-surface-inset hover:border-border-strong hover:bg-surface-overlay';
 }
 </script>

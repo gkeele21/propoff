@@ -27,7 +27,7 @@
             <div class="mt-6 flex justify-end gap-3">
                 <Button
                     v-if="showCancel"
-                    variant="secondary"
+                    variant="outline"
                     @click="handleCancel"
                 >
                     {{ cancelText }}

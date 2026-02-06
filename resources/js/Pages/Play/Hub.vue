@@ -227,7 +227,7 @@ const toggleLock = () => {
 
                         <!-- Score and Rank (if submitted) -->
                         <template v-if="myEntry?.status === 'submitted'">
-                            <div class="text-2xl font-bold text-success mb-1">{{ myEntry.score }} pts</div>
+                            <div class="text-2xl font-bold text-success mb-1">{{ myEntry.score }} points</div>
                             <div v-if="myEntry.rank" class="text-muted mb-4">
                                 {{ getOrdinal(myEntry.rank) }} of {{ myEntry.total_participants }}
                             </div>
@@ -336,7 +336,7 @@ const toggleLock = () => {
                             {{ entry.name }}
                             <Badge v-if="entry.user_id === leaderboard.currentUserId" variant="primary-soft" size="sm" class="ml-2">You</Badge>
                         </div>
-                        <div class="font-semibold">{{ entry.score }} pts</div>
+                        <div class="font-semibold">{{ entry.score }} points</div>
                     </div>
 
                     <!-- User's row if not in top 5 -->
@@ -350,7 +350,7 @@ const toggleLock = () => {
                                 {{ leaderboard.userRow.name }}
                                 <Badge variant="primary-soft" size="sm" class="ml-2">You</Badge>
                             </div>
-                            <div class="font-semibold">{{ leaderboard.userRow.score }} pts</div>
+                            <div class="font-semibold">{{ leaderboard.userRow.score }} points</div>
                         </div>
                     </template>
 

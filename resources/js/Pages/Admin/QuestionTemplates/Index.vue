@@ -50,7 +50,7 @@
                         v-for="template in templates.data"
                         :key="template.id"
                         :href="route('admin.question-templates.edit', template.id)"
-                        class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border hover:border-primary transition-colors cursor-pointer block"
+                        class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border border-l-4 border-l-info hover:border-primary transition-colors cursor-pointer block"
                     >
                         <div class="p-6">
                             <div class="flex justify-between items-start mb-4">

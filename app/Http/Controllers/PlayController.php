@@ -188,18 +188,40 @@ class PlayController extends Controller
     /**
      * Display the questions page for answering.
      */
-    public function questions(string $code)
+    public function questions(Request $request, string $code)
     {
-        $group = Group::where('code', $code)->firstOrFail();
-        $user = auth()->user();
+        $group = Group::where('code', $code)->with('event')->firstOrFail();
+        $currentUser = auth()->user();
 
-        if (!$user) {
+        if (!$currentUser) {
             return redirect()->route('play.join', ['code' => $code]);
         }
 
-        // Check if user is a member
-        if (!$group->users()->where('user_id', $user->id)->exists()) {
+        // Check if current user is a member
+        if (!$group->users()->where('user_id', $currentUser->id)->exists()) {
             return redirect()->route('play.join', ['code' => $code]);
+        }
+
+        // Determine target user (self or someone else if captain)
+        $targetUser = $currentUser;
+        $submittingFor = null;
+
+        if ($request->has('for_user') && $request->for_user != $currentUser->id) {
+            // Check if current user is a captain of this group
+            if (!$currentUser->isCaptainOf($group->id)) {
+                abort(403, 'Only captains can submit for other users.');
+            }
+
+            // Get target user and verify they're in this group
+            $targetUser = User::findOrFail($request->for_user);
+            if (!$group->users()->where('user_id', $targetUser->id)->exists()) {
+                abort(404, 'User is not a member of this group.');
+            }
+
+            $submittingFor = [
+                'id' => $targetUser->id,
+                'name' => $targetUser->name,
+            ];
         }
 
         // Check if group is locked
@@ -208,8 +230,8 @@ class PlayController extends Controller
                 ->with('error', 'This game is locked. You can no longer submit answers.');
         }
 
-        // Get or create entry
-        $entry = Entry::where('user_id', $user->id)
+        // Get or create entry for target user
+        $entry = Entry::where('user_id', $targetUser->id)
             ->where('group_id', $group->id)
             ->first();
 
@@ -221,7 +243,7 @@ class PlayController extends Controller
 
             $entry = Entry::create([
                 'event_id' => $group->event_id,
-                'user_id' => $user->id,
+                'user_id' => $targetUser->id,
                 'group_id' => $group->id,
                 'total_score' => 0,
                 'possible_points' => $possiblePoints,
@@ -230,8 +252,8 @@ class PlayController extends Controller
             ]);
         }
 
-        // If entry is complete, redirect to results
-        if ($entry->is_complete) {
+        // If entry is complete and not submitting for someone else, redirect to results
+        if ($entry->is_complete && !$submittingFor) {
             return redirect()->route('play.results', ['code' => $code]);
         }
 
@@ -263,12 +285,19 @@ class PlayController extends Controller
                 'name' => $group->name,
                 'code' => $group->code,
             ],
+            'event' => $group->event ? [
+                'id' => $group->event->id,
+                'name' => $group->event->name,
+                'description' => $group->event->description,
+            ] : null,
             'entry' => [
                 'id' => $entry->id,
                 'answered_count' => $answeredCount,
                 'total_questions' => $questions->count(),
+                'is_complete' => $entry->is_complete,
             ],
             'questions' => $questions,
+            'submittingFor' => $submittingFor,
         ]);
     }
 
@@ -278,10 +307,27 @@ class PlayController extends Controller
     public function saveAnswers(Request $request, string $code)
     {
         $group = Group::where('code', $code)->firstOrFail();
-        $user = auth()->user();
+        $currentUser = auth()->user();
 
-        if (!$user) {
+        if (!$currentUser) {
             return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Determine target user (self or someone else if captain)
+        $targetUserId = $currentUser->id;
+
+        if ($request->has('for_user') && $request->for_user != $currentUser->id) {
+            // Check if current user is a captain of this group
+            if (!$currentUser->isCaptainOf($group->id)) {
+                abort(403, 'Only captains can submit for other users.');
+            }
+
+            // Verify target user is in this group
+            if (!$group->users()->where('user_id', $request->for_user)->exists()) {
+                abort(404, 'User is not a member of this group.');
+            }
+
+            $targetUserId = $request->for_user;
         }
 
         // Check if group is locked
@@ -289,7 +335,7 @@ class PlayController extends Controller
             return back()->with('error', 'This game is locked. You can no longer submit answers.');
         }
 
-        $entry = Entry::where('user_id', $user->id)
+        $entry = Entry::where('user_id', $targetUserId)
             ->where('group_id', $group->id)
             ->first();
 
@@ -349,10 +395,29 @@ class PlayController extends Controller
     public function submit(Request $request, string $code)
     {
         $group = Group::where('code', $code)->firstOrFail();
-        $user = auth()->user();
+        $currentUser = auth()->user();
 
-        if (!$user) {
+        if (!$currentUser) {
             return redirect()->route('play.join', ['code' => $code]);
+        }
+
+        // Determine target user (self or someone else if captain)
+        $targetUserId = $currentUser->id;
+        $submittingForOther = false;
+
+        if ($request->has('for_user') && $request->for_user != $currentUser->id) {
+            // Check if current user is a captain of this group
+            if (!$currentUser->isCaptainOf($group->id)) {
+                abort(403, 'Only captains can submit for other users.');
+            }
+
+            // Verify target user is in this group
+            if (!$group->users()->where('user_id', $request->for_user)->exists()) {
+                abort(404, 'User is not a member of this group.');
+            }
+
+            $targetUserId = $request->for_user;
+            $submittingForOther = true;
         }
 
         // Check if group is locked
@@ -361,7 +426,7 @@ class PlayController extends Controller
                 ->with('error', 'This game is locked. You can no longer submit answers.');
         }
 
-        $entry = Entry::where('user_id', $user->id)
+        $entry = Entry::where('user_id', $targetUserId)
             ->where('group_id', $group->id)
             ->first();
 
@@ -370,6 +435,10 @@ class PlayController extends Controller
         }
 
         if ($entry->is_complete) {
+            if ($submittingForOther) {
+                return redirect()->route('groups.members.index', ['group' => $group->id])
+                    ->with('info', 'This entry has already been submitted.');
+            }
             return redirect()->route('play.results', ['code' => $code]);
         }
 
@@ -388,6 +457,12 @@ class PlayController extends Controller
 
         // Update leaderboard
         $this->updateLeaderboard($entry);
+
+        // Redirect appropriately based on who submitted
+        if ($submittingForOther) {
+            return redirect()->route('groups.members.index', ['group' => $group->id])
+                ->with('success', 'Entry submitted successfully!');
+        }
 
         return redirect()->route('play.results', ['code' => $code])
             ->with('success', 'Entry submitted!');
@@ -588,9 +663,14 @@ class PlayController extends Controller
             ->where('group_id', $group->id)
             ->count();
 
+        // Determine status: submitted if complete, in_progress if has answers, otherwise not_started
+        $status = $entry->is_complete
+            ? 'submitted'
+            : ($answeredCount > 0 ? 'in_progress' : 'not_started');
+
         return [
             'id' => $entry->id,
-            'status' => $entry->is_complete ? 'submitted' : 'in_progress',
+            'status' => $status,
             'answered_count' => $answeredCount,
             'total_questions' => $totalQuestions,
             'score' => $entry->is_complete ? $entry->total_score : null,

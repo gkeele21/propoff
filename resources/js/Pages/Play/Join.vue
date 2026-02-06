@@ -186,7 +186,7 @@ const formatDate = (dateString) => {
                         Yes, that's me
                     </Button>
                     <Button
-                        variant="secondary"
+                        variant="outline"
                         class="flex-1"
                         @click="createNew"
                     >

@@ -46,9 +46,9 @@ const joinGroup = () => {
             <div v-if="canLogin" class="fixed top-0 right-0 p-6 text-end z-10">
                 <Link
                     v-if="$page.props.auth.user"
-                    :href="['admin', 'manager'].includes($page.props.auth.user.role) ? route('admin.events.index') : route('dashboard')"
+                    :href="route('dashboard')"
                     class="font-semibold text-muted hover:text-body transition-colors"
-                >My Home</Link>
+                >Play</Link>
                 <Link
                     v-if="$page.props.auth.user"
                     :href="route('logout')"
@@ -166,10 +166,10 @@ const joinGroup = () => {
                     </Link>
                     <Link
                         v-else
-                        :href="['admin', 'manager'].includes($page.props.auth.user.role) ? route('admin.events.index') : route('dashboard')"
+                        :href="route('dashboard')"
                         class="btn-success px-8 py-4 text-white font-bold text-lg rounded-lg"
                     >
-                        Go to My Home
+                        Play
                     </Link>
                 </div>
             </div>
@@ -192,7 +192,7 @@ const joinGroup = () => {
 /* Input focus state with glow */
 .input-focus-glow:focus {
     outline: none;
-    box-shadow: 0 0 0 1px rgb(var(--color-text)), 0 0 0 3px #1a3490, 0 0 15px rgba(26, 52, 144, 0.3);
+    box-shadow: 0 0 0 1px rgb(var(--color-text)), 0 0 0 3px rgb(var(--color-primary)), 0 0 15px rgb(var(--color-primary) / 0.3);
     border-color: transparent;
 }
 

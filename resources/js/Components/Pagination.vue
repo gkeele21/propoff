@@ -6,10 +6,11 @@
                     Showing <span class="font-medium text-body">{{ data.from }}</span> to <span class="font-medium text-body">{{ data.to }}</span> of <span class="font-medium text-body">{{ data.total }}</span> {{ itemName }}
                 </div>
                 <div class="flex items-center space-x-2">
-                    <Link
+                    <component
                         v-for="link in data.links"
                         :key="link.label"
-                        :href="link.url"
+                        :is="link.url ? Link : 'span'"
+                        :href="link.url || undefined"
                         :class="[
                             'px-3 py-2 text-sm font-medium rounded-md',
                             link.active
@@ -18,8 +19,8 @@
                                     ? 'text-body hover:bg-surface-overlay'
                                     : 'text-subtle cursor-not-allowed'
                         ]"
-                        :preserve-state="preserveState"
-                        :preserve-scroll="preserveScroll"
+                        :preserve-state="link.url ? preserveState : undefined"
+                        :preserve-scroll="link.url ? preserveScroll : undefined"
                         v-html="link.label"
                     />
                 </div>

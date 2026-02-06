@@ -166,8 +166,8 @@ const deleteTemplate = () => {
                 :title="isEditing ? 'Edit Template' : 'Create Template'"
                 :subtitle="isEditing ? template.title : 'Create a new reusable question template'"
                 :crumbs="[
-                    { text: 'Templates', href: route('admin.question-templates.index') },
-                    { text: isEditing ? 'Edit' : 'Create' }
+                    { label: 'Templates', href: route('admin.question-templates.index') },
+                    { label: isEditing ? 'Edit' : 'Create' }
                 ]"
             >
                 <template #actions>
@@ -322,7 +322,7 @@ const deleteTemplate = () => {
                                 </div>
                             </div>
 
-                            <Button type="button" variant="secondary" size="sm" @click="addOption">
+                            <Button type="button" variant="muted" size="sm" @click="addOption">
                                 <Icon name="plus" class="mr-2" size="sm" />
                                 Add Option
                             </Button>
@@ -395,7 +395,7 @@ const deleteTemplate = () => {
                             <Button
                                 v-if="form.template_answers.length < 7"
                                 type="button"
-                                variant="secondary"
+                                variant="muted"
                                 size="sm"
                                 @click="addTemplateAnswer"
                             >

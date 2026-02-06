@@ -254,7 +254,7 @@ const handleClose = () => {
                     <!-- Add Option Button -->
                     <Button
                         type="button"
-                        variant="secondary"
+                        variant="muted"
                         size="sm"
                         @click="addOption"
                     >
@@ -272,7 +272,6 @@ const handleClose = () => {
                     <Button
                         type="button"
                         variant="outline"
-                        class="!border-primary !text-primary hover:!bg-primary/10"
                         @click="handleClose"
                         :disabled="form.processing"
                     >

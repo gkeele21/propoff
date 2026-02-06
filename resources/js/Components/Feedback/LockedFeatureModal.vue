@@ -27,7 +27,7 @@
                 </Button>
                 <Button
                     @click="$emit('close')"
-                    variant="secondary"
+                    variant="outline"
                 >
                     Close
                 </Button>

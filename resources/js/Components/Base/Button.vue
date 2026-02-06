@@ -32,12 +32,13 @@ const props = defineProps({
 });
 
 const variants = {
-    primary: 'bg-primary hover:bg-white text-white hover:text-primary border-2 border-transparent hover:border-primary',  // Blue - main actions
+    primary: 'bg-primary hover:bg-white text-white hover:text-primary border-2 border-transparent hover:border-primary',  // Theme color - main actions
     success: 'bg-success hover:bg-white text-white hover:text-success border-2 border-transparent hover:border-success',  // Green - positive/CTA actions
-    secondary: 'bg-surface-inset hover:bg-surface-header text-body border-2 border-border hover:border-border-strong',  // Dark inset - secondary actions
+    secondary: 'bg-info hover:bg-white text-white hover:text-info border-2 border-transparent hover:border-info',  // Blue - secondary actions
     accent: 'bg-warning hover:bg-white text-white hover:text-warning border-2 border-transparent hover:border-warning',  // Orange - accent/highlight actions
-    outline: 'bg-transparent hover:bg-surface-elevated text-body border-2 border-border hover:border-border-strong',  // Outline - cancel/neutral
+    outline: 'bg-transparent hover:bg-primary/10 text-primary border-2 border-primary hover:border-primary',  // Outline with primary - cancel/back
     danger: 'bg-danger hover:bg-white text-white hover:text-danger border-2 border-transparent hover:border-danger',
+    muted: 'bg-surface-inset hover:bg-surface-header text-body border-2 border-border hover:border-border-strong',  // Neutral/muted actions
     neutral: 'bg-black hover:bg-white text-white hover:text-black border-2 border-black hover:border-black',
     ghost: 'bg-transparent hover:bg-surface text-primary border-2 border-transparent',
     // Light variants for use on dark backgrounds

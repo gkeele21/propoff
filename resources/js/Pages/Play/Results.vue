@@ -72,13 +72,13 @@ const rankDisplay = computed(() => {
                                 v-else-if="question.is_correct"
                                 variant="success-soft"
                             >
-                                +{{ question.points_earned }} pts
+                                +{{ question.points_earned }} {{ question.points_earned === 1 ? 'point' : 'points' }}
                             </Badge>
                             <Badge
                                 v-else-if="question.correct_answer"
                                 variant="danger-soft"
                             >
-                                0 pts
+                                0 points
                             </Badge>
                             <Badge
                                 v-else

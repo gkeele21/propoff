@@ -30,9 +30,9 @@ const submit = () => {
             <PageHeader
                 title="Edit Event"
                 :crumbs="[
-                    { text: 'Events', href: route('events.index') },
-                    { text: event.name, href: route('events.show', event.id) },
-                    { text: 'Edit' }
+                    { label: 'Events', href: route('events.index') },
+                    { label: event.name, href: route('events.show', event.id) },
+                    { label: 'Edit' }
                 ]"
             />
         </template>

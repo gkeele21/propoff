@@ -101,7 +101,7 @@ const formatDate = (dateString) => {
                         Delete Selected ({{ selectedGroups.length }})
                     </Button>
                     <Button
-                        variant="secondary"
+                        variant="muted"
                         size="sm"
                         @click="exportCSV"
                     >

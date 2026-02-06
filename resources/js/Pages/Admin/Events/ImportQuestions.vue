@@ -6,9 +6,9 @@
             <PageHeader
                 title="Import from Templates"
                 :crumbs="[
-                    { text: 'Events', href: route('admin.events.index') },
-                    { text: event.name, href: route('admin.events.show', event.id) },
-                    { text: 'Import Templates' }
+                    { label: 'Events', href: route('admin.events.index') },
+                    { label: event.name, href: route('admin.events.show', event.id) },
+                    { label: 'Import Templates' }
                 ]"
             />
         </template>
@@ -78,7 +78,7 @@
                                             <Button variant="primary" size="sm" @click="selectAllTemplates">
                                                 Select All
                                             </Button>
-                                            <Button variant="secondary" size="sm" @click="deselectAllTemplates">
+                                            <Button variant="muted" size="sm" @click="deselectAllTemplates">
                                                 Deselect All
                                             </Button>
                                             <Button

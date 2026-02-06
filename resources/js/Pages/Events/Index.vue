@@ -46,7 +46,7 @@ defineProps({
                             <div
                                 v-for="event in events.data"
                                 :key="event.id"
-                                class="border rounded-lg p-6 hover:shadow-md transition"
+                                class="border border-l-4 border-l-primary rounded-lg p-6 hover:shadow-md transition"
                             >
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">

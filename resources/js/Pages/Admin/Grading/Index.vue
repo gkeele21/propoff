@@ -139,7 +139,7 @@ const yesNoOptions = [
                     <span class="text-muted">{{ groups.length }} groups</span>
                 </template>
                 <template #actions>
-                    <Button variant="secondary" icon="file-arrow-down" @click="exportCSV">
+                    <Button variant="muted" icon="file-arrow-down" @click="exportCSV">
                         Export CSV
                     </Button>
                     <Button variant="primary" icon="calculator" @click="calculateScores">

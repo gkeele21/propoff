@@ -205,20 +205,20 @@ const getOptionPoints = (option) => {
                                             <label
                                                 v-for="(option, index) in currentQuestion.options"
                                                 :key="index"
-                                                class="flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition"
+                                                class="flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-all focus-within-glow"
                                                 :class="{
-                                                    'border-primary bg-primary/10': answers[currentQuestion.id] === getOptionValue(option),
-                                                    'border-border hover:border-muted': answers[currentQuestion.id] !== getOptionValue(option),
+                                                    'border-primary bg-primary/10 checked-glow': answers[currentQuestion.id] === getOptionValue(option),
+                                                    'border-border bg-surface-inset hover:border-border-strong hover:bg-surface-overlay': answers[currentQuestion.id] !== getOptionValue(option),
                                                 }"
                                             >
+                                                <input
+                                                    type="radio"
+                                                    v-model="answers[currentQuestion.id]"
+                                                    :value="getOptionValue(option)"
+                                                    class="sr-only"
+                                                />
                                                 <div class="flex items-center flex-1">
-                                                    <input
-                                                        type="radio"
-                                                        v-model="answers[currentQuestion.id]"
-                                                        :value="getOptionValue(option)"
-                                                        class="h-4 w-4 text-primary focus:ring-primary/50"
-                                                    />
-                                                    <span class="ml-3 text-body">{{ getOptionLabel(option) }}</span>
+                                                    <span class="text-body">{{ getOptionLabel(option) }}</span>
                                                 </div>
                                                 <div v-if="getOptionPoints(option) > 0" class="ml-4 flex items-center gap-1">
                                                     <span class="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded">
@@ -236,34 +236,34 @@ const getOptionPoints = (option) => {
                                     <div v-else-if="currentQuestion.question_type === 'yes_no'">
                                         <div class="space-y-3">
                                             <label
-                                                class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition"
+                                                class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all focus-within-glow"
                                                 :class="{
-                                                    'border-primary bg-primary/10': answers[currentQuestion.id] === 'Yes',
-                                                    'border-border hover:border-muted': answers[currentQuestion.id] !== 'Yes',
+                                                    'border-primary bg-primary/10 checked-glow': answers[currentQuestion.id] === 'Yes',
+                                                    'border-border bg-surface-inset hover:border-border-strong hover:bg-surface-overlay': answers[currentQuestion.id] !== 'Yes',
                                                 }"
                                             >
                                                 <input
                                                     type="radio"
                                                     v-model="answers[currentQuestion.id]"
                                                     value="Yes"
-                                                    class="h-4 w-4 text-primary focus:ring-primary/50"
+                                                    class="sr-only"
                                                 />
-                                                <span class="ml-3 text-body">Yes</span>
+                                                <span class="text-body">Yes</span>
                                             </label>
                                             <label
-                                                class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition"
+                                                class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all focus-within-glow"
                                                 :class="{
-                                                    'border-primary bg-primary/10': answers[currentQuestion.id] === 'No',
-                                                    'border-border hover:border-muted': answers[currentQuestion.id] !== 'No',
+                                                    'border-primary bg-primary/10 checked-glow': answers[currentQuestion.id] === 'No',
+                                                    'border-border bg-surface-inset hover:border-border-strong hover:bg-surface-overlay': answers[currentQuestion.id] !== 'No',
                                                 }"
                                             >
                                                 <input
                                                     type="radio"
                                                     v-model="answers[currentQuestion.id]"
                                                     value="No"
-                                                    class="h-4 w-4 text-primary focus:ring-primary/50"
+                                                    class="sr-only"
                                                 />
-                                                <span class="ml-3 text-body">No</span>
+                                                <span class="text-body">No</span>
                                             </label>
                                         </div>
                                     </div>
@@ -272,34 +272,34 @@ const getOptionPoints = (option) => {
                                     <div v-else-if="currentQuestion.question_type === 'true_false'">
                                         <div class="space-y-3">
                                             <label
-                                                class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition"
+                                                class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all focus-within-glow"
                                                 :class="{
-                                                    'border-primary bg-primary/10': answers[currentQuestion.id] === 'True',
-                                                    'border-border hover:border-muted': answers[currentQuestion.id] !== 'True',
+                                                    'border-primary bg-primary/10 checked-glow': answers[currentQuestion.id] === 'True',
+                                                    'border-border bg-surface-inset hover:border-border-strong hover:bg-surface-overlay': answers[currentQuestion.id] !== 'True',
                                                 }"
                                             >
                                                 <input
                                                     type="radio"
                                                     v-model="answers[currentQuestion.id]"
                                                     value="True"
-                                                    class="h-4 w-4 text-primary focus:ring-primary/50"
+                                                    class="sr-only"
                                                 />
-                                                <span class="ml-3 text-body">True</span>
+                                                <span class="text-body">True</span>
                                             </label>
                                             <label
-                                                class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition"
+                                                class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all focus-within-glow"
                                                 :class="{
-                                                    'border-primary bg-primary/10': answers[currentQuestion.id] === 'False',
-                                                    'border-border hover:border-muted': answers[currentQuestion.id] !== 'False',
+                                                    'border-primary bg-primary/10 checked-glow': answers[currentQuestion.id] === 'False',
+                                                    'border-border bg-surface-inset hover:border-border-strong hover:bg-surface-overlay': answers[currentQuestion.id] !== 'False',
                                                 }"
                                             >
                                                 <input
                                                     type="radio"
                                                     v-model="answers[currentQuestion.id]"
                                                     value="False"
-                                                    class="h-4 w-4 text-primary focus:ring-primary/50"
+                                                    class="sr-only"
                                                 />
-                                                <span class="ml-3 text-body">False</span>
+                                                <span class="text-body">False</span>
                                             </label>
                                         </div>
                                     </div>
