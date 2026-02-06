@@ -6,7 +6,7 @@ import Button from '@/Components/Base/Button.vue';
 import Badge from '@/Components/Base/Badge.vue';
 import Card from '@/Components/Base/Card.vue';
 import Icon from '@/Components/Base/Icon.vue';
-import PageHeader from '@/Components/PageHeader.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
 import QuestionCard from '@/Components/Domain/QuestionCard.vue';
 import QuestionModal from '@/Components/Domain/QuestionModal.vue';
 import Confirm from '@/Components/Feedback/Confirm.vue';
@@ -290,12 +290,9 @@ const getTypeBadgeVariant = (type) => {
                     </div>
                 </template>
                 <template #actions>
-                    <Link :href="route('groups.invitation', group.id)">
-                        <Button variant="accent" size="sm">
-                            <Icon name="share-nodes" class="mr-2" size="sm" />
-                            Join Info
-                        </Button>
-                    </Link>
+                    <Button variant="accent" size="sm" icon="share-nodes" @click="router.visit(route('groups.invitation', group.id))">
+                        Join Info
+                    </Button>
                 </template>
             </PageHeader>
         </template>

@@ -1,7 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import PageHeader from '@/Components/PageHeader.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
 import Button from '@/Components/Base/Button.vue';
 import TextField from '@/Components/Form/TextField.vue';
 import TextArea from '@/Components/Form/TextArea.vue';
@@ -38,13 +37,12 @@ const submit = () => {
     form.post(route('captain.groups.store', [props.event.id, props.invitation.token]));
 };
 
-const LayoutComponent = props.isGuest ? GuestLayout : AuthenticatedLayout;
 </script>
 
 <template>
     <Head title="Create Group" />
 
-    <component :is="LayoutComponent">
+    <AuthenticatedLayout>
         <template #header>
             <PageHeader
                 :title="`Create Group for ${event.name}`"
@@ -229,5 +227,5 @@ const LayoutComponent = props.isGuest ? GuestLayout : AuthenticatedLayout;
                 </Card>
             </div>
         </div>
-    </component>
+    </AuthenticatedLayout>
 </template>

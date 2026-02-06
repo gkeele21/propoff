@@ -125,7 +125,7 @@
                 </div>
 
                 <!-- Pagination -->
-                <Pagination :data="templates" item-name="templates" class="mt-6" />
+                <Pagination :dataset="templates" class="mt-6" />
             </div>
         </div>
     </AuthenticatedLayout>
@@ -133,14 +133,14 @@
 
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import PageHeader from '@/Components/PageHeader.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import Button from '@/Components/Base/Button.vue';
 import Badge from '@/Components/Base/Badge.vue';
 import Icon from '@/Components/Base/Icon.vue';
 import TextField from '@/Components/Form/TextField.vue';
 import Select from '@/Components/Form/Select.vue';
-import Pagination from '@/Components/Pagination.vue';
+import Pagination from '@/Components/Base/Pagination.vue';
 import { ref, computed, watch } from 'vue';
 import { debounce } from 'lodash';
 

@@ -2,7 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import PageHeader from '@/Components/PageHeader.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
 import Button from '@/Components/Base/Button.vue';
 import Badge from '@/Components/Base/Badge.vue';
 import Card from '@/Components/Base/Card.vue';
@@ -156,7 +156,7 @@ const formatDate = (dateString) => {
                 title="Manage Members"
                 subtitle="Manage members and permissions for your group"
                 :crumbs="[
-                    { label: 'My Home', href: route('dashboard') },
+                    { label: 'Home', href: route('play') },
                     { label: group.name, href: route('groups.show', group.id) },
                     { label: 'Members' }
                 ]"

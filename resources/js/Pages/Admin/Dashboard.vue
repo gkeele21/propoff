@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import PageHeader from '@/Components/PageHeader.vue';
-import StatCard from '@/Components/StatCard.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
+import StatCard from '@/Components/Domain/StatCard.vue';
 import Badge from '@/Components/Base/Badge.vue';
 import { Head } from '@inertiajs/vue3';
 

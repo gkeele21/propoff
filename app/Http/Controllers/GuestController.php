@@ -92,11 +92,11 @@ class GuestController extends Controller
         //     Mail::to($request->email)->send(new GuestWelcome($user, $invitation->event, $magicLink));
         // }
 
-        // Redirect to dashboard with magic link
+        // Redirect to play hub with magic link
         session()->flash('success', 'Welcome! You can now play the event.');
         session()->flash('magic_link', $magicLink);
         session()->flash('show_magic_link', true);
-        return \Inertia\Inertia::location(route('dashboard'));
+        return \Inertia\Inertia::location(route('play.hub'));
     }
 
     /**
@@ -111,8 +111,8 @@ class GuestController extends Controller
         // Auto-login
         Auth::login($user);
 
-        // Redirect to dashboard with success message
-        return redirect()->route('dashboard')
+        // Redirect to play hub with success message
+        return redirect()->route('play.hub')
             ->with('success', 'Welcome back, ' . $user->name . '!');
     }
 
@@ -146,8 +146,8 @@ class GuestController extends Controller
         // Auto-login
         Auth::login($user);
 
-        // Redirect to dashboard with success message
-        return redirect()->route('dashboard')
+        // Redirect to play hub with success message
+        return redirect()->route('play.hub')
             ->with('success', 'Welcome back, ' . $user->name . '!');
     }
 
@@ -170,6 +170,7 @@ class GuestController extends Controller
                     'id' => $entry->id,
                     'event_id' => $entry->event_id,
                     'group_id' => $entry->group_id,
+                    'group_code' => $entry->group->code,
                     'event_name' => $entry->event->name,
                     'group_name' => $entry->group->name,
                     'total_score' => $entry->total_score,

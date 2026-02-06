@@ -31,7 +31,7 @@ class InvitationController extends Controller
             ]);
         }
 
-        return Inertia::render('Captain/Invitation', [
+        return Inertia::render('Groups/Invitation', [
             'group' => [
                 'id' => $group->id,
                 'name' => $group->name,

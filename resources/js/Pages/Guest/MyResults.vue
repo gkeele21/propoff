@@ -1,21 +1,26 @@
 <template>
     <Head title="My Results" />
 
-    <GuestLayout>
+    <div class="min-h-screen bg-bg">
+        <!-- Simple header with logo -->
+        <header class="bg-surface border-b border-border py-4 px-4 sm:px-6 lg:px-8">
+            <Logo size="sm" link-to="/" />
+        </header>
+
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Welcome -->
-                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border mb-6">
+                <div class="bg-surface overflow-hidden shadow-sm rounded-lg border border-border mb-6">
                     <div class="p-6">
-                        <h2 class="text-2xl font-bold text-body mb-2">
+                        <h1 class="text-2xl font-bold text-body mb-2">
                             Welcome back, {{ user.name }}!
-                        </h2>
+                        </h1>
                         <p class="text-muted">Here are your game results</p>
 
                         <!-- Save This Link Notice -->
                         <div class="mt-4 bg-primary/10 border border-primary/30 rounded-lg p-4">
                             <div class="flex items-start gap-3">
-                                <InformationCircleIcon class="w-5 h-5 text-primary mt-0.5" />
+                                <Icon name="circle-info" class="text-primary mt-0.5" />
                                 <div class="flex-1">
                                     <p class="text-sm text-primary font-medium">Save this link!</p>
                                     <p class="text-sm text-primary mt-1">
@@ -27,12 +32,13 @@
                                             readonly
                                             class="flex-1 text-xs bg-surface-elevated border border-primary/30 rounded px-2 py-1 text-body"
                                         />
-                                        <button
+                                        <Button
+                                            variant="primary"
+                                            size="xs"
                                             @click="copyLink"
-                                            class="px-3 py-1 bg-primary text-white text-xs rounded hover:bg-primary/80"
                                         >
                                             {{ copied ? 'Copied!' : 'Copy' }}
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
@@ -41,12 +47,12 @@
                 </div>
 
                 <!-- Entries -->
-                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
+                <div class="bg-surface overflow-hidden shadow-sm rounded-lg border border-border">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold text-body mb-4">My Entries</h3>
+                        <h2 class="text-lg font-semibold text-body mb-4">My Entries</h2>
 
                         <div v-if="entries.length === 0" class="text-center py-12">
-                            <TrophyIcon class="w-16 h-16 text-warning mx-auto mb-4" />
+                            <Icon name="trophy" size="3x" class="text-warning mx-auto mb-4" />
                             <p class="text-muted">No entries yet</p>
                         </div>
 
@@ -58,14 +64,14 @@
                             >
                                 <div class="flex items-start justify-between">
                                     <div class="flex-1">
-                                        <h4 class="font-semibold text-body">{{ entry.event_name }}</h4>
+                                        <h3 class="font-semibold text-body">{{ entry.event_name }}</h3>
                                         <p class="text-sm text-muted">{{ entry.group_name }}</p>
 
                                         <div class="mt-2 flex items-center gap-4">
                                             <div>
-                                                <span class="text-2xl font-bold text-success">{{ entry.percentage }}%</span>
+                                                <span class="text-2xl font-bold text-success">{{ entry.total_score }}</span>
                                                 <span class="text-sm text-muted ml-1">
-                                                    ({{ entry.total_score }}/{{ entry.possible_points }} {{ entry.possible_points === 1 ? 'point' : 'points' }})
+                                                    / {{ entry.possible_points }} pts
                                                 </span>
                                             </div>
                                         </div>
@@ -75,20 +81,20 @@
                                         </p>
                                     </div>
 
-                                    <div class="flex flex-col gap-2">
-                                        <span
-                                            :class="entry.is_complete ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'"
-                                            class="px-3 py-1 rounded-full text-xs font-medium"
+                                    <div class="flex flex-col gap-2 items-end">
+                                        <Badge
+                                            :variant="entry.is_complete ? 'success-soft' : 'warning-soft'"
                                         >
                                             {{ entry.is_complete ? 'Complete' : 'In Progress' }}
-                                        </span>
-                                        
+                                        </Badge>
+
                                         <Link
                                             v-if="entry.can_edit"
-                                            :href="route('entries.continue', entry.id)"
-                                            class="px-3 py-1 bg-primary text-white text-xs rounded hover:bg-primary/80 text-center"
+                                            :href="entry.is_complete ? route('play.results', entry.group_code) : route('play.questions', entry.group_code)"
                                         >
-                                            {{ entry.is_complete ? 'View' : 'Continue' }}
+                                            <Button variant="primary" size="sm">
+                                                {{ entry.is_complete ? 'View' : 'Continue' }}
+                                            </Button>
                                         </Link>
                                     </div>
                                 </div>
@@ -98,14 +104,16 @@
                 </div>
             </div>
         </div>
-    </GuestLayout>
+    </div>
 </template>
 
 <script setup>
-import GuestLayout from '@/Layouts/GuestLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
-import { TrophyIcon, InformationCircleIcon } from '@heroicons/vue/24/outline';
+import Logo from '@/Components/Domain/Logo.vue';
+import Icon from '@/Components/Base/Icon.vue';
+import Button from '@/Components/Base/Button.vue';
+import Badge from '@/Components/Base/Badge.vue';
 
 const props = defineProps({
     user: Object,

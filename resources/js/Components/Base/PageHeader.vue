@@ -1,52 +1,53 @@
 <template>
-    <div :class="[centered ? 'text-center' : '', containerClass]">
-        <div :class="[sizes[size].title, weights[weight], titleClass]">
-            <slot name="title">{{ title }}</slot>
-        </div>
-        <p v-if="subtitle || $slots.subtitle" :class="['mt-2', sizes[size].subtitle, subtitleClass]">
-            <slot name="subtitle">{{ subtitle }}</slot>
-        </p>
-        <div v-if="$slots.actions" class="mt-4">
-            <slot name="actions" />
+    <div class="bg-surface border-b border-border shadow-sm sticky top-16 z-40">
+        <div class="py-4 px-4 sm:px-6 lg:px-8">
+            <!-- Breadcrumbs -->
+            <Breadcrumb v-if="crumbs && crumbs.length > 0" :crumbs="crumbs" class="mb-2" />
+
+            <!-- Title Section with Actions -->
+            <div class="flex justify-between items-center">
+                <!-- Left side: Title and optional subtitle/metadata -->
+                <div class="flex-1 min-w-0">
+                    <h1 class="font-bold text-xl text-body leading-tight flex items-center gap-3">
+                        {{ title }}
+                        <slot name="titleSuffix" />
+                    </h1>
+
+                    <!-- Subtitle text (if provided as prop) -->
+                    <p v-if="subtitle" class="text-sm text-muted mt-1">
+                        {{ subtitle }}
+                    </p>
+
+                    <!-- Metadata slot for custom content like event status, date, etc. -->
+                    <div v-if="$slots.metadata" class="mt-1 text-sm text-muted">
+                        <slot name="metadata" />
+                    </div>
+                </div>
+
+                <!-- Right side: Action buttons -->
+                <div v-if="$slots.actions" class="flex items-center gap-3 ml-4 flex-shrink-0">
+                    <slot name="actions" />
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
-const props = defineProps({
-    title: { type: String, default: '' },
-    subtitle: { type: String, default: '' },
-    size: { type: String, default: 'lg' }, // sm, md, lg, xl
-    weight: { type: String, default: 'bold' }, // normal, medium, semibold, bold
-    centered: { type: Boolean, default: false },
-    containerClass: { type: String, default: '' },
-    titleClass: { type: String, default: 'text-body' },
-    subtitleClass: { type: String, default: 'text-subtle' },
+import Breadcrumb from '@/Components/Base/Breadcrumb.vue';
+
+defineProps({
+    title: {
+        type: String,
+        required: true,
+    },
+    subtitle: {
+        type: String,
+        default: null,
+    },
+    crumbs: {
+        type: Array,
+        default: () => [],
+    },
 });
-
-const sizes = {
-    sm: {
-        title: 'text-lg',
-        subtitle: 'text-sm',
-    },
-    md: {
-        title: 'text-xl',
-        subtitle: 'text-base',
-    },
-    lg: {
-        title: 'text-2xl',
-        subtitle: 'text-base',
-    },
-    xl: {
-        title: 'text-3xl',
-        subtitle: 'text-lg',
-    },
-};
-
-const weights = {
-    normal: 'font-normal',
-    medium: 'font-medium',
-    semibold: 'font-semibold',
-    bold: 'font-bold',
-};
 </script>

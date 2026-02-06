@@ -7,7 +7,7 @@
                 title="Member Invitation"
                 subtitle="Invite members to join your group"
                 :crumbs="[
-                    { label: 'Dashboard', href: route('dashboard') },
+                    { label: 'Home', href: route('play') },
                     { label: group.name, href: route('groups.show', group.id) },
                     { label: 'Invitation' }
                 ]"
@@ -257,7 +257,7 @@ import {
     ExclamationTriangleIcon,
 } from '@heroicons/vue/24/outline';
 import QRCode from 'qrcode';
-import PageHeader from '@/Components/PageHeader.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
 
 const props = defineProps({
     group: Object,

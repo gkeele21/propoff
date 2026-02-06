@@ -487,6 +487,62 @@ To view: `open docs/specs/PropOffUserFlow.html`
 
 ---
 
+## Implementation Status
+
+> **Last Updated**: 2026-02-06
+
+### Fully Implemented ✅
+
+| Feature | Notes |
+|---------|-------|
+| **Play Hub** | `/play/{code}` - Full hub with stats, entry card, leaderboard preview |
+| **Smart Routing** | 0 groups → homepage, 1 group → play hub, multiple → chooser |
+| **Guest Cookie System** | `propoff_guest` cookie, 90-day duration, domain-wide |
+| **Name Matching** | With last initial logic for duplicate handling |
+| **Guest Verification** | "Is this you?" flow when name matches existing entry |
+| **Lock/Unlock Toggle** | Manual toggle via `entry_cutoff` field |
+| **Breadcrumbs Navigation** | Via PageHeader component on all play pages |
+| **History Page** | With year filtering and stats row |
+| **Leaderboard** | Both preview (top 5) and full view |
+| **Captain Controls** | Full question, grading, member management |
+| **Group Picker** | `/groups/choose` for multi-group users |
+| **Points Display** | Points only, no percentages |
+
+### Partial / Different Implementation ⚠️
+
+| Feature | Spec | Actual Implementation |
+|---------|------|----------------------|
+| **Scheduled Locks** | "Captain can set a lock time on group creation" | Manual toggle only - no pre-scheduled lock times |
+| **Nav Group Dropdown** | "Group name in nav with dropdown chevron for switching" | Uses breadcrumbs instead; group switching via `/groups/choose` |
+| **Dual Guest Flows** | Single unified flow | Two flows coexist: GuestController (EventInvitation-based) and PlayController (Play Hub flow). PlayController is the primary flow. |
+
+### Route Mapping
+
+| Spec Route | Actual Route | Status |
+|------------|--------------|--------|
+| `/play/{code}` | `/play/{code}` | ✅ Implemented |
+| `/play/{code}/join` | `/play/{code}/join` | ✅ Implemented |
+| `/play/{code}/play` | `/play/{code}/play` | ✅ Implemented |
+| `/play/{code}/leaderboard` | `/play/{code}/leaderboard` | ✅ Implemented |
+| `/play/{code}/my-entry` | `/play/{code}/results` | ✅ Renamed to "results" |
+| `/groups/choose` | `/groups/choose` | ✅ Implemented |
+| `/groups/{id}/grade` | `/groups/{group}/grading` | ✅ Slightly different naming |
+| `/groups/{id}/members` | `/groups/{group}/members` | ✅ Implemented |
+| `/history` | `/history` | ✅ Implemented |
+
+### Database Implementation Notes
+
+**Lock Mechanism**: Uses `entry_cutoff` timestamp field instead of boolean `is_locked`:
+- `entry_cutoff = null` → Group is unlocked
+- `entry_cutoff <= now()` → Group is locked
+- `is_locked` is a computed property from this field
+
+**Guest Players vs Guest Captains**:
+- Guest players: Created via Play Hub join flow, stored with `role='guest'`, identified by `propoff_guest` cookie
+- Guest captains: Created via Captain Invitation flow, same database structure, but accessed via different entry point
+
+---
+
 ## Changelog
 
 | Date | Changes |
@@ -494,4 +550,5 @@ To view: `open docs/specs/PropOffUserFlow.html`
 | 2024-02-05 | Initial spec created from conversation |
 | 2026-02-05 | Added UI consistency rules, navigation patterns, sub-page designs, history stats layout |
 | 2026-02-05 | Renamed from group-flow-spec.md to PropOffUserFlow.md, consolidated mockups |
+| 2026-02-06 | Added Implementation Status section documenting actual state vs spec |
 

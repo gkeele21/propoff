@@ -92,12 +92,21 @@ Group::create([
 
 ### Changing Grading Source
 
-Captains can change grading source at any time:
+Captains can change grading source **only before answers are set**:
 
 ```php
-// Captain changes grading source
-$group->update(['grading_source' => 'admin']);
+// Check if source can be changed
+if ($group->canChangeGradingSource()) {
+    $group->update(['grading_source' => 'admin']);
+}
 ```
+
+**Lock Mechanism**: Once ANY answer is set (captain or admin), the grading source is locked. This prevents:
+- Score inconsistencies from mid-grading source changes
+- Confusion about which answers apply
+- Accidental data loss
+
+**Method**: `Group::canChangeGradingSource()` returns `false` if any answers exist for the group's questions.
 
 **Impact**: Changes which answer table is used for grading.
 
@@ -201,7 +210,7 @@ protected function compareAnswers($userAnswer, $correctAnswer, $questionType)
 4. Click "Calculate Scores"
 5. Scores update immediately
 
-**Frontend** (Groups/Grading/Index.vue):
+**Frontend** (integrated into Groups/Show.vue):
 ```vue
 <template>
   <div v-for="question in questions" :key="question.id">
@@ -333,8 +342,7 @@ EventAnswer::updateOrCreate(
 - `app/Http/Controllers/Admin/GradingController.php` - Admin grading interface
 
 ### Views
-- `resources/js/Pages/Groups/Grading/Index.vue` - Captain grading
-- `resources/js/Pages/Admin/EventAnswers/Index.vue` - Admin event answers
+- `resources/js/Pages/Groups/Show.vue` - Captain grading (integrated into group page)
 - `resources/js/Pages/Admin/Grading/Index.vue` - Admin grading interface
 
 ## Design Decisions

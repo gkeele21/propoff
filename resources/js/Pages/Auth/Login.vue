@@ -1,5 +1,5 @@
 <script setup>
-import Checkbox from '@/Components/Checkbox.vue';
+import Checkbox from '@/Components/Form/Checkbox.vue';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import Button from '@/Components/Base/Button.vue';
 import TextField from '@/Components/Form/TextField.vue';
@@ -60,10 +60,7 @@ const submit = () => {
             />
 
             <div class="flex items-center justify-between">
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="text-sm text-muted">Remember me</span>
-                </label>
+<Checkbox v-model="form.remember" label="Remember me" labelVariant="muted" />
                 <Link
                     v-if="canResetPassword"
                     :href="route('password.request')"

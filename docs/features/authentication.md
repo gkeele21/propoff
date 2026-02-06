@@ -12,7 +12,8 @@ PropOff features a unique **Hybrid Authentication System** that combines traditi
 |-----------|-----------|--------|---------------|------------------|
 | **Admin** | ✅ Required | ✅ Required | `/login` page | Site administrators |
 | **Regular User** | ✅ Required | ✅ Required | `/login` or `/register` | Users who want permanent accounts |
-| **Guest Captain** | ❌ No password | ⚠️ Optional | Invitation link only | Event captains (passwordless) |
+| **Guest Captain** | ❌ No password | ⚠️ Optional | Captain invitation link | Event captains (passwordless) |
+| **Guest Player** | ❌ No password | ❌ None | Play Hub join flow | Players who just want to participate |
 
 ## Traditional Authentication (Admins & Regular Users)
 
@@ -141,6 +142,97 @@ Guest users can only access app via invitation links:
 - ✅ Can become captains with full permissions
 - ✅ Can participate in events
 - ⏳ Can upgrade to full account (future feature)
+
+## Guest Player Authentication (Play Hub Flow)
+
+**Purpose**: Allow anyone to play in a group without creating an account.
+
+### Cookie-Based Recognition
+
+Guest players are recognized via a persistent cookie:
+
+| Property | Value |
+|----------|-------|
+| **Cookie Name** | `propoff_guest` |
+| **Cookie Value** | Guest's unique token (32 chars) |
+| **Duration** | 90 days |
+| **Scope** | Domain-wide (works across all groups) |
+
+**Type**: This is a session cookie (not a tracking cookie) - no consent banner needed.
+
+### Guest Player Join Flow
+
+```
+Guest visits /play/{code}
+        │
+        ▼
+┌─────────────────┐
+│ Cookie exists?  │
+└─────────────────┘
+     │         │
+    YES        NO
+     │         │
+     ▼         ▼
+Auto-login   Show Join Form
+via token    with name input
+     │              │
+     │              ▼
+     │       Name matching
+     │       (see below)
+     │              │
+     ▼              ▼
+   Play Hub with entry access
+```
+
+### Name Matching Logic
+
+Prevents duplicate entries when guest loses cookie:
+
+1. Guest enters name (e.g., "Mike")
+2. If no "Mike" in group → create guest, set cookie, done
+3. If "Mike" exists → ask for last initial
+4. Guest enters initial (e.g., "T")
+5. If "Mike T." exists → show verification ("8/10 answered - is this you?")
+6. If verified → link to existing guest (set cookie)
+7. If not verified → create "Mike T." as new guest
+
+**Key Decision**: Ask for last initial immediately if name exists (don't show verification first). This handles "two Mikes" edge case automatically.
+
+### Three Ways Back In
+
+| Method | How It Works |
+|--------|--------------|
+| **Cookie** | Automatic - guest recognized on return |
+| **URL** | `/play/{code}` - the join code is in the URL |
+| **Type Code** | Enter code on homepage if cookie lost and URL forgotten |
+
+### Database Structure
+
+Guest players use the same `users` table:
+```sql
+users:
+  - name (display name, e.g., "Mike T.")
+  - email (null for guest players)
+  - password (null)
+  - role ('guest')
+  - guest_token (unique 32-char string, stored in cookie)
+```
+
+### Guest Player vs Guest Captain
+
+| Aspect | Guest Player | Guest Captain |
+|--------|--------------|---------------|
+| **Entry Point** | Play Hub (`/play/{code}`) | Captain Invitation link |
+| **Email** | Never collected | Optional |
+| **Recognition** | Cookie-based | Email linking (if provided) |
+| **Permissions** | Play, view leaderboard | Full captain control |
+| **Use Case** | Quick participation | Group management |
+
+### Code Locations
+
+- `app/Http/Controllers/PlayController.php` - Join flow, cookie handling
+- `app/Http/Middleware/GuestCookieMiddleware.php` - Auto-login via cookie
+- `resources/js/Pages/Play/Join.vue` - 3-step join form UI
 
 ## Guest Captain Permissions
 

@@ -364,10 +364,10 @@ class GroupController extends Controller
             session()->flash('success', 'Successfully joined ' . $group->name . '! You can now submit your entry.');
             session()->flash('magic_link', $magicLink);
             session()->flash('show_magic_link', true);
-            return \Inertia\Inertia::location(route('dashboard'));
+            return \Inertia\Inertia::location(route('play'));
         }
 
-        return redirect()->route('dashboard')
+        return redirect()->route('play')
             ->with('success', 'Successfully joined ' . $group->name . '!');
     }
 

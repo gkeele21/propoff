@@ -7,7 +7,7 @@
                 :title="`${group.name} Leaderboard`"
                 subtitle="View rankings for this group"
                 :crumbs="[
-                    { label: 'Dashboard', href: route('dashboard') },
+                    { label: 'Home', href: route('play') },
                     { label: 'Groups', href: route('groups.index') },
                     { label: group.name, href: route('groups.show', group.id) },
                     { label: 'Leaderboard' }
@@ -131,7 +131,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { TrophyIcon } from '@heroicons/vue/24/outline';
 import { computed } from 'vue';
-import PageHeader from '@/Components/PageHeader.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
 
 const props = defineProps({
     group: Object,

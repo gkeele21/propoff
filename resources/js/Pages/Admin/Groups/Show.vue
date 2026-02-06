@@ -226,7 +226,7 @@ import Icon from '@/Components/Base/Icon.vue';
 import Modal from '@/Components/Base/Modal.vue';
 import TextField from '@/Components/Form/TextField.vue';
 import Confirm from '@/Components/Feedback/Confirm.vue';
-import PageHeader from '@/Components/PageHeader.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
 
 const props = defineProps({
     group: Object,

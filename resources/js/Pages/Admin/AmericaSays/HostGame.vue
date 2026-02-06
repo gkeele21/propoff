@@ -1,7 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import PageHeader from '@/Components/PageHeader.vue';
-import GameSound from '@/Components/GameSound.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { getThemeFromEvent } from '../../AmericaSays/themes.js';
@@ -244,9 +243,6 @@ onUnmounted(() => {
     <Head title="America Says - Host Game" />
 
     <AuthenticatedLayout>
-        <!-- Sound Component -->
-        <GameSound :trigger="buzzerTrigger" sound-type="buzzer" />
-
         <template #header>
             <PageHeader
                 title="Host Game"

@@ -7,6 +7,7 @@ Welcome to the PropOff documentation. This folder contains comprehensive documen
 ### Core Documentation
 - **[requirements.md](requirements.md)** - Functional and non-functional requirements
 - **[design.md](design.md)** - Technical architecture and design patterns
+- **[specs/PropOffUserFlow.md](specs/PropOffUserFlow.md)** - User flow specification (Play Hub, guests, smart routing)
 
 ### Feature Documentation
 The `features/` folder contains detailed documentation for each major feature:

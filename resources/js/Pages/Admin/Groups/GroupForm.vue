@@ -8,7 +8,7 @@ import Icon from '@/Components/Base/Icon.vue';
 import TextField from '@/Components/Form/TextField.vue';
 import Select from '@/Components/Form/Select.vue';
 import Radio from '@/Components/Form/Radio.vue';
-import PageHeader from '@/Components/PageHeader.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
 
 const props = defineProps({
     group: {

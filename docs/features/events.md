@@ -54,17 +54,57 @@ Event::create([
 - Duplicate events
 - View event statistics
 
+## Groups and Grading Source
+
+Each event can have **multiple groups**, and each group chooses its **grading source**:
+
+### Grading Source Options
+
+| Source | Who Sets Answers | Use Case |
+|--------|-----------------|----------|
+| **Admin** | Admin sets answers at event level | Centralized control, all groups share same answers |
+| **Captain** | Captain sets answers for their group | Independent groups with different answer timing |
+
+### Question Inheritance
+
+When a group is created for an event:
+1. Event questions are **copied** to the group as group questions
+2. Captain can customize: toggle active, modify text, reorder, add custom
+3. Changes to event questions do NOT auto-sync to existing groups
+
+### Grading Source Lock
+
+Once a group has answers set:
+- `canChangeGradingSource()` returns `false`
+- Prevents switching sources mid-grading
+- Protects score integrity
+
+### Workflow Examples
+
+**Admin Grading (Simple)**:
+1. Admin creates event with questions
+2. Multiple groups created (all use "admin" grading source)
+3. Event happens
+4. Admin sets correct answers ONCE
+5. All groups automatically graded
+
+**Captain Grading (Flexible)**:
+1. Admin creates event with questions
+2. Groups created with "captain" grading source
+3. Each captain customizes their questions
+4. Each captain grades their own group on their timeline
+5. Groups have independent answer reveal
+
 ## Code Locations
 
 - `app/Models/Event.php`
-- `app/Http/Controllers/EventController.php`
 - `app/Http/Controllers/Admin/EventController.php`
-- `resources/js/Pages/Events/Show.vue`
+- `app/Http/Controllers/Admin/GradingController.php`
 - `resources/js/Pages/Admin/Events/`
 
 ## Integration
 
 - **Questions**: Events contain event questions (see [question-system.md](question-system.md))
-- **Groups**: Multiple groups per event with independent questions
-- **Grading**: Admin can set event-level answers (see [grading-system.md](grading-system.md))
-- **Captains**: Admins generate captain invitations per event
+- **Groups**: Multiple groups per event with independent questions (see [groups.md](groups.md))
+- **Grading**: Admin or captain sets answers (see [grading-system.md](grading-system.md))
+- **Captains**: Admins generate captain invitations per event (see [captain-system.md](captain-system.md))

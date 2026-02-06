@@ -246,7 +246,7 @@ import { ref, computed } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import PageHeader from '@/Components/PageHeader.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
 import TextField from '@/Components/Form/TextField.vue';
 import Checkbox from '@/Components/Form/Checkbox.vue';
 import Button from '@/Components/Base/Button.vue';

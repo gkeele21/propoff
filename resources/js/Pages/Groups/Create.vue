@@ -7,7 +7,7 @@
                 title="Create New Group"
                 subtitle="Set up your group and become a captain"
                 :crumbs="[
-                    { label: 'Dashboard', href: route('dashboard') },
+                    { label: 'Home', href: route('play') },
                     { label: 'Groups', href: route('groups.index') },
                     { label: 'Create' }
                 ]"
@@ -188,7 +188,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import PageHeader from '@/Components/PageHeader.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
 
 const props = defineProps({
     events: {

@@ -4,8 +4,8 @@
 
 - **Framework**: Vue 3 (Composition API)
 - **Bridge**: Inertia.js v0.6.11
-- **CSS**: Tailwind CSS + PropOff brand colors
-- **Icons**: Heroicons
+- **CSS**: Tailwind CSS with custom design system (see [CLAUDE.md](/CLAUDE.md))
+- **Icons**: Font Awesome 6 via Icon component
 - **Build Tool**: Vite 5.4.21
 
 ## Vue 3 Composition API
@@ -87,32 +87,37 @@ const filter = () => {
 ### Feature-Based Organization
 ```
 resources/js/Pages/
-├── Dashboard.vue (unified for all users)
-├── Events/
-│   ├── Index.vue
-│   ├── Show.vue
-│   └── Continue.vue
+├── Index.vue (homepage with join code form)
+├── History.vue (past events and results)
+├── Play/
+│   ├── Hub.vue (main play hub - adapts for role)
+│   ├── Join.vue (guest join flow - 3-step)
+│   ├── Questions.vue (answer questions)
+│   ├── Results.vue (view submission results)
+│   └── Leaderboard.vue (full leaderboard)
 ├── Groups/
-│   ├── Index.vue
-│   ├── Show.vue (adapts for captain vs member)
-│   ├── Questions/Index.vue (captain only)
-│   ├── Grading/Index.vue (captain only)
-│   ├── Members/Index.vue (captain only)
-│   └── Leaderboard.vue
+│   ├── Index.vue (list user's groups)
+│   ├── Show.vue (captain hub - questions, grading, management)
+│   ├── Create.vue (create new group)
+│   ├── Edit.vue (edit group settings)
+│   ├── Choose.vue (group picker for multi-group)
+│   ├── Join.vue (join group form)
+│   ├── Invitation.vue (invitation management)
+│   ├── Leaderboard.vue (group leaderboard)
+│   └── Members/Index.vue (member management)
 ├── Captain/
 │   ├── CreateGroup.vue (guest + auth flows)
-│   ├── Invitation.vue
 │   └── InvitationExpired.vue
 ├── Admin/
-│   ├── Events/
-│   ├── QuestionTemplates/
-│   ├── CaptainInvitations/
-│   └── EventAnswers/
+│   ├── Events/ (event management)
+│   ├── QuestionTemplates/ (template management)
+│   ├── Groups/ (group management)
+│   └── Grading/ (grading interface)
 └── AmericaSays/
-    ├── GameBoard.vue
-    ├── GameSetup.vue
-    └── ManageAnswers.vue
+    └── GameBoard.vue (live game display)
 ```
+
+**Note**: The legacy `Entries/` folder has been removed. Entry management now happens through the Play Hub flow (`/play/{code}/play` and `/play/{code}/results`).
 
 ## Layouts
 
@@ -138,49 +143,93 @@ const LayoutComponent = props.isGuest ? GuestLayout : AuthenticatedLayout
 - `GuestLayout.vue` - For guest users (no nav)
 - `AdminLayout.vue` - Uses AuthenticatedLayout with admin nav
 
-## PropOff Brand Colors
+## Design System Colors
 
-### Color Palette
-```javascript
-// tailwind.config.js
-colors: {
-    'propoff-red': '#af1919',        // Admin, errors, primary CTA
-    'propoff-orange': '#f47612',     // Groups, captains, warnings
-    'propoff-green': '#57d025',      // Success states, entries
-    'propoff-dark-green': '#186916', // Success text, completed
-    'propoff-blue': '#1a3490',       // Events, information
-}
-```
+PropOff uses a **dark mode** design with **user-selectable accent colors** (themes). See [CLAUDE.md](/CLAUDE.md) for the complete color palette.
 
-### Semantic Mapping
-- **Events**: Blue backgrounds, borders, text
-- **Groups**: Orange backgrounds, borders, text
-- **Admin**: Red backgrounds, borders, text
-- **Captains**: Orange (same as groups)
-- **Success**: Green (icons) + Dark Green (text)
-- **Entries**: Dark Green
+### Key Color Classes
+
+**Theme-Adaptive (changes with user's theme)**:
+- `primary` - Main accent color, actions, links
+- `primary-hover` - Hover state for primary
+
+**Semantic (consistent across themes)**:
+- `success` (#57d025) - Positive states, confirmations
+- `warning` (#f47612) - Caution, attention
+- `danger` (#ef4444) - Errors, destructive actions
+- `info` (#3b82f6) - Informational states
+
+**Surfaces (dark mode hierarchy)**:
+- `bg` (#404040) - Page background
+- `surface` (#1f1f1f) - Cards, panels
+- `surface-elevated` (#262626) - Elevated content
+- `surface-inset` (#0f0f0f) - Stats, badges, buttons
+
+**Text**:
+- `body` (#f5f5f5) - Primary text
+- `muted` (#a3a3a3) - Secondary text
+- `subtle` (#737373) - Disabled, hints
 
 ### Usage Example
 ```vue
 <template>
-    <!-- Event card -->
-    <div class="bg-propoff-blue/10 border-propoff-blue/30 border">
-        <h3 class="text-propoff-blue">Event Name</h3>
+    <!-- Card on dark background -->
+    <div class="bg-surface border border-border rounded-lg p-4">
+        <h3 class="text-body">Event Name</h3>
+        <p class="text-muted">Description here</p>
     </div>
 
-    <!-- Group card -->
-    <div class="bg-propoff-orange/10 border-propoff-orange/30 border">
-        <h3 class="text-propoff-orange">Group Name</h3>
-    </div>
+    <!-- Primary action button -->
+    <Button variant="primary">Submit</Button>
 
-    <!-- Success message -->
-    <div class="bg-propoff-green/10 text-propoff-dark-green">
-        ✓ Submission complete
-    </div>
+    <!-- Success state -->
+    <Badge variant="success">Submitted</Badge>
+
+    <!-- Rank badge (consistent styling) -->
+    <span class="bg-surface-inset text-body px-2 py-1 rounded">3rd</span>
 </template>
 ```
 
+**Note**: The old `propoff-*` color classes are deprecated. See CLAUDE.md for migration guidance.
+
 ## Common Patterns
+
+### Play Hub Pattern
+
+The Play Hub (`Play/Hub.vue`) is the central player experience. It adapts based on role and state:
+
+```vue
+<script setup>
+const props = defineProps({
+    group: Object,
+    entry: Object,         // User's current entry (null if not started)
+    isCaptain: Boolean,
+    leaderboard: Array,
+    stats: Object,
+})
+
+// Entry state determines UI
+const entryState = computed(() => {
+    if (!props.entry) return 'not_started'
+    if (props.entry.is_submitted) return 'submitted'
+    return 'in_progress'
+})
+</script>
+
+<template>
+    <!-- Stats row for everyone -->
+    <StatsRow :stats="stats" />
+
+    <!-- My Entry card (adapts to state) -->
+    <MyEntryCard :entry="entry" :group="group" />
+
+    <!-- Captain Controls (captain only) -->
+    <CaptainControls v-if="isCaptain" :group="group" />
+
+    <!-- Leaderboard preview -->
+    <LeaderboardPreview :entries="leaderboard" />
+</template>
+```
 
 ### Conditional Rendering (Role-Based)
 ```vue
@@ -262,7 +311,7 @@ const handleDrop = (event, targetIndex) => {
 ```vue
 <script setup>
 const breadcrumbs = [
-    { label: 'Dashboard', href: route('dashboard') },
+    { label: 'Home', href: route('play') },
     { label: 'Events', href: route('events.index') },
     { label: props.event.name, href: null },  // Current page
 ]
@@ -346,11 +395,13 @@ router.get(route('events.show', event.id), {}, {
 />
 ```
 
-### StatusBadge
+### Badge Component
 ```vue
-<StatusBadge :status="event.status" />
-<!-- Automatically styled based on status (draft, open, locked, etc.) -->
-```
+<Badge variant="success">Active</Badge>
+<Badge variant="warning">Pending</Badge>
+<Badge variant="danger">Closed</Badge>
+<Badge variant="primary-soft">+5 bonus</Badge>
+<!-- See Components/Base/Badge.vue for all variants -->
 
 ## Testing Patterns
 
@@ -374,3 +425,7 @@ test('displays event name', () => {
 3. **Route Helper**: Must use `route()` helper, not hardcoded URLs
 4. **Preserve State**: Use `preserveState: true` for filtering/pagination
 5. **Color Opacity**: Use `/10`, `/20` etc for alpha, not opacity classes
+6. **Component Library**: Always use existing components (Button, Badge, Card, etc.) - see CLAUDE.md
+7. **Icons**: Use `<Icon name="check" />` component, not inline SVGs
+8. **Play vs Groups**: Play/ pages are for players; Groups/ pages are for captain management
+9. **Guest Detection**: Check `$user->isGuest()` or `props.user.role === 'guest'`

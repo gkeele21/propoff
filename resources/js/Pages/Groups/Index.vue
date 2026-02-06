@@ -4,7 +4,7 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import { PlusIcon, UserGroupIcon } from '@heroicons/vue/24/outline';
 import Button from '@/Components/Base/Button.vue';
 import TextField from '@/Components/Form/TextField.vue';
-import PageHeader from '@/Components/PageHeader.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
 import { ref } from 'vue';
 
 const props = defineProps({
@@ -36,7 +36,7 @@ const joinGroup = () => {
                 title="Groups"
                 subtitle="Your groups and available groups to join"
                 :crumbs="[
-                    { label: 'Dashboard', href: route('dashboard') },
+                    { label: 'Home', href: route('play') },
                     { label: 'Groups' }
                 ]"
             >

@@ -250,9 +250,9 @@ const previewText = computed(() => {
 - No dedicated service (logic in controllers/models)
 
 ### Views
-- `resources/js/Pages/Admin/QuestionTemplates/Create.vue` - Template creation
-- `resources/js/Pages/Admin/Questions/Index.vue` - Event question management
-- `resources/js/Pages/Groups/Questions/Index.vue` - Captain question customization
+- `resources/js/Pages/Admin/QuestionTemplates/` - Template management (CRUD)
+- `resources/js/Pages/Admin/Events/Show.vue` - Event question management (integrated)
+- `resources/js/Pages/Groups/Show.vue` - Captain question customization (integrated)
 
 ## Workflows
 

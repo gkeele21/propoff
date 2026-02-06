@@ -2,7 +2,6 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import { getThemeFromEvent } from './themes.js';
-import GameSound from '@/Components/GameSound.vue';
 import axios from 'axios';
 
 const props = defineProps({
@@ -192,9 +191,6 @@ onUnmounted(() => {
             fontFamily: theme.fonts.question,
         }"
     >
-        <!-- Sound Component -->
-        <GameSound :trigger="successSoundTrigger" sound-type="ding7" />
-
         <!-- Snowflakes (inside main container, behind content) -->
         <div
             class="fixed inset-0 pointer-events-none overflow-hidden"

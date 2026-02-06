@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import Logo from '@/Components/Domain/Logo.vue';
+import Button from '@/Components/Base/Button.vue';
 
 defineProps({
     canLogin: {
@@ -46,26 +47,16 @@ const joinGroup = () => {
             <div v-if="canLogin" class="fixed top-0 right-0 p-6 text-end z-10">
                 <Link
                     v-if="$page.props.auth.user"
-                    :href="route('dashboard')"
-                    class="font-semibold text-muted hover:text-body transition-colors"
-                >Play</Link>
-                <Link
-                    v-if="$page.props.auth.user"
                     :href="route('logout')"
                     method="post"
                     as="button"
-                    class="ms-4 font-semibold text-muted hover:text-body transition-colors"
-                >Log Out</Link>
+                >
+                    <Button variant="danger">Log Out</Button>
+                </Link>
                 <template v-else>
-                    <Link
-                        :href="route('login')"
-                        class="font-semibold text-muted hover:text-body transition-colors"
-                    >Log in</Link>
-                    <Link
-                        v-if="canRegister"
-                        :href="route('register')"
-                        class="ms-4 px-4 py-2 bg-surface border border-border rounded-lg font-semibold text-body hover:bg-surface-elevated transition-colors"
-                    >Register</Link>
+                    <Link :href="route('login')">
+                        <Button variant="primary">Log in</Button>
+                    </Link>
                 </template>
             </div>
 
@@ -157,19 +148,11 @@ const joinGroup = () => {
 
                 <!-- Call to Action -->
                 <div class="flex justify-center mt-12 pb-8">
-                    <Link
-                        v-if="!$page.props.auth.user"
-                        :href="route('register')"
-                        class="btn-success px-8 py-4 text-white font-bold text-lg rounded-lg"
-                    >
-                        Get Started Free
+                    <Link v-if="!$page.props.auth.user" :href="route('register')">
+                        <Button variant="accent" size="lg">Get Started Free</Button>
                     </Link>
-                    <Link
-                        v-else
-                        :href="route('dashboard')"
-                        class="btn-success px-8 py-4 text-white font-bold text-lg rounded-lg"
-                    >
-                        Play
+                    <Link v-else :href="route('play')">
+                        <Button variant="primary" size="lg">My Groups</Button>
                     </Link>
                 </div>
             </div>
@@ -205,11 +188,4 @@ const joinGroup = () => {
     box-shadow: 0 0 0 1px rgb(var(--color-text)), 0 0 0 3px #1a3490, 0 0 20px rgba(26, 52, 144, 0.4);
 }
 
-.btn-success {
-    background-color: rgb(var(--color-success));
-    transition: all 0.2s ease;
-}
-.btn-success:hover:not(:disabled) {
-    box-shadow: 0 0 0 1px rgb(var(--color-text)), 0 0 0 3px rgb(var(--color-success)), 0 0 20px rgba(87, 208, 37, 0.4);
-}
 </style>

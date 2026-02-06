@@ -107,6 +107,25 @@ Captains have **full control** over their groups:
 - ✅ View group statistics
 - ✅ Access group leaderboard
 - ✅ Manage group settings
+- ✅ Lock/unlock entries (see below)
+
+### Lock/Unlock Controls
+
+Captains control when entries are accepted via the lock mechanism:
+
+**How It Works**:
+- Groups have an `entry_cutoff` timestamp field
+- `NULL` = unlocked (entries accepted)
+- Set to timestamp = locked (no new entries after that time)
+
+**Captain Actions**:
+- **Lock Now**: Sets `entry_cutoff` to current timestamp
+- **Unlock**: Clears `entry_cutoff` to `NULL`
+- Available via "Lock/Unlock Entries" toggle in Captain Controls
+
+**Current Limitation**: Pre-scheduled lock times (setting a future `entry_cutoff` on group creation) are not yet implemented. Captains must manually toggle the lock when they want to close entries.
+
+**Route**: `POST /groups/{group}/toggle-lock`
 
 ## Code Locations
 
@@ -131,11 +150,9 @@ Captains have **full control** over their groups:
 
 ### Views
 - `resources/js/Pages/Captain/CreateGroup.vue` - Group creation (guest + auth)
-- `resources/js/Pages/Captain/Invitation.vue` - Invitation display
-- `resources/js/Pages/Captain/InvitationExpired.vue` - Expired invitation
-- `resources/js/Pages/Groups/Show.vue` - Unified group view (adapts for captains)
-- `resources/js/Pages/Groups/Questions/Index.vue` - Question management
-- `resources/js/Pages/Groups/Grading/Index.vue` - Grading interface
+- `resources/js/Pages/Captain/InvitationExpired.vue` - Expired invitation message
+- `resources/js/Pages/Groups/Show.vue` - Group detail (adapts for captains)
+- `resources/js/Pages/Groups/Invitation.vue` - Captain invitation management
 - `resources/js/Pages/Groups/Members/Index.vue` - Member management
 
 ## Workflows

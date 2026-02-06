@@ -1,9 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventQuestionController;
-use App\Http\Controllers\EntryController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GuestController;
@@ -65,7 +63,8 @@ Route::prefix('play/{code}')->group(function () {
 Route::get('/groups/join', [GroupController::class, 'showJoinForm'])->name('groups.join.form');
 Route::post('/groups/join', [GroupController::class, 'join'])->name('groups.join');
 
-Route::get('/my-home', [App\Http\Controllers\MyHomeController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+// Legacy route - redirects to smart routing
+Route::get('/my-home', fn () => redirect()->route('play'))->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     // Smart redirect to Play Hub (uses SmartRoutingService)
@@ -84,19 +83,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // Event routes (user-facing - read only)
-    Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
-
-    // Entry routes
-    Route::get('/entries', [EntryController::class, 'index'])->name('entries.index');
-    Route::post('/events/{event}/entries/start', [EntryController::class, 'start'])->name('entries.start');
-    Route::get('/entries/{entry}/continue', [EntryController::class, 'continue'])->name('entries.continue');
-    Route::post('/entries/{entry}/answers', [EntryController::class, 'saveAnswers'])->name('entries.saveAnswers');
-    Route::post('/entries/{entry}/submit', [EntryController::class, 'submit'])->name('entries.submit');
-    Route::get('/entries/{entry}', [EntryController::class, 'show'])->name('entries.show');
-    Route::get('/entries/{entry}/confirmation', [EntryController::class, 'confirmation'])->name('entries.confirmation');
-    Route::delete('/entries/{entry}', [EntryController::class, 'destroy'])->name('entries.destroy');
 
     // Leaderboard routes (group-specific only)
     Route::get('/groups/{group}/leaderboard', [LeaderboardController::class, 'group'])->name('groups.leaderboard');
@@ -133,11 +119,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/groups/{group}/members/{user}', [\App\Http\Controllers\Captain\MemberController::class, 'remove'])->name('groups.members.remove');
         Route::post('/groups/{group}/regenerate-join-code', [\App\Http\Controllers\Captain\MemberController::class, 'regenerateJoinCode'])->name('groups.members.regenerateJoinCode');
         Route::post('/groups/{group}/members/add-guest', [\App\Http\Controllers\Captain\MemberController::class, 'addGuest'])->name('groups.members.addGuest');
-
-        // Entry Management (Captain submitting on behalf of users)
-        Route::get('/groups/{group}/entries', [\App\Http\Controllers\Captain\EntryController::class, 'index'])->name('captain.entries.index');
-        Route::get('/groups/{group}/members/{user}/entry', [\App\Http\Controllers\Captain\EntryController::class, 'edit'])->name('captain.entries.edit');
-        Route::post('/groups/{group}/members/{user}/entry', [\App\Http\Controllers\Captain\EntryController::class, 'update'])->name('captain.entries.update');
 
         // Invitation Management
         Route::get('/groups/{group}/invitation', [\App\Http\Controllers\Captain\InvitationController::class, 'show'])->name('groups.invitation');

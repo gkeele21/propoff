@@ -6,7 +6,7 @@ import Button from '@/Components/Base/Button.vue';
 import Badge from '@/Components/Base/Badge.vue';
 import Card from '@/Components/Base/Card.vue';
 import Icon from '@/Components/Base/Icon.vue';
-import PageHeader from '@/Components/PageHeader.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
 import QuestionCard from '@/Components/Domain/QuestionCard.vue';
 import Toast from '@/Components/Feedback/Toast.vue';
 

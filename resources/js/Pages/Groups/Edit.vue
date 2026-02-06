@@ -7,7 +7,7 @@
                 title="Edit Group"
                 :subtitle="`Edit ${group.name}`"
                 :crumbs="[
-                    { label: 'Dashboard', href: route('dashboard') },
+                    { label: 'Home', href: route('play') },
                     { label: 'Groups', href: route('groups.index') },
                     { label: group.name, href: route('groups.show', group.id) },
                     { label: 'Edit' }
@@ -89,7 +89,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import PageHeader from '@/Components/PageHeader.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
 import Card from '@/Components/Base/Card.vue';
 import Button from '@/Components/Base/Button.vue';
 import TextField from '@/Components/Form/TextField.vue';

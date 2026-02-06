@@ -6,7 +6,7 @@ import Button from '@/Components/Base/Button.vue';
 import Badge from '@/Components/Base/Badge.vue';
 import Card from '@/Components/Base/Card.vue';
 import Icon from '@/Components/Base/Icon.vue';
-import PageHeader from '@/Components/PageHeader.vue';
+import PageHeader from '@/Components/Base/PageHeader.vue';
 import Toast from '@/Components/Feedback/Toast.vue';
 
 const props = defineProps({
@@ -136,8 +136,7 @@ const toggleLock = () => {
                             Manage Questions
                         </Button>
                     </Link>
-                    <Button variant="accent" size="sm" @click="copyJoinCode">
-                        <Icon name="share-nodes" class="mr-2" size="sm" />
+                    <Button variant="accent" size="sm" icon="share-nodes" @click="router.visit(route('groups.invitation', group.id))">
                         Share
                     </Button>
                 </template>
