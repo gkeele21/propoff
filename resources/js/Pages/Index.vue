@@ -1,7 +1,10 @@
 <script setup>
+import { ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import Logo from '@/Components/Domain/Logo.vue';
 import Button from '@/Components/Base/Button.vue';
+import Icon from '@/Components/Base/Icon.vue';
+import Modal from '@/Components/Base/Modal.vue';
 
 defineProps({
     canLogin: {
@@ -19,6 +22,8 @@ defineProps({
         required: true,
     },
 });
+
+const showUserModal = ref(false);
 
 const joinGroupForm = useForm({
     code: '',
@@ -45,17 +50,18 @@ const joinGroup = () => {
         <div class="relative min-h-screen">
             <!-- Navigation -->
             <div v-if="canLogin" class="fixed top-0 right-0 p-6 text-end z-10">
-                <Link
+                <button
                     v-if="$page.props.auth.user"
-                    :href="route('logout')"
-                    method="post"
-                    as="button"
+                    @click="showUserModal = true"
+                    type="button"
+                    class="inline-flex items-center gap-2 h-9 px-3 text-sm font-medium text-body hover:text-primary focus:outline-none transition duration-150"
                 >
-                    <Button variant="danger">Log Out</Button>
-                </Link>
+                    <Icon name="user" size="sm" />
+                    {{ $page.props.auth.user.name }}
+                </button>
                 <template v-else>
                     <Link :href="route('login')">
-                        <Button variant="primary">Log in</Button>
+                        <Button variant="primary" size="md">Log in</Button>
                     </Link>
                 </template>
             </div>
@@ -135,14 +141,15 @@ const joinGroup = () => {
                                 {{ joinGroupForm.errors.code }}
                             </p>
                         </div>
-                        <button
+                        <Button
                             type="submit"
-                            :disabled="joinGroupForm.processing || !joinGroupForm.code"
-                            class="btn-primary px-8 py-3 text-white font-bold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            variant="secondary"
+                            size="lg"
+                            :loading="joinGroupForm.processing"
+                            :disabled="!joinGroupForm.code"
                         >
-                            <span v-if="joinGroupForm.processing">Joining...</span>
-                            <span v-else>Join</span>
-                        </button>
+                            Join
+                        </Button>
                     </form>
                 </div>
 
@@ -152,11 +159,41 @@ const joinGroup = () => {
                         <Button variant="accent" size="lg">Get Started Free</Button>
                     </Link>
                     <Link v-else :href="route('play')">
-                        <Button variant="primary" size="lg">My Groups</Button>
+                        <Button variant="primary" size="lg">Continue</Button>
                     </Link>
                 </div>
             </div>
         </div>
+
+        <!-- User Modal -->
+        <Modal :show="showUserModal" @close="showUserModal = false" max-width="sm">
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-surface-inset rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Icon name="user" size="2x" class="text-muted" />
+                    </div>
+                    <div class="text-lg font-semibold text-body">{{ $page.props.auth.user?.name }}</div>
+                    <div class="text-sm text-muted">{{ $page.props.auth.user?.email }}</div>
+                </div>
+                <div class="space-y-3">
+                    <Link :href="route('profile.edit')" class="block">
+                        <Button variant="secondary" class="w-full" icon="user">
+                            Profile
+                        </Button>
+                    </Link>
+                    <Link
+                        :href="route('logout')"
+                        method="post"
+                        as="button"
+                        class="w-full"
+                    >
+                        <Button variant="danger" class="w-full" icon="right-from-bracket">
+                            Log Out
+                        </Button>
+                    </Link>
+                </div>
+            </div>
+        </Modal>
     </div>
 </template>
 
@@ -177,15 +214,6 @@ const joinGroup = () => {
     outline: none;
     box-shadow: 0 0 0 1px rgb(var(--color-text)), 0 0 0 3px rgb(var(--color-primary)), 0 0 15px rgb(var(--color-primary) / 0.3);
     border-color: transparent;
-}
-
-/* Button styles with hover glow */
-.btn-primary {
-    background-color: #1a3490;
-    transition: all 0.2s ease;
-}
-.btn-primary:hover:not(:disabled) {
-    box-shadow: 0 0 0 1px rgb(var(--color-text)), 0 0 0 3px #1a3490, 0 0 20px rgba(26, 52, 144, 0.4);
 }
 
 </style>
