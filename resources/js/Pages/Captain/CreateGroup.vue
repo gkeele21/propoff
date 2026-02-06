@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
 import Button from '@/Components/Base/Button.vue';
 import TextField from '@/Components/Form/TextField.vue';
 import TextArea from '@/Components/Form/TextArea.vue';
@@ -45,12 +46,12 @@ const LayoutComponent = props.isGuest ? GuestLayout : AuthenticatedLayout;
 
     <component :is="LayoutComponent">
         <template #header>
-            <h2 class="font-semibold text-xl text-body leading-tight">
-                Create Group for {{ event.name }}
-            </h2>
+            <PageHeader
+                :title="`Create Group for ${event.name}`"
+            />
         </template>
 
-        <div class="py-12">
+        <div class="py-8">
             <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
                 <!-- Invitation Info Banner -->
                 <div class="bg-info/10 border border-info/30 rounded-lg p-6 mb-6">

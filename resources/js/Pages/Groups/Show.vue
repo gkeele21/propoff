@@ -6,6 +6,7 @@ import Button from '@/Components/Base/Button.vue';
 import Badge from '@/Components/Base/Badge.vue';
 import Card from '@/Components/Base/Card.vue';
 import Icon from '@/Components/Base/Icon.vue';
+import PageHeader from '@/Components/PageHeader.vue';
 import QuestionCard from '@/Components/Domain/QuestionCard.vue';
 import QuestionModal from '@/Components/Domain/QuestionModal.vue';
 import Confirm from '@/Components/Feedback/Confirm.vue';
@@ -269,54 +270,39 @@ const getTypeBadgeVariant = (type) => {
     <Head :title="group.name" />
 
     <AuthenticatedLayout>
-        <!-- Captain View -->
-        <template v-if="isCaptain">
-            <!-- Compact Header -->
-            <div class="bg-surface shadow-sm mb-8 border-b border-border">
-                <div class="max-w-7xl mx-auto px-6 py-6">
-                    <div class="flex justify-between items-start gap-6">
-                        <!-- Left: Title, Event, Meta -->
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 flex-wrap mb-2">
-                                <h1 class="text-2xl font-bold text-body">{{ group.name }}</h1>
-                                <Badge variant="warning-soft">Captain</Badge>
-                                <span v-if="group.event" class="text-subtle">
-                                    {{ group.event.name }}
-                                </span>
-                                <span v-if="group.event?.event_date" class="text-subtle">
-                                    {{ formatDate(group.event.event_date) }}
-                                </span>
-                                <span class="text-subtle">
-                                    {{ stats?.total_members || 0 }} members
-                                </span>
-                                <Link :href="route('groups.edit', group.id)" class="text-primary hover:text-primary-hover transition-colors">
-                                    Edit
-                                </Link>
-                            </div>
-                            <p v-if="group.description" class="text-muted">{{ group.description }}</p>
-                            <div class="flex items-center gap-2 mt-2">
-                                <span class="text-sm text-muted">Join Code:</span>
-                                <span class="font-mono font-bold text-body">{{ group.code || group.join_code }}</span>
-                                <Badge v-if="group.grading_source === 'captain'" variant="primary-soft" size="sm">Captain Graded</Badge>
-                                <Badge v-else variant="info-soft" size="sm">Admin Graded</Badge>
-                            </div>
-                        </div>
-
-                        <!-- Right: Action Buttons -->
-                        <div class="flex gap-2">
-                            <Link :href="route('groups.invitation', group.id)">
-                                <Button variant="accent" size="sm">
-                                    <Icon name="share-nodes" class="mr-2" size="sm" />
-                                    Join Info
-                                </Button>
-                            </Link>
-                        </div>
+        <!-- Page Header (Captain View Only) -->
+        <template v-if="isCaptain" #header>
+            <PageHeader :title="group.name">
+                <template #metadata>
+                    <div class="flex items-center gap-2 flex-wrap mb-1">
+                        <Badge variant="warning-soft">Captain</Badge>
+                        <span v-if="group.event" class="text-subtle">{{ group.event.name }}</span>
+                        <span v-if="group.event?.event_date" class="text-subtle">{{ formatDate(group.event.event_date) }}</span>
+                        <span class="text-subtle">{{ stats?.total_members || 0 }} members</span>
+                        <Link :href="route('groups.edit', group.id)" class="text-primary hover:text-primary-hover transition-colors">Edit</Link>
                     </div>
-                </div>
-            </div>
+                    <p v-if="group.description" class="text-muted mb-1">{{ group.description }}</p>
+                    <div class="flex items-center gap-2">
+                        <span class="text-muted">Join Code:</span>
+                        <span class="font-mono font-bold text-body">{{ group.code || group.join_code }}</span>
+                        <Badge v-if="group.grading_source === 'captain'" variant="primary-soft" size="sm">Captain Graded</Badge>
+                        <Badge v-else variant="info-soft" size="sm">Admin Graded</Badge>
+                    </div>
+                </template>
+                <template #actions>
+                    <Link :href="route('groups.invitation', group.id)">
+                        <Button variant="accent" size="sm">
+                            <Icon name="share-nodes" class="mr-2" size="sm" />
+                            Join Info
+                        </Button>
+                    </Link>
+                </template>
+            </PageHeader>
+        </template>
 
-            <!-- Main Content -->
-            <div class="max-w-7xl mx-auto px-6 pb-12">
+        <!-- Captain View Content -->
+        <template v-if="isCaptain">
+            <div class="max-w-7xl mx-auto px-6 py-8">
                 <!-- Stats Row (4 tiles) -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <div class="bg-surface-inset border border-border border-t-4 border-t-success rounded-lg p-5 text-center">

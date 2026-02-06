@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
 import Button from '@/Components/Base/Button.vue';
 import Badge from '@/Components/Base/Badge.vue';
 import Card from '@/Components/Base/Card.vue';
@@ -307,49 +308,48 @@ const submitCreateGroup = () => {
     <Head :title="event.name" />
 
     <AuthenticatedLayout>
-        <!-- Compact Event Header -->
-        <div class="bg-surface shadow-sm mb-8 border-b border-border">
-            <div class="max-w-7xl mx-auto px-6 py-6">
-                <div class="flex justify-between items-start gap-6">
-                    <!-- Left: Title, Status, Meta Info -->
-                    <div class="flex-1">
-                        <div class="flex items-center gap-3 flex-wrap mb-2">
-                            <h1 class="text-2xl font-bold text-body">{{ event.name }}</h1>
-                            <Badge :variant="getStatusVariant(event.status)">
-                                {{ event.status }}
-                            </Badge>
-                            <span class="text-subtle">
-                                📅 {{ formatDate(event.event_date) }}
-                            </span>
-                            <span class="text-subtle">
-                                👥 {{ stats.total_entries || 0 }} entries
-                            </span>
-                            <Link :href="route('admin.events.edit', event.id)" class="text-primary hover:text-primary-hover transition-colors">
-                                Edit
-                            </Link>
-                        </div>
-                        <p class="text-muted">{{ event.description }}</p>
-                    </div>
-
-                    <!-- Right: Action Buttons -->
-                    <div class="flex gap-2">
-                        <Button variant="secondary" size="sm" class="!bg-info !text-white !border-info hover:!bg-info/80" @click="showCreateGroupModal = true">
-                            <Icon name="users" class="mr-2" size="sm" />
-                            Create My Group
-                        </Button>
-                        <Link :href="route('admin.events.captain-invitations.index', event.id)">
-                            <Button variant="accent" size="sm">
-                                <Icon name="paper-plane" class="mr-2" size="sm" />
-                                Manage Invitations
-                            </Button>
+        <template #header>
+            <PageHeader
+                :title="event.name"
+                :subtitle="event.description"
+                :crumbs="[
+                    { text: 'Events', href: route('admin.events.index') },
+                    { text: event.name }
+                ]"
+            >
+                <template #metadata>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <Badge :variant="getStatusVariant(event.status)">
+                            {{ event.status }}
+                        </Badge>
+                        <span class="text-subtle">
+                            {{ formatDate(event.event_date) }}
+                        </span>
+                        <span class="text-subtle">
+                            {{ stats.total_entries || 0 }} entries
+                        </span>
+                        <Link :href="route('admin.events.edit', event.id)" class="text-primary hover:text-primary-hover transition-colors">
+                            Edit
                         </Link>
                     </div>
-                </div>
-            </div>
-        </div>
+                </template>
+                <template #actions>
+                    <Button variant="secondary" size="sm" class="!bg-info !text-white !border-info hover:!bg-info/80" @click="showCreateGroupModal = true">
+                        <Icon name="users" class="mr-2" size="sm" />
+                        Create My Group
+                    </Button>
+                    <Link :href="route('admin.events.captain-invitations.index', event.id)">
+                        <Button variant="accent" size="sm">
+                            <Icon name="paper-plane" class="mr-2" size="sm" />
+                            Manage Invitations
+                        </Button>
+                    </Link>
+                </template>
+            </PageHeader>
+        </template>
 
         <!-- Main Content -->
-        <div class="max-w-7xl mx-auto px-6 pb-12">
+        <div class="max-w-7xl mx-auto px-6 py-8">
             <!-- Stats Row -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div class="bg-surface-inset border border-border border-t-4 border-t-success rounded-lg p-5 text-center">

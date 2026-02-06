@@ -1,8 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import PageHeader from '@/Components/PageHeader.vue';
 import Button from '@/Components/Base/Button.vue';
 import Icon from '@/Components/Base/Icon.vue';
 import TextField from '@/Components/Form/TextField.vue';
@@ -96,17 +96,12 @@ const formatDate = (dateString) => {
 
     <AuthenticatedLayout>
         <template #header>
-            <PageHeader
-                title="Manage Users"
-                subtitle="View and manage all users"
-                :crumbs="[
-                    { label: 'Users' }
-                ]"
-            >
+            <PageHeader title="Users">
                 <template #actions>
                     <Button
                         v-if="selectedUsers.length > 0"
                         variant="danger"
+                        size="sm"
                         icon="trash"
                         @click="bulkDelete"
                     >
@@ -114,6 +109,7 @@ const formatDate = (dateString) => {
                     </Button>
                     <Button
                         variant="secondary"
+                        size="sm"
                         icon="file-arrow-down"
                         @click="exportCSV"
                     >

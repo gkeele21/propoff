@@ -1,15 +1,19 @@
 <template>
     <Head :title="`Import Questions - ${event.name}`" />
 
-    <AuthenticatedLayout
-        title="Import from Templates"
-        :breadcrumbs="[
-            { text: 'Events', href: route('admin.events.index') },
-            { text: event.name, href: route('admin.events.show', event.id) },
-            { text: 'Import Templates' }
-        ]"
-    >
-        <div class="py-12">
+    <AuthenticatedLayout>
+        <template #header>
+            <PageHeader
+                title="Import from Templates"
+                :crumbs="[
+                    { text: 'Events', href: route('admin.events.index') },
+                    { text: event.name, href: route('admin.events.show', event.id) },
+                    { text: 'Import Templates' }
+                ]"
+            />
+        </template>
+
+        <div class="py-8">
             <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
                 <!-- Event Context -->
                 <div class="bg-primary/10 border border-primary/30 rounded-lg p-4 mb-6">
@@ -242,6 +246,7 @@ import { ref, computed } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
 import TextField from '@/Components/Form/TextField.vue';
 import Checkbox from '@/Components/Form/Checkbox.vue';
 import Button from '@/Components/Base/Button.vue';

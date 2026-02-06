@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import PageHeader from '@/Components/PageHeader.vue';
+import { Head, useForm, Link } from '@inertiajs/vue3';
 import Button from '@/Components/Base/Button.vue';
 import TextField from '@/Components/Form/TextField.vue';
 
@@ -23,10 +24,16 @@ const submit = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Create New Event</h2>
+            <PageHeader
+                title="Create New Event"
+                :crumbs="[
+                    { text: 'Events', href: route('events.index') },
+                    { text: 'Create' }
+                ]"
+            />
         </template>
 
-        <div class="py-12">
+        <div class="py-8">
             <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <form @submit.prevent="submit" class="p-6 space-y-6">

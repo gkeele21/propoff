@@ -3,16 +3,10 @@
 
     <AuthenticatedLayout>
         <template #header>
-            <PageHeader
-                title="Question Templates"
-                subtitle="Manage reusable question templates"
-                :crumbs="[
-                                        { label: 'Question Templates' }
-                ]"
-            >
+            <PageHeader title="Question Templates">
                 <template #actions>
                     <Link :href="route('admin.question-templates.create')">
-                        <Button variant="primary" icon="plus">Create Template</Button>
+                        <Button variant="primary" size="sm" icon="plus">Create Template</Button>
                     </Link>
                 </template>
             </PageHeader>
@@ -139,8 +133,8 @@
 
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
 import PageHeader from '@/Components/PageHeader.vue';
+import { Head, Link, router } from '@inertiajs/vue3';
 import Button from '@/Components/Base/Button.vue';
 import Badge from '@/Components/Base/Badge.vue';
 import Icon from '@/Components/Base/Icon.vue';

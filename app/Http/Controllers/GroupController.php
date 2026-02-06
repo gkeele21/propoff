@@ -460,6 +460,26 @@ class GroupController extends Controller
     }
 
     /**
+     * Toggle lock status for the group by setting/clearing entry_cutoff.
+     */
+    public function toggleLock(Group $group)
+    {
+        $this->authorize('update', $group);
+
+        if ($group->is_locked) {
+            // Unlock: clear the entry_cutoff
+            $group->update(['entry_cutoff' => null]);
+            $message = 'Group unlocked';
+        } else {
+            // Lock: set entry_cutoff to now
+            $group->update(['entry_cutoff' => now()]);
+            $message = 'Group locked';
+        }
+
+        return back()->with('success', $message);
+    }
+
+    /**
      * Check if grading source can be changed for this group.
      * Can change if:
      * 1. Event is in draft or open status

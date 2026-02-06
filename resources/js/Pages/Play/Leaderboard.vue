@@ -1,0 +1,80 @@
+<script setup>
+import { computed } from 'vue';
+import { Head, Link } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import Badge from '@/Components/Base/Badge.vue';
+import Card from '@/Components/Base/Card.vue';
+import PageHeader from '@/Components/PageHeader.vue';
+import Icon from '@/Components/Base/Icon.vue';
+
+const props = defineProps({
+    group: Object,
+    leaderboard: Object,
+    userRow: Object,
+});
+
+// Get ordinal suffix
+const getOrdinal = (n) => {
+    const s = ['th', 'st', 'nd', 'rd'];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+};
+
+const breadcrumbs = computed(() => [
+    { label: props.group.name, href: route('play.hub', { code: props.group.code }) },
+    { label: 'Leaderboard' },
+]);
+</script>
+
+<template>
+    <Head :title="`Leaderboard - ${group.name}`" />
+
+    <AuthenticatedLayout :group="group">
+        <template #header>
+            <PageHeader title="Leaderboard" :subtitle="group.event?.name" :crumbs="breadcrumbs" />
+        </template>
+
+        <!-- Main Content -->
+        <div class="max-w-4xl mx-auto px-6 py-8">
+            <Card>
+                <div class="divide-y divide-border -m-5">
+                    <div
+                        v-for="entry in leaderboard.data"
+                        :key="entry.id"
+                        class="flex items-center py-3 px-5"
+                        :class="{ 'bg-surface-elevated': entry.user_id === userRow?.user_id }"
+                    >
+                        <div class="min-w-[36px] h-7 px-2 rounded-md flex items-center justify-center font-bold text-sm bg-surface-inset text-body mr-4">
+                            {{ getOrdinal(entry.rank) }}
+                        </div>
+                        <div class="flex-1">
+                            {{ entry.user?.name }}
+                            <Badge v-if="entry.user_id === userRow?.user_id" variant="primary-soft" size="sm" class="ml-2">You</Badge>
+                        </div>
+                        <div class="font-semibold">{{ entry.total_score }} pts</div>
+                    </div>
+
+                    <!-- Empty state -->
+                    <div v-if="leaderboard.data.length === 0" class="p-8 text-center">
+                        <Icon name="trophy" size="3x" class="text-subtle mb-4" />
+                        <p class="text-muted">No entries yet</p>
+                    </div>
+                </div>
+            </Card>
+
+            <!-- Pagination -->
+            <div v-if="leaderboard.links && leaderboard.links.length > 3" class="mt-6 flex justify-center gap-2">
+                <Link
+                    v-for="link in leaderboard.links"
+                    :key="link.label"
+                    :href="link.url || '#'"
+                    class="px-3 py-1 rounded text-sm"
+                    :class="link.active
+                        ? 'bg-primary text-white'
+                        : 'bg-surface border border-border text-muted hover:border-primary'"
+                    v-html="link.label"
+                />
+            </div>
+        </div>
+    </AuthenticatedLayout>
+</template>

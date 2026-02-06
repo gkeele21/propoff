@@ -49,6 +49,18 @@ Route::post('/join/{token}', [GuestController::class, 'register'])->name('guest.
 Route::get('/my-results/{guestToken}', [GuestController::class, 'results'])->name('guest.results');
 Route::get('/guest/{guestToken}', [GuestController::class, 'login'])->name('guest.login');
 
+// Play routes (public - guest-accessible via cookie or join flow)
+Route::prefix('play/{code}')->group(function () {
+    Route::get('/', [\App\Http\Controllers\PlayController::class, 'hub'])->name('play.hub');
+    Route::get('/join', [\App\Http\Controllers\PlayController::class, 'joinForm'])->name('play.join');
+    Route::post('/join', [\App\Http\Controllers\PlayController::class, 'processJoin'])->name('play.join.process');
+    Route::get('/play', [\App\Http\Controllers\PlayController::class, 'questions'])->name('play.questions');
+    Route::post('/save', [\App\Http\Controllers\PlayController::class, 'saveAnswers'])->name('play.save');
+    Route::post('/submit', [\App\Http\Controllers\PlayController::class, 'submit'])->name('play.submit');
+    Route::get('/results', [\App\Http\Controllers\PlayController::class, 'results'])->name('play.results');
+    Route::get('/leaderboard', [\App\Http\Controllers\PlayController::class, 'leaderboard'])->name('play.leaderboard');
+});
+
 // Public join group routes (for homepage join code)
 Route::get('/groups/join', [GroupController::class, 'showJoinForm'])->name('groups.join.form');
 Route::post('/groups/join', [GroupController::class, 'join'])->name('groups.join');
@@ -56,6 +68,18 @@ Route::post('/groups/join', [GroupController::class, 'join'])->name('groups.join
 Route::get('/my-home', [App\Http\Controllers\MyHomeController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    // Smart redirect to Play Hub (uses SmartRoutingService)
+    Route::get('/play', function () {
+        $smartRouting = app(\App\Services\SmartRoutingService::class);
+        return redirect($smartRouting->getRedirectForUser(auth()->user()));
+    })->name('play');
+
+    // Group chooser (for users with multiple active groups)
+    Route::get('/groups/choose', [\App\Http\Controllers\GroupPickerController::class, 'index'])->name('groups.choose');
+
+    // History page
+    Route::get('/history', [\App\Http\Controllers\HistoryController::class, 'index'])->name('history');
+
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -120,6 +144,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/groups/{group}/invitation/regenerate', [\App\Http\Controllers\Captain\InvitationController::class, 'regenerate'])->name('groups.invitation.regenerate');
         Route::post('/groups/{group}/invitation/toggle', [\App\Http\Controllers\Captain\InvitationController::class, 'toggle'])->name('groups.invitation.toggle');
         Route::patch('/groups/{group}/invitation', [\App\Http\Controllers\Captain\InvitationController::class, 'update'])->name('groups.invitation.update');
+
+        // Lock/Unlock Group
+        Route::post('/groups/{group}/toggle-lock', [GroupController::class, 'toggleLock'])->name('groups.toggle-lock');
     });
 });
 

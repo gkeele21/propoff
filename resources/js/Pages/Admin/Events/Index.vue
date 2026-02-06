@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import Button from '@/Components/Base/Button.vue';
@@ -48,13 +49,17 @@ const getStatusVariant = (status) => {
 <template>
     <Head title="Manage Events" />
 
-    <AuthenticatedLayout title="Events">
-        <template #actions>
-            <Link :href="route('admin.events.create')">
-                <Button variant="primary" size="sm" icon="plus">
-                    Create Event
-                </Button>
-            </Link>
+    <AuthenticatedLayout>
+        <template #header>
+            <PageHeader title="Events">
+                <template #actions>
+                    <Link :href="route('admin.events.create')">
+                        <Button variant="primary" size="sm" icon="plus">
+                            Create Event
+                        </Button>
+                    </Link>
+                </template>
+            </PageHeader>
         </template>
 
         <div class="py-12">

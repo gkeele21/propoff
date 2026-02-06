@@ -2,7 +2,7 @@
     <button
         :type="type"
         :class="[
-            'rounded font-semibold transition whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed',
+            'rounded font-semibold transition whitespace-nowrap cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed',
             variants[variant],
             sizes[size]
         ]"

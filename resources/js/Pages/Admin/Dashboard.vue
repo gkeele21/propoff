@@ -1,7 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
 import StatCard from '@/Components/StatCard.vue';
-import Icon from '@/Components/Base/Icon.vue';
+import Badge from '@/Components/Base/Badge.vue';
 import { Head } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -34,15 +35,11 @@ const groupsSubtitle = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center gap-3">
-                <Icon name="gear" size="lg" class="text-muted" />
-                <h2 class="font-semibold text-xl text-body leading-tight">
-                    Admin Dashboard
-                </h2>
-                <span class="ml-2 text-sm bg-danger text-white px-3 py-1 rounded-full font-bold">
-                    Admin
-                </span>
-            </div>
+            <PageHeader title="Admin Dashboard">
+                <template #metadata>
+                    <Badge variant="danger" size="sm">Admin</Badge>
+                </template>
+            </PageHeader>
         </template>
 
         <div class="py-12">

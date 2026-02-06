@@ -199,4 +199,13 @@ class Group extends Model
         // No cutoff set - entries allowed
         return true;
     }
+
+    /**
+     * Get the is_locked attribute.
+     * A group is locked if the entry cutoff or event lock_date has passed.
+     */
+    public function getIsLockedAttribute(): bool
+    {
+        return !$this->acceptingEntries();
+    }
 }

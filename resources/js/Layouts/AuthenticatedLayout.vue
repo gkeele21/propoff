@@ -1,32 +1,23 @@
 <script setup>
-import { ref, computed, useSlots } from 'vue';
+import { ref, computed } from 'vue';
 import Logo from '@/Components/Domain/Logo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import Breadcrumbs from '@/Components/Base/Breadcrumbs.vue';
 import PreferencesModal from '@/Components/PreferencesModal.vue';
 import { usePage } from '@inertiajs/vue3';
 import { useTheme } from '@/composables/useTheme';
-
-const props = defineProps({
-    title: { type: String, default: '' },
-    breadcrumbs: { type: Array, default: () => [] },
-});
 
 // Initialize theme from localStorage on app load
 useTheme();
 
 const showingNavigationDropdown = ref(false);
 const showPreferences = ref(false);
-const slots = useSlots();
 
 const page = usePage();
 const isManager = computed(() => page.props.auth.user?.role === 'manager');
 const isAdmin = computed(() => ['admin', 'manager'].includes(page.props.auth.user?.role));
-
-const showHeader = computed(() => props.title || props.breadcrumbs.length > 0 || slots.actions);
 </script>
 
 <template>
@@ -44,10 +35,16 @@ const showHeader = computed(() => props.title || props.breadcrumbs.length > 0 ||
                         <!-- Navigation Links (Center) -->
                         <div class="hidden sm:flex items-center space-x-8">
                             <NavLink
-                                :href="route('dashboard')"
-                                :active="route().current('dashboard')"
+                                :href="route('play')"
+                                :active="route().current('play.*') || route().current('groups.choose')"
                             >
-                                My Home
+                                Play
+                            </NavLink>
+                            <NavLink
+                                :href="route('history')"
+                                :active="route().current('history')"
+                            >
+                                History
                             </NavLink>
                             <NavLink
                                 v-if="isAdmin"
@@ -162,8 +159,14 @@ const showHeader = computed(() => props.title || props.breadcrumbs.length > 0 ||
                     class="sm:hidden"
                 >
                     <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                            My Home
+                        <ResponsiveNavLink
+                            :href="route('play')"
+                            :active="route().current('play.*') || route().current('groups.choose')"
+                        >
+                            Play
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('history')" :active="route().current('history')">
+                            History
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
                             v-if="isAdmin"
@@ -220,25 +223,8 @@ const showHeader = computed(() => props.title || props.breadcrumbs.length > 0 ||
                 </div>
             </nav>
 
-            <!-- Page Heading -->
-            <header v-if="showHeader" class="bg-surface border-b border-border shadow sticky top-16 z-40">
-                <div class="py-3 px-4 sm:px-6 lg:px-8">
-                    <!-- Breadcrumbs -->
-                    <Breadcrumbs
-                        v-if="breadcrumbs.length > 0"
-                        :items="breadcrumbs"
-                        variant="light"
-                        class="mb-2"
-                    />
-                    <!-- Title + Actions -->
-                    <div class="flex justify-between items-center">
-                        <h1 v-if="title" class="text-xl font-bold text-body">{{ title }}</h1>
-                        <div v-if="slots.actions" class="flex items-center gap-3">
-                            <slot name="actions" />
-                        </div>
-                    </div>
-                </div>
-            </header>
+            <!-- Page Header (provided by page via slot) -->
+            <slot name="header" />
 
             <!-- Page Content -->
             <main>

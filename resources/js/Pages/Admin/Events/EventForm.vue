@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import Button from '@/Components/Base/Button.vue';
@@ -78,30 +79,34 @@ const breadcrumbs = computed(() => {
 <template>
     <Head :title="isEditing ? `Edit ${event.name}` : 'Create Event'" />
 
-    <AuthenticatedLayout
-        :title="isEditing ? 'Edit Event' : 'Create Event'"
-        :breadcrumbs="breadcrumbs"
-    >
-        <template #actions>
-            <Link :href="cancelRoute">
-                <Button variant="outline" size="sm">
-                    Cancel
-                </Button>
-            </Link>
-            <Button
-                v-if="isEditing"
-                variant="danger"
-                size="sm"
-                @click="showDeleteConfirm = true"
+    <AuthenticatedLayout>
+        <template #header>
+            <PageHeader
+                :title="isEditing ? 'Edit Event' : 'Create Event'"
+                :crumbs="breadcrumbs"
             >
-                Delete
-            </Button>
-            <Button variant="primary" size="sm" @click="submit" :disabled="form.processing">
-                Save
-            </Button>
+                <template #actions>
+                    <Link :href="cancelRoute">
+                        <Button variant="outline" size="sm">
+                            Cancel
+                        </Button>
+                    </Link>
+                    <Button
+                        v-if="isEditing"
+                        variant="danger"
+                        size="sm"
+                        @click="showDeleteConfirm = true"
+                    >
+                        Delete
+                    </Button>
+                    <Button variant="primary" size="sm" @click="submit" :disabled="form.processing">
+                        Save
+                    </Button>
+                </template>
+            </PageHeader>
         </template>
 
-        <div class="py-12">
+        <div class="py-8">
             <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <form @submit.prevent="submit" class="p-6 space-y-6">

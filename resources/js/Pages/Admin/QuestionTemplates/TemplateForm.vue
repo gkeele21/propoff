@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import { ref, computed, watch } from 'vue';
 import Button from '@/Components/Base/Button.vue';
@@ -160,44 +161,40 @@ const deleteTemplate = () => {
     <Head :title="isEditing ? 'Edit Question Template' : 'Create Question Template'" />
 
     <AuthenticatedLayout>
-        <!-- Header Bar with Actions -->
-        <div class="bg-surface border-b border-border">
-            <div class="max-w-7xl mx-auto px-6 py-4">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h1 class="text-2xl font-bold text-body">
-                            {{ isEditing ? 'Edit Template' : 'Create Template' }}
-                        </h1>
-                        <p class="text-muted text-sm mt-1">
-                            {{ isEditing ? template.title : 'Create a new reusable question template' }}
-                        </p>
-                    </div>
-                    <div class="flex gap-3">
-                        <Link :href="route('admin.question-templates.index')">
-                            <Button variant="outline" size="sm">Cancel</Button>
-                        </Link>
-                        <Button
-                            v-if="isEditing"
-                            variant="danger"
-                            size="sm"
-                            @click="showDeleteConfirm = true"
-                        >
-                            Delete
-                        </Button>
-                        <Button
-                            variant="primary"
-                            size="sm"
-                            @click="submit"
-                            :disabled="form.processing"
-                        >
-                            {{ isEditing ? 'Save' : 'Create Template' }}
-                        </Button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <template #header>
+            <PageHeader
+                :title="isEditing ? 'Edit Template' : 'Create Template'"
+                :subtitle="isEditing ? template.title : 'Create a new reusable question template'"
+                :crumbs="[
+                    { text: 'Templates', href: route('admin.question-templates.index') },
+                    { text: isEditing ? 'Edit' : 'Create' }
+                ]"
+            >
+                <template #actions>
+                    <Link :href="route('admin.question-templates.index')">
+                        <Button variant="outline" size="sm">Cancel</Button>
+                    </Link>
+                    <Button
+                        v-if="isEditing"
+                        variant="danger"
+                        size="sm"
+                        @click="showDeleteConfirm = true"
+                    >
+                        Delete
+                    </Button>
+                    <Button
+                        variant="primary"
+                        size="sm"
+                        @click="submit"
+                        :disabled="form.processing"
+                    >
+                        {{ isEditing ? 'Save' : 'Create Template' }}
+                    </Button>
+                </template>
+            </PageHeader>
+        </template>
 
-        <div class="py-12">
+        <div class="py-8">
             <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <form @submit.prevent="submit" class="p-6 space-y-6">

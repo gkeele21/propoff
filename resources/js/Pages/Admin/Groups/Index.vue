@@ -1,8 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import PageHeader from '@/Components/PageHeader.vue';
 import Button from '@/Components/Base/Button.vue';
 import Card from '@/Components/Base/Card.vue';
 import Badge from '@/Components/Base/Badge.vue';
@@ -89,11 +89,7 @@ const formatDate = (dateString) => {
 
     <AuthenticatedLayout>
         <template #header>
-            <PageHeader
-                title="Manage Groups"
-                subtitle="View and manage all groups"
-                :crumbs="[{ label: 'Groups' }]"
-            >
+            <PageHeader title="Groups">
                 <template #actions>
                     <Button
                         v-if="selectedGroups.length > 0"

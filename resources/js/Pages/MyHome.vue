@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import {
@@ -85,9 +86,7 @@ const copyMagicLink = (link) => {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-body leading-tight">
-                My Home
-            </h2>
+            <PageHeader title="My Home" />
         </template>
 
         <div class="py-12">
