@@ -158,7 +158,7 @@ const joinGroup = () => {
                     <Link v-if="!$page.props.auth.user" :href="route('register')">
                         <Button variant="accent" size="lg">Get Started Free</Button>
                     </Link>
-                    <Link v-else :href="route('play')">
+                    <Link v-else :href="route('home')">
                         <Button variant="primary" size="lg">Continue</Button>
                     </Link>
                 </div>

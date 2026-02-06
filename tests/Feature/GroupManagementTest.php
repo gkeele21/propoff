@@ -109,11 +109,11 @@ class GroupManagementTest extends TestCase
         $group = Group::factory()->create(['event_id' => $event->id]);
         $group->users()->attach($user->id, ['joined_at' => now()]);
 
-        $response = $this->actingAs($user)->get(route('groups.show', $group));
+        $response = $this->actingAs($user)->get(route('groups.questions', $group));
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
-            ->component('Groups/Show')
+            ->component('Groups/Questions')
             ->has('group')
         );
     }
@@ -125,7 +125,7 @@ class GroupManagementTest extends TestCase
         $event = Event::factory()->create();
         $group = Group::factory()->create(['event_id' => $event->id]);
 
-        $response = $this->actingAs($user)->get(route('groups.show', $group));
+        $response = $this->actingAs($user)->get(route('groups.questions', $group));
 
         $response->assertStatus(403);
     }
@@ -168,7 +168,7 @@ class GroupManagementTest extends TestCase
             'code' => 'ABC123',
         ]);
 
-        $response->assertRedirect(route('groups.show', $group));
+        $response->assertRedirect(route('groups.questions', $group));
         $response->assertSessionHas('info');
     }
 
@@ -209,7 +209,7 @@ class GroupManagementTest extends TestCase
             'entry_cutoff' => null,
         ]);
 
-        $response->assertRedirect(route('groups.show', $group));
+        $response->assertRedirect(route('groups.questions', $group));
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('groups', [
@@ -553,7 +553,7 @@ class GroupManagementTest extends TestCase
         $event = Event::factory()->create();
         $group = Group::factory()->create(['event_id' => $event->id]);
 
-        $response = $this->actingAs($admin)->get(route('groups.show', $group));
+        $response = $this->actingAs($admin)->get(route('groups.questions', $group));
 
         $response->assertStatus(200);
     }

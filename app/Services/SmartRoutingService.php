@@ -27,7 +27,7 @@ class SmartRoutingService
             return route('play.hub', ['code' => $activeGroups->first()->code]);
         }
 
-        return route('groups.choose');
+        return route('selector');
     }
 
     /**

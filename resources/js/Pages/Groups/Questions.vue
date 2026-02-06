@@ -11,6 +11,7 @@ import QuestionCard from '@/Components/Domain/QuestionCard.vue';
 import QuestionModal from '@/Components/Domain/QuestionModal.vue';
 import Confirm from '@/Components/Feedback/Confirm.vue';
 import Toast from '@/Components/Feedback/Toast.vue';
+import StatTile from '@/Components/Base/StatTile.vue';
 
 const props = defineProps({
     group: Object,
@@ -267,32 +268,26 @@ const getTypeBadgeVariant = (type) => {
 </script>
 
 <template>
-    <Head :title="group.name" />
+    <Head :title="`Manage Questions - ${group.name}`" />
 
     <AuthenticatedLayout>
         <!-- Page Header (Captain View Only) -->
         <template v-if="isCaptain" #header>
-            <PageHeader :title="group.name">
-                <template #metadata>
-                    <div class="flex items-center gap-2 flex-wrap mb-1">
-                        <Badge variant="warning-soft">Captain</Badge>
-                        <span v-if="group.event" class="text-subtle">{{ group.event.name }}</span>
-                        <span v-if="group.event?.event_date" class="text-subtle">{{ formatDate(group.event.event_date) }}</span>
-                        <span class="text-subtle">{{ stats?.total_members || 0 }} members</span>
-                        <Link :href="route('groups.edit', group.id)" class="text-primary hover:text-primary-hover transition-colors">Edit</Link>
-                    </div>
-                    <p v-if="group.description" class="text-muted mb-1">{{ group.description }}</p>
-                    <div class="flex items-center gap-2">
-                        <span class="text-muted">Join Code:</span>
-                        <span class="font-mono font-bold text-body">{{ group.code || group.join_code }}</span>
-                        <Badge v-if="group.grading_source === 'captain'" variant="primary-soft" size="sm">Captain Graded</Badge>
-                        <Badge v-else variant="info-soft" size="sm">Admin Graded</Badge>
-                    </div>
-                </template>
+            <PageHeader
+                title="Manage Questions"
+                subtitle="Add, edit, or remove questions. Set correct answers to calculate scores."
+                :crumbs="[
+                    { label: 'Home', href: route('play.hub', { code: group.code }) },
+                    { label: 'Questions' }
+                ]"
+            >
                 <template #actions>
-                    <Button variant="accent" size="sm" icon="share-nodes" @click="router.visit(route('groups.invitation', group.id))">
-                        Join Info
-                    </Button>
+                    <Link :href="route('groups.members.index', group.id)">
+                        <Button variant="secondary" size="sm">
+                            <Icon name="users" class="mr-2" size="sm" />
+                            Members
+                        </Button>
+                    </Link>
                 </template>
             </PageHeader>
         </template>
@@ -302,22 +297,10 @@ const getTypeBadgeVariant = (type) => {
             <div class="max-w-7xl mx-auto px-6 py-8">
                 <!-- Stats Row (4 tiles) -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-surface-inset border border-border border-t-4 border-t-success rounded-lg p-5 text-center">
-                        <div class="text-3xl font-bold text-success mb-1">{{ stats?.total_questions || 0 }}</div>
-                        <div class="text-xs text-muted uppercase tracking-wider">Questions</div>
-                    </div>
-                    <div class="bg-surface-inset border border-border border-t-4 border-t-warning rounded-lg p-5 text-center">
-                        <div class="text-3xl font-bold text-warning mb-1">{{ stats?.answered_questions || 0 }}</div>
-                        <div class="text-xs text-muted uppercase tracking-wider">Answered</div>
-                    </div>
-                    <div class="bg-surface-inset border border-border border-t-4 border-t-primary rounded-lg p-5 text-center">
-                        <div class="text-3xl font-bold text-primary mb-1">{{ stats?.total_members || 0 }}</div>
-                        <div class="text-xs text-muted uppercase tracking-wider">Members</div>
-                    </div>
-                    <div class="bg-surface-inset border border-border border-t-4 border-t-info rounded-lg p-5 text-center">
-                        <div class="text-3xl font-bold text-info mb-1">{{ stats?.total_points || 0 }}</div>
-                        <div class="text-xs text-muted uppercase tracking-wider">Total Points</div>
-                    </div>
+                    <StatTile :value="stats?.total_questions || 0" label="Questions" color="primary" />
+                    <StatTile :value="stats?.answered_questions || 0" label="Answered" color="warning" />
+                    <StatTile :value="stats?.total_points || 0" label="Max Possible" color="neutral" />
+                    <StatTile :value="stats?.total_members || 0" label="Members" color="info" />
                 </div>
 
                 <!-- Questions Section -->

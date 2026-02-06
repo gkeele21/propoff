@@ -7,9 +7,9 @@
                 :title="`${group.name} Leaderboard`"
                 subtitle="View rankings for this group"
                 :crumbs="[
-                    { label: 'Home', href: route('play') },
+                    { label: 'Home', href: route('home') },
                     { label: 'Groups', href: route('groups.index') },
-                    { label: group.name, href: route('groups.show', group.id) },
+                    { label: group.name, href: route('groups.questions', group.id) },
                     { label: 'Leaderboard' }
                 ]"
             >

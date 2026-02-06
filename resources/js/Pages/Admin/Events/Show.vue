@@ -14,6 +14,7 @@ import QuestionCard from '@/Components/Domain/QuestionCard.vue';
 import QuestionModal from '@/Components/Domain/QuestionModal.vue';
 import Confirm from '@/Components/Feedback/Confirm.vue';
 import Toast from '@/Components/Feedback/Toast.vue';
+import StatTile from '@/Components/Base/StatTile.vue';
 
 const props = defineProps({
     event: {
@@ -352,22 +353,10 @@ const submitCreateGroup = () => {
         <div class="max-w-7xl mx-auto px-6 py-8">
             <!-- Stats Row -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-surface-inset border border-border border-t-4 border-t-success rounded-lg p-5 text-center">
-                    <div class="text-3xl font-bold text-success mb-1">{{ questions.length }}</div>
-                    <div class="text-xs text-muted uppercase tracking-wider">Questions</div>
-                </div>
-                <div class="bg-surface-inset border border-border border-t-4 border-t-warning rounded-lg p-5 text-center">
-                    <div class="text-3xl font-bold text-warning mb-1">{{ stats.graded_count || 0 }}</div>
-                    <div class="text-xs text-muted uppercase tracking-wider">Answered</div>
-                </div>
-                <div class="bg-surface-inset border border-border border-t-4 border-t-primary rounded-lg p-5 text-center">
-                    <div class="text-3xl font-bold text-primary mb-1">{{ stats.total_entries || 0 }}</div>
-                    <div class="text-xs text-muted uppercase tracking-wider">Entries</div>
-                </div>
-                <div class="bg-surface-inset border border-border border-t-4 border-t-info rounded-lg p-5 text-center">
-                    <div class="text-3xl font-bold text-info mb-1">{{ stats.total_points || 0 }}</div>
-                    <div class="text-xs text-muted uppercase tracking-wider">Total Points</div>
-                </div>
+                <StatTile :value="questions.length" label="Questions" color="primary" />
+                <StatTile :value="stats.graded_count || 0" label="Answered" color="warning" />
+                <StatTile :value="stats.total_points || 0" label="Max Possible" color="neutral" />
+                <StatTile :value="stats.total_entries || 0" label="Entries" color="info" />
             </div>
 
             <!-- Questions Section -->

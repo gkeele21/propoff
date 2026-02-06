@@ -35,6 +35,7 @@ class InvitationController extends Controller
             'group' => [
                 'id' => $group->id,
                 'name' => $group->name,
+                'code' => $group->code,
                 'event' => [
                     'id' => $group->event->id,
                     'name' => $group->event->name,

@@ -51,8 +51,8 @@ User goes to /play
    │       │         │
    ▼       ▼         ▼
 Homepage  Play Hub   Group
-   /       for that   Picker
-          group      /groups/choose
+   /       for that   Selector
+          group      /selector
 ```
 
 **Active Group Definition**: Event status in `['draft', 'open', 'locked']` OR event date within last 7 days.
@@ -225,11 +225,11 @@ See [captain-system.md](captain-system.md) for captain details.
 ### Views
 - `resources/js/Pages/Play/Hub.vue` - Main play hub
 - `resources/js/Pages/Play/Join.vue` - Guest join form (3-step flow)
-- `resources/js/Pages/Play/Questions.vue` - Answer questions
+- `resources/js/Pages/Play/Game.vue` - Answer questions
 - `resources/js/Pages/Play/Results.vue` - View submitted answers
 - `resources/js/Pages/Play/Leaderboard.vue` - Full leaderboard
-- `resources/js/Pages/Groups/Choose.vue` - Group picker for multi-group users
-- `resources/js/Pages/Groups/Show.vue` - Group detail (captain view)
+- `resources/js/Pages/Groups/Selector.vue` - Group selector for multi-group users
+- `resources/js/Pages/Groups/Questions.vue` - Group question management (captain view)
 - `resources/js/Pages/Groups/Index.vue` - List user's groups
 - `resources/js/Pages/History.vue` - Past events with stats
 

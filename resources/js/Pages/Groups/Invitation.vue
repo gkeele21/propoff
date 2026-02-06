@@ -1,25 +1,12 @@
 <template>
-    <Head :title="`Member Invitation - ${group.name}`" />
+    <Head :title="`Join Info - ${group.name}`" />
 
     <AuthenticatedLayout>
         <template #header>
             <PageHeader
-                title="Member Invitation"
-                subtitle="Invite members to join your group"
-                :crumbs="[
-                    { label: 'Home', href: route('play') },
-                    { label: group.name, href: route('groups.show', group.id) },
-                    { label: 'Invitation' }
-                ]"
-            >
-                <template #metadata>
-                    <span class="font-medium text-body">{{ group.name }}</span>
-                    <span class="text-subtle mx-2">•</span>
-                    <span :class="invitation.is_active ? 'text-success' : 'text-danger'">
-                        {{ invitation.is_active ? 'Active' : 'Inactive' }}
-                    </span>
-                </template>
-            </PageHeader>
+                title="Join Info"
+                :crumbs="[{ label: 'Home', href: route('play.hub', { code: group.code }) }]"
+            />
         </template>
 
         <div class="py-12">
@@ -38,8 +25,14 @@
                             <p class="text-xs text-subtle mt-1">
                                 {{ formatDate(group.event.event_date) }}
                             </p>
+                            <p class="text-sm text-body mt-2">
+                                Join Code: <span class="font-mono font-bold text-primary">{{ group.code }}</span>
+                            </p>
                         </div>
                     </div>
+                    <p class="text-sm text-muted mt-4 pt-4 border-t border-border">
+                        Share the join code, the invitation link below, or let members scan the QR code to join your group.
+                    </p>
                 </div>
 
                 <!-- Invitation Link Section -->

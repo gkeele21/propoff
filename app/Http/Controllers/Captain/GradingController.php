@@ -24,15 +24,6 @@ class GradingController extends Controller
     }
 
     /**
-     * Display the grading interface for the group.
-     * Redirects to Group Show page where grading is now handled inline.
-     */
-    public function index(Request $request, Group $group)
-    {
-        return redirect()->route('groups.show', $group);
-    }
-
-    /**
      * Set the correct answer for a specific question.
      */
     public function setAnswer(SetAnswerRequest $request, Group $group, GroupQuestion $groupQuestion)
@@ -71,58 +62,6 @@ class GradingController extends Controller
         $this->leaderboardService->updateLeaderboard($group->event, $group);
 
         return back()->with('success', 'Answer set successfully! Scores recalculated.');
-    }
-
-    /**
-     * Bulk set answers for all questions.
-     */
-    public function bulkSetAnswers(Request $request, Group $group)
-    {
-        // Check if group uses captain grading
-        if ($group->grading_source !== 'captain') {
-            return back()->with('error', 'This group uses admin grading. Cannot set captain answers.');
-        }
-
-        $validated = $request->validate([
-            'answers' => 'required|array',
-            'answers.*.group_question_id' => 'required|exists:group_questions,id',
-            'answers.*.correct_answer' => 'required|string',
-            'answers.*.points_awarded' => 'nullable|integer|min:0',
-            'answers.*.is_void' => 'nullable|boolean',
-        ]);
-
-        foreach ($validated['answers'] as $answerData) {
-            $groupQuestion = GroupQuestion::find($answerData['group_question_id']);
-
-            // Ensure question belongs to this group
-            if ($groupQuestion->group_id !== $group->id) {
-                continue;
-            }
-
-            GroupQuestionAnswer::updateOrCreate(
-                [
-                    'group_id' => $group->id,
-                    'group_question_id' => $groupQuestion->id,
-                ],
-                [
-                    'question_id' => $groupQuestion->event_question_id,
-                    'correct_answer' => $answerData['correct_answer'],
-                    'points_awarded' => $answerData['points_awarded'] ?? null,
-                    'is_void' => $answerData['is_void'] ?? false,
-                ]
-            );
-        }
-
-        // Recalculate scores for all entries in this group
-        $entries = $group->entries()->where('is_complete', true)->get();
-        foreach ($entries as $entry) {
-            $this->entryService->calculateScore($entry);
-        }
-
-        // Update leaderboard
-        $this->leaderboardService->updateLeaderboard($group->event, $group);
-
-        return back()->with('success', 'All answers set successfully! Scores recalculated.');
     }
 
     /**

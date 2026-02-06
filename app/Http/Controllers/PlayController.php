@@ -279,7 +279,7 @@ class PlayController extends Controller
 
         $answeredCount = $entry->userAnswers()->count();
 
-        return Inertia::render('Play/Questions', [
+        return Inertia::render('Play/Game', [
             'group' => [
                 'id' => $group->id,
                 'name' => $group->name,
@@ -431,7 +431,7 @@ class PlayController extends Controller
             ->first();
 
         if (!$entry) {
-            return redirect()->route('play.questions', ['code' => $code]);
+            return redirect()->route('play.game', ['code' => $code]);
         }
 
         if ($entry->is_complete) {

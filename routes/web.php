@@ -52,7 +52,7 @@ Route::prefix('play/{code}')->group(function () {
     Route::get('/', [\App\Http\Controllers\PlayController::class, 'hub'])->name('play.hub');
     Route::get('/join', [\App\Http\Controllers\PlayController::class, 'joinForm'])->name('play.join');
     Route::post('/join', [\App\Http\Controllers\PlayController::class, 'processJoin'])->name('play.join.process');
-    Route::get('/play', [\App\Http\Controllers\PlayController::class, 'questions'])->name('play.questions');
+    Route::get('/game', [\App\Http\Controllers\PlayController::class, 'questions'])->name('play.game');
     Route::post('/save', [\App\Http\Controllers\PlayController::class, 'saveAnswers'])->name('play.save');
     Route::post('/submit', [\App\Http\Controllers\PlayController::class, 'submit'])->name('play.submit');
     Route::get('/results', [\App\Http\Controllers\PlayController::class, 'results'])->name('play.results');
@@ -64,17 +64,17 @@ Route::get('/groups/join', [GroupController::class, 'showJoinForm'])->name('grou
 Route::post('/groups/join', [GroupController::class, 'join'])->name('groups.join');
 
 // Legacy route - redirects to smart routing
-Route::get('/my-home', fn () => redirect()->route('play'))->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/my-home', fn () => redirect()->route('home'))->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    // Smart redirect to Play Hub (uses SmartRoutingService)
-    Route::get('/play', function () {
+    // Smart redirect to Home/Play Hub (uses SmartRoutingService)
+    Route::get('/home', function () {
         $smartRouting = app(\App\Services\SmartRoutingService::class);
         return redirect($smartRouting->getRedirectForUser(auth()->user()));
-    })->name('play');
+    })->name('home');
 
-    // Group chooser (for users with multiple active groups)
-    Route::get('/groups/choose', [\App\Http\Controllers\GroupPickerController::class, 'index'])->name('groups.choose');
+    // Group selector (for users with multiple active groups)
+    Route::get('/selector', [\App\Http\Controllers\GroupPickerController::class, 'index'])->name('selector');
 
     // History page
     Route::get('/history', [\App\Http\Controllers\HistoryController::class, 'index'])->name('history');
@@ -88,18 +88,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/groups/{group}/leaderboard', [LeaderboardController::class, 'group'])->name('groups.leaderboard');
 
     // Group routes
-    Route::resource('groups', GroupController::class);
+    Route::resource('groups', GroupController::class)->except(['show']);
+    Route::get('/groups/{group}/questions', [GroupController::class, 'show'])->name('groups.questions');
     Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
-    Route::delete('/groups/{group}/members/{user}', [GroupController::class, 'removeMember'])->name('groups.removeMember');
-    Route::post('/groups/{group}/regenerate-code', [GroupController::class, 'regenerateCode'])->name('groups.regenerateCode');
 
     // Captain Group Management (requires captain of specific group)
     Route::middleware(\App\Http\Middleware\EnsureIsCaptainOfGroup::class)->group(function () {
         // Question Management
-        Route::get('/groups/{group}/questions', [\App\Http\Controllers\Captain\GroupQuestionController::class, 'index'])->name('groups.questions.index');
-        Route::get('/groups/{group}/questions/create', [\App\Http\Controllers\Captain\GroupQuestionController::class, 'create'])->name('groups.questions.create');
         Route::post('/groups/{group}/questions', [\App\Http\Controllers\Captain\GroupQuestionController::class, 'store'])->name('groups.questions.store');
-        Route::get('/groups/{group}/questions/{groupQuestion}/edit', [\App\Http\Controllers\Captain\GroupQuestionController::class, 'edit'])->name('groups.questions.edit');
         Route::patch('/groups/{group}/questions/{groupQuestion}', [\App\Http\Controllers\Captain\GroupQuestionController::class, 'update'])->name('groups.questions.update');
         Route::delete('/groups/{group}/questions/{groupQuestion}', [\App\Http\Controllers\Captain\GroupQuestionController::class, 'destroy'])->name('groups.questions.destroy');
         Route::post('/groups/{group}/questions/{groupQuestion}/toggle-active', [\App\Http\Controllers\Captain\GroupQuestionController::class, 'toggleActive'])->name('groups.questions.toggleActive');
@@ -107,9 +103,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/groups/{group}/questions/reorder', [\App\Http\Controllers\Captain\GroupQuestionController::class, 'reorder'])->name('groups.questions.reorder');
 
         // Grading
-        Route::get('/groups/{group}/grading', [\App\Http\Controllers\Captain\GradingController::class, 'index'])->name('groups.grading.index');
         Route::post('/groups/{group}/questions/{groupQuestion}/set-answer', [\App\Http\Controllers\Captain\GradingController::class, 'setAnswer'])->name('groups.grading.setAnswer');
-        Route::post('/groups/{group}/grading/bulk-set-answers', [\App\Http\Controllers\Captain\GradingController::class, 'bulkSetAnswers'])->name('groups.grading.bulkSetAnswers');
         Route::post('/groups/{group}/questions/{groupQuestion}/toggle-void', [\App\Http\Controllers\Captain\GradingController::class, 'toggleVoid'])->name('groups.grading.toggleVoid');
 
         // Member Management

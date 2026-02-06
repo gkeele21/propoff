@@ -198,10 +198,10 @@ class GroupController extends Controller
                 Mail::to($user->email)->send(new CaptainWelcome($user, $group, $magicLink));
             }
 
-            return Inertia::location(route('play'));
+            return Inertia::location(route('home'));
         }
 
-        return redirect()->route('play')
+        return redirect()->route('home')
             ->with('success', 'Group created successfully! You are now a captain of this group.');
     }
 }

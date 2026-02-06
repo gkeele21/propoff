@@ -90,7 +90,7 @@
 
                                         <Link
                                             v-if="entry.can_edit"
-                                            :href="entry.is_complete ? route('play.results', entry.group_code) : route('play.questions', entry.group_code)"
+                                            :href="entry.is_complete ? route('play.results', entry.group_code) : route('play.game', entry.group_code)"
                                         >
                                             <Button variant="primary" size="sm">
                                                 {{ entry.is_complete ? 'View' : 'Continue' }}

@@ -99,7 +99,7 @@ class GroupController extends Controller
             ]);
         }
 
-        return redirect()->route('groups.show', $group)
+        return redirect()->route('groups.questions', $group)
             ->with('success', 'Group created successfully! You are now a captain.');
     }
 
@@ -218,7 +218,7 @@ class GroupController extends Controller
             $data['group'] = $group;
         }
 
-        return Inertia::render('Groups/Show', $data);
+        return Inertia::render('Groups/Questions', $data);
     }
 
     /**
@@ -272,7 +272,7 @@ class GroupController extends Controller
 
         $group->update($validated);
 
-        return redirect()->route('groups.show', $group)
+        return redirect()->route('groups.questions', $group)
             ->with('success', 'Group updated successfully!');
     }
 
@@ -348,7 +348,7 @@ class GroupController extends Controller
 
         // Check if user is already a member
         if ($group->users->contains($user->id)) {
-            return redirect()->route('groups.show', $group)
+            return redirect()->route('groups.questions', $group)
                 ->with('info', 'You are already a member of this group.');
         }
 
@@ -364,10 +364,10 @@ class GroupController extends Controller
             session()->flash('success', 'Successfully joined ' . $group->name . '! You can now submit your entry.');
             session()->flash('magic_link', $magicLink);
             session()->flash('show_magic_link', true);
-            return \Inertia\Inertia::location(route('play'));
+            return \Inertia\Inertia::location(route('home'));
         }
 
-        return redirect()->route('play')
+        return redirect()->route('home')
             ->with('success', 'Successfully joined ' . $group->name . '!');
     }
 
@@ -415,48 +415,6 @@ class GroupController extends Controller
 
         return redirect()->route('groups.index')
             ->with('success', 'You have left the group.');
-    }
-
-    /**
-     * Remove a user from the group.
-     */
-    public function removeMember(Group $group, $userId)
-    {
-        $this->authorize('update', $group);
-
-        if ($group->created_by == $userId) {
-            return back()->with('error', 'Cannot remove the group creator.');
-        }
-
-        $group->users()->detach($userId);
-
-        return back()->with('success', 'Member removed from group.');
-    }
-
-    /**
-     * Generate a unique group code.
-     */
-    protected function generateUniqueCode()
-    {
-        do {
-            $code = strtoupper(Str::random(8));
-        } while (Group::where('code', $code)->exists());
-
-        return $code;
-    }
-
-    /**
-     * Regenerate group code.
-     */
-    public function regenerateCode(Group $group)
-    {
-        $this->authorize('update', $group);
-
-        $group->update([
-            'code' => $this->generateUniqueCode(),
-        ]);
-
-        return back()->with('success', 'Group code regenerated successfully!');
     }
 
     /**

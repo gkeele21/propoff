@@ -82,7 +82,7 @@ class GroupPickerController extends Controller
             ];
         });
 
-        return Inertia::render('Groups/Choose', [
+        return Inertia::render('Groups/Selector', [
             'groups' => $groups,
         ]);
     }

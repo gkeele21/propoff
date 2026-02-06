@@ -248,6 +248,6 @@ class CaptainInvitationController extends Controller
             'is_active' => true,
         ]);
 
-        return redirect()->route('play')->with('success', "Group '{$group->name}' created! You are now a captain.");
+        return redirect()->route('home')->with('success', "Group '{$group->name}' created! You are now a captain.");
     }
 }

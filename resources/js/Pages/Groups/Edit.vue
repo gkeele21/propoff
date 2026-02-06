@@ -7,9 +7,9 @@
                 title="Edit Group"
                 :subtitle="`Edit ${group.name}`"
                 :crumbs="[
-                    { label: 'Home', href: route('play') },
+                    { label: 'Home', href: route('home') },
                     { label: 'Groups', href: route('groups.index') },
-                    { label: group.name, href: route('groups.show', group.id) },
+                    { label: group.name, href: route('groups.questions', group.id) },
                     { label: 'Edit' }
                 ]"
             />
@@ -68,7 +68,7 @@
 
                         <!-- Actions -->
                         <div class="flex items-center justify-end gap-3 pt-4 border-t border-border">
-                            <Link :href="route('groups.show', group.id)">
+                            <Link :href="route('groups.questions', group.id)">
                                 <Button variant="outline">Cancel</Button>
                             </Link>
                             <Button

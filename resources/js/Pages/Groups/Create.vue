@@ -7,7 +7,7 @@
                 title="Create New Group"
                 subtitle="Set up your group and become a captain"
                 :crumbs="[
-                    { label: 'Home', href: route('play') },
+                    { label: 'Home', href: route('home') },
                     { label: 'Groups', href: route('groups.index') },
                     { label: 'Create' }
                 ]"

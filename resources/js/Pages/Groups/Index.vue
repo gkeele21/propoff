@@ -36,7 +36,7 @@ const joinGroup = () => {
                 title="Groups"
                 subtitle="Your groups and available groups to join"
                 :crumbs="[
-                    { label: 'Home', href: route('play') },
+                    { label: 'Home', href: route('home') },
                     { label: 'Groups' }
                 ]"
             >
@@ -72,7 +72,7 @@ const joinGroup = () => {
                             <Link
                                 v-for="group in userGroups"
                                 :key="group.id"
-                                :href="route('groups.show', group.id)"
+                                :href="route('groups.questions', group.id)"
                                 class="border border-border rounded-lg p-4 hover:shadow-md hover:bg-surface-elevated transition"
                             >
                                 <div class="flex items-start gap-3">
@@ -116,7 +116,7 @@ const joinGroup = () => {
                                             {{ group.users_count }} members
                                         </div>
                                         <Link
-                                            :href="route('groups.show', group.id)"
+                                            :href="route('groups.questions', group.id)"
                                             class="mt-3 inline-block text-primary hover:text-primary/80 text-sm"
                                         >
                                             View Group →

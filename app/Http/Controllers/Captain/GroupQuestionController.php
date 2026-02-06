@@ -13,24 +13,6 @@ use Inertia\Inertia;
 class GroupQuestionController extends Controller
 {
     /**
-     * Display a listing of questions for the group.
-     */
-    public function index(Request $request, Group $group)
-    {
-        // Questions are now managed on the Group Show page
-        return redirect()->route('groups.show', $group);
-    }
-
-    /**
-     * Show the form for creating a new custom question.
-     * Redirects to Group Show page where the modal handles creation.
-     */
-    public function create(Request $request, Group $group)
-    {
-        return redirect()->route('groups.show', $group);
-    }
-
-    /**
      * Store a newly created custom question.
      */
     public function store(StoreGroupQuestionRequest $request, Group $group)
@@ -47,17 +29,8 @@ class GroupQuestionController extends Controller
             'is_custom' => true, // Mark as custom
         ]);
 
-        return redirect()->route('groups.show', $group)
+        return redirect()->route('groups.questions', $group)
             ->with('success', 'Custom question added successfully!');
-    }
-
-    /**
-     * Show the form for editing the specified question.
-     * Redirects to Group Show page where the modal handles editing.
-     */
-    public function edit(Request $request, Group $group, GroupQuestion $groupQuestion)
-    {
-        return redirect()->route('groups.show', $group);
     }
 
     /**
@@ -79,7 +52,7 @@ class GroupQuestionController extends Controller
             'is_active' => $request->is_active ?? true,
         ]);
 
-        return redirect()->route('groups.show', $group)
+        return redirect()->route('groups.questions', $group)
             ->with('success', 'Question updated successfully!');
     }
 
@@ -108,7 +81,7 @@ class GroupQuestionController extends Controller
             ->where('display_order', '>', $groupQuestion->display_order)
             ->decrement('display_order');
 
-        return redirect()->route('groups.show', $group)
+        return redirect()->route('groups.questions', $group)
             ->with('success', 'Question deleted successfully!');
     }
 

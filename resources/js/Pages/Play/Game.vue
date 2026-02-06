@@ -52,14 +52,13 @@ const totalPoints = computed(() => {
 const breadcrumbs = computed(() => {
     if (props.submittingFor) {
         return [
-            { label: props.group.name, href: route('groups.show', { group: props.group.id }) },
+            { label: 'Home', href: route('play.hub', { code: props.group.code }) },
+            { label: props.group.name, href: route('groups.questions', { group: props.group.id }) },
             { label: 'Members', href: route('groups.members.index', { group: props.group.id }) },
-            { label: `Play for ${props.submittingFor.name}` },
         ];
     }
     return [
-        { label: props.group.name, href: route('play.hub', { code: props.group.code }) },
-        { label: 'Play' },
+        { label: 'Home', href: route('play.hub', { code: props.group.code }) },
     ];
 });
 

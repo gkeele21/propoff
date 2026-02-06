@@ -24,7 +24,6 @@ const props = defineProps({
 
 const showAddGuestModal = ref(false);
 const guestName = ref('');
-const copied = ref(false);
 
 // Confirmation dialog state
 const confirmDialog = ref({
@@ -96,28 +95,6 @@ const removeMember = (member) => {
     );
 };
 
-const regenerateJoinCode = () => {
-    showConfirmDialog(
-        'Regenerate Join Code?',
-        'Are you sure you want to regenerate the join code? The old code will stop working.',
-        () => {
-            router.post(route('groups.members.regenerateJoinCode', props.group.id), {}, {
-                preserveScroll: true,
-            });
-        },
-        'warning',
-        'rotate'
-    );
-};
-
-const copyJoinCode = async () => {
-    await navigator.clipboard.writeText(props.group.join_code);
-    copied.value = true;
-    setTimeout(() => {
-        copied.value = false;
-    }, 2000);
-};
-
 const addGuest = () => {
     if (!guestName.value.trim()) {
         return;
@@ -135,7 +112,7 @@ const addGuest = () => {
 };
 
 const submitEntryFor = (userId) => {
-    router.get(route('play.questions', { code: props.group.join_code, for_user: userId }));
+    router.get(route('play.game', { code: props.group.join_code, for_user: userId }));
 };
 
 const formatDate = (dateString) => {
@@ -156,69 +133,29 @@ const formatDate = (dateString) => {
                 title="Manage Members"
                 subtitle="Manage members and permissions for your group"
                 :crumbs="[
-                    { label: 'Home', href: route('play') },
-                    { label: group.name, href: route('groups.show', group.id) },
+                    { label: 'Home', href: route('play.hub', { code: group.join_code }) },
                     { label: 'Members' }
                 ]"
             >
-                <template #metadata>
-                    <span class="font-medium text-body">{{ group.name }}</span>
-                    <span class="text-subtle mx-2">•</span>
-                    <span class="text-muted">{{ members.length }} members</span>
+                <template #actions>
+                    <Button
+                        variant="primary"
+                        size="sm"
+                        icon="user-plus"
+                        @click="showAddGuestModal = true"
+                    >
+                        Add User
+                    </Button>
                 </template>
             </PageHeader>
         </template>
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                <!-- Join Code Card -->
-                <Card>
-                    <template #header>
-                        <div class="flex items-center gap-2">
-                            <Icon name="key" class="text-primary" />
-                            <h3 class="text-lg font-semibold text-body">Join Code</h3>
-                        </div>
-                    </template>
-
-                    <p class="text-sm text-muted mb-4">
-                        Share this code with members to join your group.
-                    </p>
-                    <div class="flex items-center gap-4">
-                        <div class="flex-1 bg-surface-inset p-4 rounded-lg border border-border">
-                            <p class="text-2xl font-mono font-bold text-center text-body">
-                                {{ group.join_code }}
-                            </p>
-                        </div>
-                        <Button
-                            variant="primary"
-                            :icon="copied ? 'check' : 'copy'"
-                            @click="copyJoinCode"
-                        >
-                            {{ copied ? 'Copied!' : 'Copy Code' }}
-                        </Button>
-                        <Button
-                            variant="muted"
-                            icon="rotate"
-                            @click="regenerateJoinCode"
-                        >
-                            Regenerate
-                        </Button>
-                    </div>
-                </Card>
-
                 <!-- Members List -->
                 <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg border border-border">
                     <div class="p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-semibold text-body">Members ({{ members.length }})</h3>
-                            <Button
-                                variant="success"
-                                icon="user-plus"
-                                @click="showAddGuestModal = true"
-                            >
-                                Add Guest User
-                            </Button>
-                        </div>
+                        <h3 class="text-lg font-semibold text-body mb-4">Members ({{ members.length }})</h3>
 
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-border">

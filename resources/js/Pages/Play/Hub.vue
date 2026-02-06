@@ -8,6 +8,7 @@ import Card from '@/Components/Base/Card.vue';
 import Icon from '@/Components/Base/Icon.vue';
 import PageHeader from '@/Components/Base/PageHeader.vue';
 import Toast from '@/Components/Feedback/Toast.vue';
+import StatTile from '@/Components/Base/StatTile.vue';
 
 const props = defineProps({
     group: Object,
@@ -61,14 +62,14 @@ const entryButtonConfig = computed(() => {
         if (isLocked) {
             return { label: "You didn't submit", icon: null, disabled: true, route: null };
         }
-        return { label: 'Start Playing', icon: 'play', disabled: false, route: 'play.questions' };
+        return { label: 'Start Playing', icon: 'play', disabled: false, route: 'play.game' };
     }
 
     if (entry.status === 'in_progress') {
         if (isLocked) {
             return { label: "You didn't submit", icon: null, disabled: true, route: null };
         }
-        return { label: 'Continue Playing', icon: 'play', disabled: false, route: 'play.questions' };
+        return { label: 'Continue Playing', icon: 'play', disabled: false, route: 'play.game' };
     }
 
     if (entry.status === 'submitted') {
@@ -117,27 +118,31 @@ const toggleLock = () => {
     <AuthenticatedLayout>
         <template #header>
             <PageHeader :title="group.name">
+                <template v-if="isCaptain" #titleSuffix>
+                    <Badge variant="warning-soft">Captain</Badge>
+                </template>
                 <template #metadata>
                     <div class="flex items-center gap-2 flex-wrap">
-                        <Badge v-if="isCaptain" variant="warning-soft">Captain</Badge>
                         <span v-if="group.event">{{ group.event.name }}</span>
                         <span v-if="group.event?.event_date">•</span>
                         <span v-if="group.event?.event_date">{{ formatDate(group.event.event_date) }}</span>
-                        <span>•</span>
-                        <span>{{ stats.total_members }} members</span>
-                        <span>•</span>
-                        <span class="font-mono font-bold text-primary">{{ group.code }}</span>
                     </div>
                 </template>
                 <template v-if="isCaptain" #actions>
-                    <Link :href="route('groups.show', group.id)">
+                    <Link :href="route('groups.questions', group.id)">
                         <Button variant="primary" size="sm">
                             <Icon name="list-check" class="mr-2" size="sm" />
-                            Manage Questions
+                            Questions
+                        </Button>
+                    </Link>
+                    <Link :href="route('groups.members.index', group.id)">
+                        <Button variant="secondary" size="sm">
+                            <Icon name="users" class="mr-2" size="sm" />
+                            Members
                         </Button>
                     </Link>
                     <Button variant="accent" size="sm" icon="share-nodes" @click="router.visit(route('groups.invitation', group.id))">
-                        Share
+                        Join Info
                     </Button>
                 </template>
             </PageHeader>
@@ -147,46 +152,10 @@ const toggleLock = () => {
         <div class="max-w-4xl mx-auto px-6 py-8">
             <!-- Stats Row (4 tiles) -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <!-- Questions tile - clickable for captains -->
-                <Link
-                    v-if="isCaptain"
-                    :href="route('groups.show', group.id)"
-                    class="block bg-surface-inset border border-border border-t-4 border-t-success rounded-lg p-5 text-center hover:bg-surface-overlay transition-colors cursor-pointer"
-                >
-                    <div class="text-3xl font-bold text-success mb-1">{{ stats.total_questions }}</div>
-                    <div class="text-xs text-muted uppercase tracking-wider">Questions</div>
-                </Link>
-                <div
-                    v-else
-                    class="bg-surface-inset border border-border border-t-4 border-t-success rounded-lg p-5 text-center"
-                >
-                    <div class="text-3xl font-bold text-success mb-1">{{ stats.total_questions }}</div>
-                    <div class="text-xs text-muted uppercase tracking-wider">Questions</div>
-                </div>
-                <div class="bg-surface-inset border border-border border-t-4 border-t-warning rounded-lg p-5 text-center">
-                    <div class="text-3xl font-bold text-warning mb-1">{{ stats.graded_questions }}</div>
-                    <div class="text-xs text-muted uppercase tracking-wider">Answered</div>
-                </div>
-                <!-- Members tile - clickable for captains -->
-                <Link
-                    v-if="isCaptain"
-                    :href="route('groups.members.index', group.id)"
-                    class="block bg-surface-inset border border-border border-t-4 border-t-primary rounded-lg p-5 text-center hover:bg-surface-overlay transition-colors cursor-pointer"
-                >
-                    <div class="text-3xl font-bold text-primary mb-1">{{ stats.total_members }}</div>
-                    <div class="text-xs text-muted uppercase tracking-wider">Members</div>
-                </Link>
-                <div
-                    v-else
-                    class="bg-surface-inset border border-border border-t-4 border-t-primary rounded-lg p-5 text-center"
-                >
-                    <div class="text-3xl font-bold text-primary mb-1">{{ stats.total_members }}</div>
-                    <div class="text-xs text-muted uppercase tracking-wider">Members</div>
-                </div>
-                <div class="bg-surface-inset border border-border border-t-4 border-t-info rounded-lg p-5 text-center">
-                    <div class="text-3xl font-bold text-info mb-1">{{ stats.total_points }}</div>
-                    <div class="text-xs text-muted uppercase tracking-wider">Max Possible</div>
-                </div>
+                <StatTile :value="stats.total_questions" label="Questions" color="primary" />
+                <StatTile :value="stats.graded_questions" label="Answered" color="warning" />
+                <StatTile :value="stats.total_points" label="Max Possible" color="neutral" />
+                <StatTile :value="stats.total_members" label="Members" color="info" />
             </div>
 
             <!-- Two Column Layout -->
@@ -229,13 +198,6 @@ const toggleLock = () => {
                             <div class="text-2xl font-bold text-success mb-1">{{ myEntry.score }} points</div>
                             <div v-if="myEntry.rank" class="text-muted mb-4">
                                 {{ getOrdinal(myEntry.rank) }} of {{ myEntry.total_participants }}
-                            </div>
-                        </template>
-
-                        <!-- Progress (if in progress) -->
-                        <template v-else-if="myEntry?.status === 'in_progress'">
-                            <div class="text-muted mb-4">
-                                {{ myEntry.answered_count }} of {{ myEntry.total_questions }} answered
                             </div>
                         </template>
 
@@ -298,12 +260,6 @@ const toggleLock = () => {
                                     {{ gameStatus?.is_locked ? 'Unlock' : 'Lock' }}
                                 </Button>
                             </div>
-                        </div>
-                        <!-- Grading -->
-                        <div class="flex justify-between items-center py-2">
-                            <span class="text-muted">Grading</span>
-                            <Badge v-if="group.grading_source === 'captain'" variant="warning-soft">Captain Graded</Badge>
-                            <Badge v-else variant="info-soft">Admin Graded</Badge>
                         </div>
                     </div>
                 </Card>

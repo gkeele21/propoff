@@ -1,5 +1,5 @@
 <template>
-    <nav class="bg-surface border-b border-border shadow-lg sticky top-0 z-50">
+    <nav class="bg-surface border-b border-warning/30 shadow-[0_4px_12px_-2px_rgb(var(--color-warning)/0.3)] sticky top-0 z-50">
         <div class="px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo (Left) -->
@@ -89,9 +89,9 @@ const isManager = computed(() => props.user?.role === 'manager');
 const isAdmin = computed(() => ['admin', 'manager'].includes(props.user?.role));
 
 // Menu items configuration
-// Order: Play, Admin links, History
+// Order: Home, Admin links, History
 const menuItems = [
-    { label: 'Play', route: 'play', activeMatch: ['play.*', 'groups.choose'] },
+    { label: 'Home', route: 'home', activeMatch: ['home', 'play.*', 'selector', 'groups.questions', 'groups.invitation', 'groups.members.*'] },
     { label: 'Events', route: 'admin.events.index', requiresAdmin: true },
     { label: 'Templates', route: 'admin.question-templates.index', requiresManager: true },
     { label: 'Users', route: 'admin.users.index', requiresManager: true },
