@@ -270,15 +270,6 @@ const showToastMessage = (message) => {
     }, 3000);
 };
 
-// Get type badge variant
-const getTypeBadgeVariant = (type) => {
-    const variants = {
-        multiple_choice: 'info-soft',
-        yes_no: 'success-soft',
-        numeric: 'warning-soft',
-    };
-    return variants[type] || 'default';
-};
 </script>
 
 <template>
@@ -382,28 +373,28 @@ const getTypeBadgeVariant = (type) => {
                                 @dragleave="handleDragLeave"
                                 @drop="handleDrop(question)"
                             >
-                            <!-- Question Header -->
-                            <div class="flex items-start gap-3 mb-4">
-                                <!-- Drag Handle -->
-                                <div class="flex-shrink-0 cursor-move text-muted hover:text-body mt-0.5" title="Drag to reorder">
-                                    <Icon name="grip-vertical" size="lg" />
-                                </div>
-
-                                <!-- Question Info -->
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <h3 class="text-lg font-semibold text-body">{{ index + 1 }}. {{ question.question_text }}</h3>
-                                        <Badge :variant="getTypeBadgeVariant(question.question_type)" size="sm">
-                                            {{ question.question_type?.replace('_', ' ') }}
-                                        </Badge>
-                                        <Badge v-if="question.is_void" variant="danger" size="sm">Voided</Badge>
-                                        <Badge v-if="question.is_custom" variant="warning-soft" size="sm">Custom</Badge>
-                                        <span class="text-sm text-white">{{ question.points }} {{ question.points === 1 ? 'point' : 'points' }}</span>
-                                    </div>
-                                </div>
-
-                                <!-- Action Buttons -->
-                                <div class="flex items-center gap-2">
+                            <QuestionCard
+                                :model-value="selectedAnswers[question.id]"
+                                @update:model-value="selectAnswer(question.id, $event, question)"
+                                :question="question.question_text"
+                                :options="question.options"
+                                :points="question.points"
+                                :question-number="index + 1"
+                                :correct-answer="question.correct_answer"
+                                :show-results="!!question.correct_answer"
+                                :show-header="true"
+                                :disabled="group.grading_source !== 'captain' || !group.is_locked"
+                                selection-color="info"
+                                :selection-bg="false"
+                                :show-focus-glow="false"
+                                :show-result-icons="false"
+                                :show-drag-handle="true"
+                                :question-type="question.question_type"
+                                :is-void="question.is_void"
+                                :is-custom="question.is_custom"
+                                :show-incorrect-indicator="false"
+                            >
+                                <template #headerActions>
                                     <Button variant="ghost" size="sm" @click="openEditModal(question)">
                                         Edit
                                     </Button>
@@ -416,30 +407,11 @@ const getTypeBadgeVariant = (type) => {
                                     >
                                         {{ question.is_void ? 'Unvoid' : 'Void' }}
                                     </Button>
-                                </div>
-                            </div>
+                                </template>
+                            </QuestionCard>
 
-                            <!-- Question Card (Answer Options) -->
-                            <div class="mb-4">
-                                <QuestionCard
-                                    :model-value="selectedAnswers[question.id]"
-                                    @update:model-value="selectAnswer(question.id, $event, question)"
-                                    :question="question.question_text"
-                                    :options="question.options"
-                                    :points="question.points"
-                                    :correct-answer="question.correct_answer"
-                                    :show-results="!!question.correct_answer"
-                                    :show-header="false"
-                                    :disabled="group.grading_source !== 'captain' || !group.is_locked"
-                                    selection-color="info"
-                                    :selection-bg="false"
-                                    :show-focus-glow="false"
-                                    :show-result-icons="false"
-                                />
-                            </div>
-
-                                <!-- Save Answer Section (captain-graded only, requires locked group) -->
-                                <div v-if="group.grading_source === 'captain' && group.is_locked && hasSelectedAnswer(question.id)" class="flex items-center justify-between gap-4">
+                            <!-- Save Answer Section (captain-graded only, requires locked group) -->
+                            <div v-if="group.grading_source === 'captain' && group.is_locked && hasSelectedAnswer(question.id)" class="flex items-center justify-between gap-4 mt-4">
                                     <!-- Sync to Admin Checkbox (only for event-linked questions) -->
                                     <div v-if="question.event_question_id">
                                         <Checkbox

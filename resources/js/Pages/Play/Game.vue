@@ -196,9 +196,6 @@ const showToastMessage = (message) => {
                 <div v-if="rankDisplay" class="text-5xl font-bold text-success mb-2">{{ rankDisplay }}</div>
                 <div v-else class="text-5xl font-bold text-body mb-2">Results</div>
                 <div class="text-2xl text-body">{{ entry.total_score }} points</div>
-                <div v-if="entry.total_participants > 0" class="text-muted mt-1">
-                    of {{ entry.total_participants }} participants
-                </div>
             </div>
 
             <!-- Intro Card -->
@@ -228,52 +225,36 @@ const showToastMessage = (message) => {
                     <div
                         v-for="(question, index) in questions"
                         :key="question.id"
-                        class="bg-surface-elevated border border-border rounded-lg overflow-hidden"
+                        class="bg-surface-elevated border border-border rounded-lg p-6"
                     >
-                        <!-- Question Header with Points Earned (shown when graded) -->
-                        <div v-if="hasGradedQuestions" class="flex justify-between items-center p-4 border-b border-border">
-                            <div class="font-semibold text-body">{{ question.question_text }}</div>
-                            <Badge
-                                v-if="question.is_void"
-                                variant="warning-soft"
-                            >
-                                Voided
-                            </Badge>
-                            <Badge
-                                v-else-if="question.is_correct"
-                                variant="success-soft"
-                            >
-                                +{{ question.points_earned }} {{ question.points_earned === 1 ? 'point' : 'points' }}
-                            </Badge>
-                            <Badge
-                                v-else-if="question.correct_answer"
-                                variant="danger-soft"
-                            >
-                                0 points
-                            </Badge>
-                            <Badge
-                                v-else
-                                variant="default"
-                            >
-                                Pending
-                            </Badge>
-                        </div>
-
-                        <div class="p-6">
-                            <QuestionCard
-                                :model-value="selectedAnswers[question.id]"
-                                @update:model-value="selectAnswer(question.id, $event)"
-                                :question="question.question_text"
-                                :options="question.options"
-                                :points="question.points"
-                                :question-number="index + 1"
-                                :show-letters="true"
-                                :show-header="!hasGradedQuestions"
-                                :disabled="group.is_locked"
-                                :correct-answer="question.correct_answer"
-                                :show-results="!!question.correct_answer && !question.is_void"
-                            />
-                        </div>
+                        <QuestionCard
+                            :model-value="selectedAnswers[question.id]"
+                            @update:model-value="selectAnswer(question.id, $event)"
+                            :question="question.question_text"
+                            :options="question.options"
+                            :points="question.points"
+                            :question-number="index + 1"
+                            :show-letters="true"
+                            :show-header="true"
+                            :disabled="group.is_locked"
+                            :correct-answer="question.correct_answer"
+                            :show-results="!!question.correct_answer && !question.is_void"
+                        >
+                            <template v-if="hasGradedQuestions" #headerActions>
+                                <Badge v-if="question.is_void" variant="warning-soft">
+                                    Voided
+                                </Badge>
+                                <Badge v-else-if="question.is_correct" variant="success-soft">
+                                    +{{ question.points_earned }} {{ question.points_earned === 1 ? 'pt' : 'pts' }}
+                                </Badge>
+                                <Badge v-else-if="question.correct_answer" variant="danger-soft">
+                                    0 pts
+                                </Badge>
+                                <Badge v-else variant="default">
+                                    Pending
+                                </Badge>
+                            </template>
+                        </QuestionCard>
                     </div>
 
                     <!-- Empty State -->

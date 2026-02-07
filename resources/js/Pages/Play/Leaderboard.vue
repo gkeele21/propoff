@@ -22,7 +22,7 @@ const getOrdinal = (n) => {
 };
 
 const breadcrumbs = computed(() => [
-    { label: props.group.name, href: route('play.hub', { code: props.group.code }) },
+    { label: 'Home', href: route('play.hub', { code: props.group.code }) },
     { label: 'Leaderboard' },
 ]);
 </script>
@@ -36,7 +36,7 @@ const breadcrumbs = computed(() => [
                 <template #actions>
                     <Link :href="route('play.game', { code: group.code })">
                         <Button
-                            variant="primary"
+                            variant="accent"
                             size="sm"
                             icon="eye"
                         >
@@ -67,7 +67,7 @@ const breadcrumbs = computed(() => [
                             class="flex items-center py-3 px-5"
                             :class="{ 'bg-surface-elevated': entry.user_id === userRow?.user_id }"
                         >
-                            <div class="min-w-[36px] h-7 px-2 rounded-md flex items-center justify-center font-bold text-sm bg-surface-inset text-body mr-4">
+                            <div class="min-w-[48px] font-bold text-xl text-primary mr-4">
                                 {{ getOrdinal(entry.rank) }}
                             </div>
                             <div class="flex-1">

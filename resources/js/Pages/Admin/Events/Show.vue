@@ -421,32 +421,25 @@ const submitCreateGroup = () => {
                             @dragleave="handleDragLeave"
                             @drop="handleDrop(question)"
                         >
-                        <!-- Question Header -->
-                        <div class="flex items-start gap-3 mb-4">
-                            <!-- Drag Handle -->
-                            <div class="flex-shrink-0 cursor-move text-muted hover:text-body mt-0.5" title="Drag to reorder">
-                                <Icon name="grip-vertical" size="lg" />
-                            </div>
-
-                            <!-- Question Info -->
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    <h3 class="text-lg font-semibold text-body">{{ index + 1 }}. {{ question.question_text }}</h3>
-                                    <Badge
-                                        :variant="question.question_type === 'multiple_choice' ? 'info-soft' :
-                                                  question.question_type === 'yes_no' ? 'success-soft' :
-                                                  question.question_type === 'numeric' ? 'warning-soft' : 'default'"
-                                        size="sm"
-                                    >
-                                        {{ question.question_type?.replace('_', ' ') }}
-                                    </Badge>
-                                    <Badge v-if="question.is_void" variant="danger" size="sm">Voided</Badge>
-                                    <span class="text-sm text-subtle">{{ question.points }} {{ question.points === 1 ? 'pt' : 'pts' }}</span>
-                                </div>
-                            </div>
-
-                            <!-- Action Buttons -->
-                            <div class="flex items-center gap-2">
+                        <QuestionCard
+                            :model-value="selectedAnswers[question.id]"
+                            @update:model-value="selectAnswer(question.id, $event)"
+                            :question="question.question_text"
+                            :options="question.options"
+                            :points="question.points"
+                            :question-number="index + 1"
+                            :correct-answer="question.correct_answer"
+                            :show-results="!!question.correct_answer"
+                            :show-header="true"
+                            :disabled="!event.is_locked"
+                            selection-color="info"
+                            :show-result-icons="false"
+                            :show-drag-handle="true"
+                            :question-type="question.question_type"
+                            :is-void="question.is_void"
+                            :show-incorrect-indicator="false"
+                        >
+                            <template #headerActions>
                                 <Button variant="ghost" size="sm" @click="openEditModal(question)">
                                     Edit
                                 </Button>
@@ -459,28 +452,11 @@ const submitCreateGroup = () => {
                                 >
                                     {{ question.is_void ? 'Unvoid' : 'Void' }}
                                 </Button>
-                            </div>
-                        </div>
+                            </template>
+                        </QuestionCard>
 
-                        <!-- Question Card (User View) -->
-                        <div class="mb-4">
-                            <QuestionCard
-                                :model-value="selectedAnswers[question.id]"
-                                @update:model-value="selectAnswer(question.id, $event)"
-                                :question="question.question_text"
-                                :options="question.options"
-                                :points="question.points"
-                                :correct-answer="question.correct_answer"
-                                :show-results="!!question.correct_answer"
-                                :show-header="false"
-                                :disabled="!event.is_locked"
-                                selection-color="info"
-                                :show-result-icons="false"
-                            />
-                        </div>
-
-                            <!-- Save Answer Button (conditional, requires locked event) -->
-                            <div v-if="event.is_locked && hasSelectedAnswer(question.id)" class="flex justify-end">
+                        <!-- Save Answer Button (conditional, requires locked event) -->
+                        <div v-if="event.is_locked && hasSelectedAnswer(question.id)" class="flex justify-end mt-4">
                                 <Button variant="secondary" @click="saveAnswer(question)">
                                     Save Answer
                                 </Button>

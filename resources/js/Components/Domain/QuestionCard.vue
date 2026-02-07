@@ -1,16 +1,31 @@
 <template>
     <div class="space-y-3">
         <!-- Question Header -->
-        <div v-if="showHeader" class="flex items-start justify-between mb-4">
-            <div class="flex items-start gap-2">
+        <div v-if="showHeader" class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+                <!-- Drag Handle -->
+                <div v-if="showDragHandle" class="flex-shrink-0 cursor-move text-muted hover:text-body" title="Drag to reorder">
+                    <Icon name="grip-vertical" size="lg" />
+                </div>
                 <span v-if="questionNumber" class="text-lg font-bold text-body">
                     {{ questionNumber }}.
                 </span>
-                <p class="text-lg text-body">{{ question }}</p>
+                <p class="text-lg font-semibold text-body">{{ question }}</p>
+                <!-- Question Type Badge -->
+                <Badge v-if="questionType" :variant="questionTypeBadgeVariant" size="sm">
+                    {{ questionType.replace('_', ' ') }}
+                </Badge>
+                <!-- Voided Badge -->
+                <Badge v-if="isVoid" variant="danger" size="sm">Voided</Badge>
+                <!-- Custom Badge -->
+                <Badge v-if="isCustom" variant="warning-soft" size="sm">Custom</Badge>
+                <span v-if="points" class="text-sm text-muted flex-shrink-0">
+                    ({{ points }} {{ points === 1 ? 'pt' : 'pts' }})
+                </span>
             </div>
-            <span v-if="points" class="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded flex-shrink-0">
-                {{ points }} {{ points === 1 ? 'point' : 'points' }}
-            </span>
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <slot name="headerActions"></slot>
+            </div>
         </div>
 
         <!-- Options -->
@@ -23,7 +38,7 @@
                 :class="[
                     getOptionClasses(option),
                     disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer',
-                    getFocusGlowClass(option)
+                    getFocusGlowClass()
                 ]"
             >
                 <!-- Hidden Radio Input for Keyboard Navigation -->
@@ -60,13 +75,14 @@
                         />
                     </div>
 
-                    <!-- Custom Radio Button -->
+                    <!-- Custom Radio Button (hidden in results mode) -->
                     <div
+                        v-if="!showResults"
                         class="w-[18px] h-[18px] rounded-full border-2 flex-shrink-0 relative transition-colors"
                         :class="[
                             isSelected(option)
                                 ? (selectionColor === 'info' ? 'border-info bg-info' : 'border-primary bg-primary')
-                                : (showResults && isCorrect(option) ? 'border-success bg-success' : 'border-border-strong bg-transparent')
+                                : 'border-border-strong bg-transparent'
                         ]"
                     >
                         <!-- Inner dot when selected -->
@@ -90,7 +106,7 @@
                     </span>
 
                     <!-- Bonus Points -->
-                    <span v-if="option.points && option.points > 0" class="text-xs font-semibold text-primary bg-primary/15 px-2 py-1 rounded">
+                    <span v-if="option.points && option.points > 0" class="text-xs font-semibold text-warning bg-warning/15 px-2 py-1 rounded">
                         +{{ option.points }} bonus {{ option.points === 1 ? 'point' : 'points' }}
                     </span>
                 </div>
@@ -108,6 +124,7 @@
 <script setup>
 import { computed } from 'vue';
 import Icon from '@/Components/Base/Icon.vue';
+import Badge from '@/Components/Base/Badge.vue';
 
 const props = defineProps({
     modelValue: { type: [String, Number], default: '' },
@@ -126,6 +143,22 @@ const props = defineProps({
     showResultIcons: { type: Boolean, default: true }, // Show check/x/arrow icons in results mode
     selectionBg: { type: Boolean, default: true }, // Show background tint on selection
     showFocusGlow: { type: Boolean, default: true }, // Show focus-within glow on click/tab
+    showIncorrectIndicator: { type: Boolean, default: true }, // Show red for wrong selections (false for admin/captain grading)
+    // Management view props
+    showDragHandle: { type: Boolean, default: false }, // Show drag handle for reordering
+    questionType: { type: String, default: null }, // Question type badge (multiple_choice, yes_no, etc.)
+    isVoid: { type: Boolean, default: false }, // Show voided badge
+    isCustom: { type: Boolean, default: false }, // Show custom badge
+});
+
+// Question type badge variant
+const questionTypeBadgeVariant = computed(() => {
+    switch (props.questionType) {
+        case 'multiple_choice': return 'info-soft';
+        case 'yes_no': return 'success-soft';
+        case 'numeric': return 'warning-soft';
+        default: return 'default';
+    }
 });
 
 defineEmits(['update:modelValue']);
@@ -164,13 +197,11 @@ function isCorrect(option) {
     return props.correctAnswer !== null && option.value === props.correctAnswer;
 }
 
-function getFocusGlowClass(option) {
+function getFocusGlowClass() {
     if (!props.showFocusGlow) return '';
-    // When showing results and this is the correct answer, use primary (green) glow
-    if (props.showResults && isCorrect(option)) {
-        return 'focus-within-glow';
-    }
-    // Otherwise use selection color's glow
+    // No focus glow in results mode (controls are disabled)
+    if (props.showResults) return '';
+    // Use selection color's glow for normal mode
     return props.selectionColor === 'info' ? 'focus-within-glow-info' : 'focus-within-glow';
 }
 
@@ -178,19 +209,37 @@ function getOptionClasses(option) {
     const bg = props.selectionBg;
     const glow = props.selectionColor === 'info' ? 'checked-glow-info' : 'checked-glow';
 
-    // Results mode styling
+    // Results mode styling - just outlines, dark background
     if (props.showResults) {
-        // Selection ALWAYS takes precedence - use selection color (blue when info)
+        // Admin/captain grading mode: selection blue, saved answer green (when not selected)
+        if (!props.showIncorrectIndicator) {
+            // Selection always shows blue with glow
+            if (isSelected(option)) {
+                return props.selectionColor === 'info'
+                    ? `border-info ${bg ? 'bg-info/10' : 'bg-surface-inset'} ${glow}`
+                    : `border-primary ${bg ? 'bg-primary/10' : 'bg-surface-inset'} checked-glow`;
+            }
+
+            // Saved answer (not selected) shows green without glow
+            if (isCorrect(option)) {
+                return 'border-success bg-surface-inset';
+            }
+
+            return 'border-border bg-surface-inset hover:border-border-strong hover:bg-surface-overlay';
+        }
+
+        // Player-facing results mode
         if (isSelected(option)) {
-            return props.selectionColor === 'info'
-                ? `border-info ${bg ? 'bg-info/10' : 'bg-surface-inset'} ${glow}`
-                : `border-primary ${bg ? 'bg-primary/10' : 'bg-surface-inset'} ${glow}`;
+            if (isCorrect(option)) {
+                return 'border-success bg-surface-inset';
+            }
+            return 'border-danger bg-surface-inset';
         }
-        // Correct answer (not selected) - green outline, no glow
+        // Correct answer (not selected) - green outline to show what was right
         if (isCorrect(option)) {
-            return `border-success ${bg ? 'bg-success/10' : 'bg-surface-inset'}`;
+            return 'border-success bg-surface-inset';
         }
-        return 'border-border bg-surface-inset hover:border-border-strong hover:bg-surface-overlay';
+        return 'border-border bg-surface-inset';
     }
 
     // Normal mode styling

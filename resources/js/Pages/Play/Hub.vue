@@ -63,27 +63,27 @@ const entryButtonConfig = computed(() => {
 
     if (!entry || entry.status === 'not_started') {
         if (isLocked) {
-            return { label: "You didn't submit", icon: null, disabled: true, route: null };
+            return { label: "You didn't submit", icon: null, disabled: true, route: null, variant: 'primary' };
         }
-        return { label: 'Start Playing', icon: 'play', disabled: false, route: 'play.game' };
+        return { label: 'Start Playing', icon: 'play', disabled: false, route: 'play.game', variant: 'primary' };
     }
 
     if (entry.status === 'in_progress') {
         if (isLocked) {
             // Still allow viewing results if they have any answers
             if (entry.answered_count > 0) {
-                return { label: 'View Answers', icon: 'eye', disabled: false, route: 'play.game' };
+                return { label: 'View Answers', icon: 'eye', disabled: false, route: 'play.game', variant: 'accent' };
             }
-            return { label: "You didn't submit", icon: null, disabled: true, route: null };
+            return { label: "You didn't submit", icon: null, disabled: true, route: null, variant: 'primary' };
         }
-        return { label: 'Continue Playing', icon: 'play', disabled: false, route: 'play.game' };
+        return { label: 'Continue Playing', icon: 'play', disabled: false, route: 'play.game', variant: 'primary' };
     }
 
     if (entry.status === 'submitted') {
-        return { label: 'View Answers', icon: 'eye', disabled: false, route: 'play.game' };
+        return { label: 'View Answers', icon: 'eye', disabled: false, route: 'play.game', variant: 'accent' };
     }
 
-    return { label: 'View Answers', icon: 'eye', disabled: false, route: 'play.game' };
+    return { label: 'View Answers', icon: 'eye', disabled: false, route: 'play.game', variant: 'accent' };
 });
 
 // Copy join code to clipboard
@@ -222,7 +222,7 @@ const toggleLock = () => {
                                 v-if="entryButtonConfig.route"
                                 :href="route(entryButtonConfig.route, { code: group.code })"
                             >
-                                <Button variant="primary" :disabled="entryButtonConfig.disabled">
+                                <Button :variant="entryButtonConfig.variant" :disabled="entryButtonConfig.disabled">
                                     <Icon v-if="entryButtonConfig.icon" :name="entryButtonConfig.icon" class="mr-2" size="sm" />
                                     {{ entryButtonConfig.label }}
                                 </Button>

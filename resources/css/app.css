@@ -122,6 +122,14 @@
             0 0 15px rgb(var(--color-info) / 0.3);
     }
 
+    /* Checked glow variant for success/green color (correct answers) */
+    .checked-glow-success {
+        box-shadow:
+            0 0 0 1px rgb(var(--color-text)),
+            0 0 0 3px rgb(var(--color-success)),
+            0 0 15px rgb(var(--color-success) / 0.3);
+    }
+
     /* Focus glow for small controls (checkbox, toggle) - smaller version */
     .focus-glow-sm:focus {
         box-shadow:
