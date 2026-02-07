@@ -96,7 +96,7 @@ class GuestController extends Controller
         session()->flash('success', 'Welcome! You can now play the event.');
         session()->flash('magic_link', $magicLink);
         session()->flash('show_magic_link', true);
-        return \Inertia\Inertia::location(route('play.hub'));
+        return \Inertia\Inertia::location(route('play.hub', ['code' => $invitation->group->code]));
     }
 
     /**
@@ -106,13 +106,21 @@ class GuestController extends Controller
     {
         $user = User::where('guest_token', $guestToken)
             ->where('role', 'guest')
+            ->with('groups')
             ->firstOrFail();
 
         // Auto-login
         Auth::login($user);
 
+        // Get the user's first group to redirect to
+        $group = $user->groups->first();
+        if (!$group) {
+            return redirect()->route('dashboard')
+                ->with('error', 'No group found for this account.');
+        }
+
         // Redirect to play hub with success message
-        return redirect()->route('play.hub')
+        return redirect()->route('play.hub', ['code' => $group->code])
             ->with('success', 'Welcome back, ' . $user->name . '!');
     }
 
@@ -135,6 +143,7 @@ class GuestController extends Controller
 
         $user = User::where('guest_token', $request->guest_token)
             ->where('role', 'guest')
+            ->with('groups')
             ->first();
 
         if (!$user) {
@@ -146,8 +155,15 @@ class GuestController extends Controller
         // Auto-login
         Auth::login($user);
 
+        // Get the user's first group to redirect to
+        $group = $user->groups->first();
+        if (!$group) {
+            return redirect()->route('dashboard')
+                ->with('error', 'No group found for this account.');
+        }
+
         // Redirect to play hub with success message
-        return redirect()->route('play.hub')
+        return redirect()->route('play.hub', ['code' => $group->code])
             ->with('success', 'Welcome back, ' . $user->name . '!');
     }
 
