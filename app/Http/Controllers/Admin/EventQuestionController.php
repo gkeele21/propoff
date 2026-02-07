@@ -501,6 +501,11 @@ class EventQuestionController extends Controller
             abort(404);
         }
 
+        // Check if event is locked (lock_date has passed)
+        if (!$event->is_locked) {
+            return back()->with('error', 'Cannot set answers until the event lock date has passed.');
+        }
+
         // Create or update the event answer
         EventAnswer::updateOrCreate(
             [
@@ -522,7 +527,7 @@ class EventQuestionController extends Controller
         $adminGroups = $event->groups()->where('grading_source', 'admin')->get();
 
         foreach ($adminGroups as $group) {
-            $entries = $group->entries()->where('is_complete', true)->get();
+            $entries = $group->entries()->get();
             foreach ($entries as $entry) {
                 $entryService->calculateScore($entry);
             }

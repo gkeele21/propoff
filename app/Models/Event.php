@@ -27,6 +27,8 @@ class Event extends Model
         'lock_date' => 'datetime',
     ];
 
+    protected $appends = ['is_locked'];
+
     /**
      * Get the user who created the event.
      */
@@ -97,5 +99,27 @@ class Event extends Model
     public function captainInvitations()
     {
         return $this->hasMany(CaptainInvitation::class);
+    }
+
+    /**
+     * Check if entries are still allowed for this event.
+     */
+    public function acceptingEntries(): bool
+    {
+        if ($this->lock_date) {
+            return now()->lessThanOrEqualTo($this->lock_date);
+        }
+
+        // No lock_date set - entries allowed
+        return true;
+    }
+
+    /**
+     * Get the is_locked attribute.
+     * An event is locked if the lock_date has passed.
+     */
+    public function getIsLockedAttribute(): bool
+    {
+        return !$this->acceptingEntries();
     }
 }

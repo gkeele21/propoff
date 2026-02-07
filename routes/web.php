@@ -68,7 +68,6 @@ Route::get('/design-system', function () {
 // Guest routes (public - no auth required)
 Route::get('/join/{token}', [GuestController::class, 'show'])->name('guest.join');
 Route::post('/join/{token}', [GuestController::class, 'register'])->name('guest.register');
-Route::get('/my-results/{guestToken}', [GuestController::class, 'results'])->name('guest.results');
 Route::get('/guest/{guestToken}', [GuestController::class, 'login'])->name('guest.login');
 
 // Start fresh - clear guest cookie and logout

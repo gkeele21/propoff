@@ -91,6 +91,11 @@ class EventAnswerController extends Controller
             abort(404);
         }
 
+        // Check if event is locked (lock_date has passed)
+        if (!$event->is_locked) {
+            return back()->with('error', 'Cannot set answers until the event lock date has passed.');
+        }
+
         // Create or update the event answer
         $eventAnswer = EventAnswer::updateOrCreate(
             [
@@ -109,7 +114,7 @@ class EventAnswerController extends Controller
         $adminGroups = $event->groups()->where('grading_source', 'admin')->get();
 
         foreach ($adminGroups as $group) {
-            $entries = $group->entries()->where('is_complete', true)->get();
+            $entries = $group->entries()->get();
             foreach ($entries as $entry) {
                 $this->entryService->calculateScore($entry);
             }
@@ -126,6 +131,11 @@ class EventAnswerController extends Controller
      */
     public function bulkSetAnswers(Request $request, Event $event)
     {
+        // Check if event is locked (lock_date has passed)
+        if (!$event->is_locked) {
+            return back()->with('error', 'Cannot set answers until the event lock date has passed.');
+        }
+
         $validated = $request->validate([
             'answers' => 'required|array',
             'answers.*.event_question_id' => 'required|exists:event_questions,id',
@@ -159,7 +169,7 @@ class EventAnswerController extends Controller
         $adminGroups = $event->groups()->where('grading_source', 'admin')->get();
 
         foreach ($adminGroups as $group) {
-            $entries = $group->entries()->where('is_complete', true)->get();
+            $entries = $group->entries()->get();
             foreach ($entries as $entry) {
                 $this->entryService->calculateScore($entry);
             }
@@ -181,6 +191,11 @@ class EventAnswerController extends Controller
             abort(404);
         }
 
+        // Check if event is locked (lock_date has passed)
+        if (!$event->is_locked) {
+            return back()->with('error', 'Cannot modify answers until the event lock date has passed.');
+        }
+
         $eventAnswer = EventAnswer::where('event_id', $event->id)
             ->where('event_question_id', $eventQuestion->id)
             ->first();
@@ -195,7 +210,7 @@ class EventAnswerController extends Controller
         $adminGroups = $event->groups()->where('grading_source', 'admin')->get();
 
         foreach ($adminGroups as $group) {
-            $entries = $group->entries()->where('is_complete', true)->get();
+            $entries = $group->entries()->get();
             foreach ($entries as $entry) {
                 $this->entryService->calculateScore($entry);
             }

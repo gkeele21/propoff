@@ -359,6 +359,15 @@ const submitCreateGroup = () => {
                 <StatTile :value="stats.total_entries || 0" label="Entries" color="info" />
             </div>
 
+            <!-- Grading Locked Notice -->
+            <div v-if="!event.is_locked" class="mb-6 bg-warning/10 border border-warning/30 rounded-lg p-4 flex items-center gap-3">
+                <Icon name="clock" class="text-warning" size="lg" />
+                <div>
+                    <p class="font-semibold text-body">Grading Not Available Yet</p>
+                    <p class="text-sm text-muted">You can set correct answers after the event lock date has passed. Players can still submit their picks until then.</p>
+                </div>
+            </div>
+
             <!-- Questions Section -->
             <Card :header-padding="false" header-bg-class="bg-surface-header">
                 <template #header>
@@ -442,6 +451,7 @@ const submitCreateGroup = () => {
                                     Edit
                                 </Button>
                                 <Button
+                                    v-if="event.is_locked && question.correct_answer"
                                     variant="ghost"
                                     size="sm"
                                     class="!text-warning"
@@ -463,13 +473,14 @@ const submitCreateGroup = () => {
                                 :correct-answer="question.correct_answer"
                                 :show-results="!!question.correct_answer"
                                 :show-header="false"
+                                :disabled="!event.is_locked"
                                 selection-color="info"
                                 :show-result-icons="false"
                             />
                         </div>
 
-                            <!-- Save Answer Button (conditional) -->
-                            <div v-if="hasSelectedAnswer(question.id)" class="flex justify-end">
+                            <!-- Save Answer Button (conditional, requires locked event) -->
+                            <div v-if="event.is_locked && hasSelectedAnswer(question.id)" class="flex justify-end">
                                 <Button variant="secondary" @click="saveAnswer(question)">
                                     Save Answer
                                 </Button>

@@ -34,6 +34,11 @@ class GradingController extends Controller
             abort(404);
         }
 
+        // Check if entry cutoff has passed (group must be locked to grade)
+        if (!$group->is_locked) {
+            return back()->with('error', 'Cannot set answers until the entry cutoff has passed.');
+        }
+
         // Check if group uses captain grading
         if ($group->grading_source !== 'captain') {
             return back()->with('error', 'This group uses admin grading. Cannot set captain answers.');
@@ -70,7 +75,7 @@ class GradingController extends Controller
         }
 
         // Recalculate scores for all entries in this group
-        $entries = $group->entries()->where('is_complete', true)->get();
+        $entries = $group->entries()->get();
         foreach ($entries as $entry) {
             $this->entryService->calculateScore($entry);
         }
@@ -91,6 +96,11 @@ class GradingController extends Controller
             abort(404);
         }
 
+        // Check if entry cutoff has passed (group must be locked to grade)
+        if (!$group->is_locked) {
+            return back()->with('error', 'Cannot modify answers until the entry cutoff has passed.');
+        }
+
         // Check if group uses captain grading
         if ($group->grading_source !== 'captain') {
             return back()->with('error', 'This group uses admin grading. Cannot modify captain answers.');
@@ -107,7 +117,7 @@ class GradingController extends Controller
         $answer->update(['is_void' => !$answer->is_void]);
 
         // Recalculate scores
-        $entries = $group->entries()->where('is_complete', true)->get();
+        $entries = $group->entries()->get();
         foreach ($entries as $entry) {
             $this->entryService->calculateScore($entry);
         }

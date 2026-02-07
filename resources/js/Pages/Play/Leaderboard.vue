@@ -38,9 +38,9 @@ const breadcrumbs = computed(() => [
                         <Button
                             variant="primary"
                             size="sm"
-                            icon="chart-bar"
+                            icon="eye"
                         >
-                            View Results
+                            View Answers
                         </Button>
                     </Link>
                 </template>

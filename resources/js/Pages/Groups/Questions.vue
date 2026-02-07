@@ -297,8 +297,8 @@ const getTypeBadgeVariant = (type) => {
             >
                 <template #actions>
                     <Link :href="route('play.game', { code: group.code })">
-                        <Button variant="accent" size="sm" icon="chart-bar">
-                            View Results
+                        <Button variant="accent" size="sm" icon="eye">
+                            View Answers
                         </Button>
                     </Link>
                     <Link :href="route('play.leaderboard', { code: group.code })">
@@ -324,6 +324,15 @@ const getTypeBadgeVariant = (type) => {
                     <StatTile :value="stats?.answered_questions || 0" label="Answered" color="warning" />
                     <StatTile :value="stats?.total_points || 0" label="Max Possible" color="neutral" />
                     <StatTile :value="stats?.total_members || 0" label="Members" color="info" />
+                </div>
+
+                <!-- Grading Locked Notice -->
+                <div v-if="group.grading_source === 'captain' && !group.is_locked" class="mb-6 bg-warning/10 border border-warning/30 rounded-lg p-4 flex items-center gap-3">
+                    <Icon name="clock" class="text-warning" size="lg" />
+                    <div>
+                        <p class="font-semibold text-body">Grading Not Available Yet</p>
+                        <p class="text-sm text-muted">You can set correct answers after the entry cutoff has passed. Members can still submit their picks until then.</p>
+                    </div>
                 </div>
 
                 <!-- Questions Section -->
@@ -399,7 +408,7 @@ const getTypeBadgeVariant = (type) => {
                                         Edit
                                     </Button>
                                     <Button
-                                        v-if="group.grading_source === 'captain' && question.correct_answer"
+                                        v-if="group.grading_source === 'captain' && question.correct_answer && group.is_locked"
                                         variant="ghost"
                                         size="sm"
                                         class="!text-warning"
@@ -421,7 +430,7 @@ const getTypeBadgeVariant = (type) => {
                                     :correct-answer="question.correct_answer"
                                     :show-results="!!question.correct_answer"
                                     :show-header="false"
-                                    :disabled="group.grading_source !== 'captain'"
+                                    :disabled="group.grading_source !== 'captain' || !group.is_locked"
                                     selection-color="info"
                                     :selection-bg="false"
                                     :show-focus-glow="false"
@@ -429,8 +438,8 @@ const getTypeBadgeVariant = (type) => {
                                 />
                             </div>
 
-                                <!-- Save Answer Section (captain-graded only) -->
-                                <div v-if="group.grading_source === 'captain' && hasSelectedAnswer(question.id)" class="flex items-center justify-between gap-4">
+                                <!-- Save Answer Section (captain-graded only, requires locked group) -->
+                                <div v-if="group.grading_source === 'captain' && group.is_locked && hasSelectedAnswer(question.id)" class="flex items-center justify-between gap-4">
                                     <!-- Sync to Admin Checkbox (only for event-linked questions) -->
                                     <div v-if="question.event_question_id">
                                         <Checkbox

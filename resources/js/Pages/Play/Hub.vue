@@ -70,16 +70,20 @@ const entryButtonConfig = computed(() => {
 
     if (entry.status === 'in_progress') {
         if (isLocked) {
+            // Still allow viewing results if they have any answers
+            if (entry.answered_count > 0) {
+                return { label: 'View Answers', icon: 'eye', disabled: false, route: 'play.game' };
+            }
             return { label: "You didn't submit", icon: null, disabled: true, route: null };
         }
         return { label: 'Continue Playing', icon: 'play', disabled: false, route: 'play.game' };
     }
 
     if (entry.status === 'submitted') {
-        return { label: 'View My Answers', icon: 'eye', disabled: false, route: 'play.results' };
+        return { label: 'View Answers', icon: 'eye', disabled: false, route: 'play.game' };
     }
 
-    return { label: 'View', icon: 'eye', disabled: false, route: 'play.results' };
+    return { label: 'View Answers', icon: 'eye', disabled: false, route: 'play.game' };
 });
 
 // Copy join code to clipboard

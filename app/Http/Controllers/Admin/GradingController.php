@@ -186,7 +186,7 @@ class GradingController extends Controller
      */
     public function calculateScores(Event $event)
     {
-        $entries = $event->entries()->where('is_complete', true)->get();
+        $entries = $event->entries()->get();
         $gradedCount = 0;
 
         foreach ($entries as $entry) {

@@ -164,6 +164,7 @@ class GroupController extends Controller
                 'description' => $group->description,
                 'grading_source' => $group->grading_source,
                 'entry_cutoff' => $group->entry_cutoff,
+                'is_locked' => $group->is_locked,
                 'code' => $group->code,
                 'join_code' => $group->code, // Alias for compatibility
                 'is_public' => $group->is_public,
