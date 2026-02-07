@@ -68,7 +68,7 @@ const avgFromFirstDisplay = computed(() => {
         </template>
 
         <!-- Main Content -->
-        <div class="max-w-4xl mx-auto px-6 py-8">
+        <div class="max-w-7xl mx-auto px-6 py-8">
             <!-- Year Filter -->
             <div class="bg-surface shadow-sm sm:rounded-lg mb-6 border border-border">
                 <div class="p-6">

@@ -40,7 +40,7 @@ const breadcrumbs = computed(() => [
                             size="sm"
                             icon="eye"
                         >
-                            View Answers
+                            View My Answers
                         </Button>
                     </Link>
                 </template>
@@ -48,7 +48,7 @@ const breadcrumbs = computed(() => [
         </template>
 
         <!-- Main Content -->
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
             <Card>
                 <div class="-m-5">
                     <!-- Column Headers -->

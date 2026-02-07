@@ -11,6 +11,7 @@ use App\Models\UserAnswer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -143,11 +144,15 @@ class PlayController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'verified' => 'nullable|boolean',
+            'email' => 'nullable|email|max:255',
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
         $name = trim($validated['name']);
+        $email = $validated['email'] ?? null;
+        $password = $validated['password'] ?? null;
 
-        // Check for exact match
+        // Check for exact name match in this group
         $exactMatch = $group->users()
             ->where('name', $name)
             ->first();
@@ -157,7 +162,7 @@ class PlayController extends Controller
             return $this->linkGuestAndProceed($exactMatch, $group, $code);
         }
 
-        // If exact match and not verified, show verification
+        // If exact name match and not verified, show verification
         if ($exactMatch) {
             $entry = Entry::where('user_id', $exactMatch->id)
                 ->where('group_id', $group->id)
@@ -177,8 +182,33 @@ class PlayController extends Controller
             ]);
         }
 
-        // No match - create new guest user and join group
-        return $this->createGuestAndJoin($name, $group, $code);
+        // Check if email already exists (returning user with different name)
+        if ($email) {
+            $existingUser = User::where('email', $email)->first();
+
+            if ($existingUser) {
+                // Update name if different and add to group
+                if ($existingUser->name !== $name) {
+                    $existingUser->update(['name' => $name]);
+                }
+
+                // Add to group if not already a member
+                if (!$group->users()->where('user_id', $existingUser->id)->exists()) {
+                    $group->users()->attach($existingUser->id, [
+                        'joined_at' => now(),
+                        'is_captain' => false,
+                    ]);
+                }
+
+                Auth::login($existingUser);
+
+                return redirect()->route('play.hub', ['code' => $code])
+                    ->with('success', 'Welcome back, ' . $existingUser->name . '!');
+            }
+        }
+
+        // No match - create new user and join group
+        return $this->createGuestAndJoin($name, $email, $password, $group, $code);
     }
 
     /**
@@ -496,6 +526,7 @@ class PlayController extends Controller
                 'id' => $group->id,
                 'name' => $group->name,
                 'code' => $group->code,
+                'is_locked' => $group->is_locked,
                 'event' => [
                     'id' => $group->event->id,
                     'name' => $group->event->name,
@@ -622,16 +653,17 @@ class PlayController extends Controller
     }
 
     /**
-     * Create a new guest user and join the group.
+     * Create a new user and join the group.
      */
-    protected function createGuestAndJoin(string $name, Group $group, string $code)
+    protected function createGuestAndJoin(string $name, ?string $email, ?string $password, Group $group, string $code)
     {
-        $guestToken = Str::random(32);
+        // Only generate guest token if no password (for magic link login)
+        $guestToken = $password ? null : Str::random(32);
 
         $user = User::create([
             'name' => $name,
-            'email' => null,
-            'password' => null,
+            'email' => $email,
+            'password' => $password ? Hash::make($password) : null,
             'role' => 'guest',
             'guest_token' => $guestToken,
         ]);
@@ -645,10 +677,15 @@ class PlayController extends Controller
         // Login the user
         Auth::login($user);
 
-        // Set cookie and redirect
-        return redirect()->route('play.hub', ['code' => $code])
-            ->with('success', 'Welcome to ' . $group->name . '!')
-            ->cookie('propoff_guest', $guestToken, 60 * 24 * 90); // 90 days
+        // Set cookie and redirect (only for guests without password)
+        $redirect = redirect()->route('play.hub', ['code' => $code])
+            ->with('success', 'Welcome to ' . $group->name . '!');
+
+        if ($guestToken) {
+            $redirect = $redirect->cookie('propoff_guest', $guestToken, 60 * 24 * 90); // 90 days
+        }
+
+        return $redirect;
     }
 
     /**

@@ -12,6 +12,7 @@ use App\Models\GroupQuestion;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -110,12 +111,12 @@ class GroupController extends Controller
                         $user->update(['name' => $request->captain_name]);
                     }
                 } else {
-                    // Create new guest user
-                    $guestToken = Str::random(32);
+                    // Create new user - with password if provided, otherwise guest
+                    $guestToken = $request->captain_password ? null : Str::random(32);
                     $user = User::create([
                         'name' => $request->captain_name,
                         'email' => $request->captain_email,
-                        'password' => null,
+                        'password' => $request->captain_password ? Hash::make($request->captain_password) : null,
                         'role' => 'guest',
                         'guest_token' => $guestToken,
                     ]);
@@ -142,6 +143,7 @@ class GroupController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'grading_source' => $request->grading_source,
+            'entry_cutoff' => $request->entry_cutoff,
             'code' => Str::upper(Str::random(8)),
             'created_by' => $user->id,
         ]);
@@ -186,13 +188,14 @@ class GroupController extends Controller
         // If we just created a guest user, force a full page redirect (not Inertia redirect)
         // to ensure authentication state is properly refreshed in the browser
         if ($request->captain_name) {
-            $magicLink = route('guest.login', ['guestToken' => $user->guest_token]);
             session()->flash('success', 'Group created successfully! You are now a captain of this group.');
-            session()->flash('magic_link', $magicLink);
-            session()->flash('show_magic_link', true);
 
-            // TODO: Future - allow user to set password and create full account
-            // Email is captured for future login but no welcome email sent for now
+            // Only show magic link if user doesn't have a password (guest without login credentials)
+            if ($user->guest_token) {
+                $magicLink = route('guest.login', ['guestToken' => $user->guest_token]);
+                session()->flash('magic_link', $magicLink);
+                session()->flash('show_magic_link', true);
+            }
 
             return Inertia::location(route('home'));
         }

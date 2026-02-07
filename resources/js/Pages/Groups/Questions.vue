@@ -290,17 +290,12 @@ const showToastMessage = (message) => {
                 <template #actions>
                     <Link v-if="group.is_locked" :href="route('play.game', { code: group.code })">
                         <Button variant="accent" size="sm" icon="eye">
-                            View Answers
+                            View My Answers
                         </Button>
                     </Link>
                     <Link :href="route('play.leaderboard', { code: group.code })">
                         <Button variant="primary" size="sm" icon="trophy">
                             Leaderboard
-                        </Button>
-                    </Link>
-                    <Link :href="route('groups.members.index', group.id)">
-                        <Button variant="secondary" size="sm" icon="users">
-                            Members
                         </Button>
                     </Link>
                 </template>
@@ -311,19 +306,27 @@ const showToastMessage = (message) => {
         <template v-if="isCaptain">
             <div class="max-w-7xl mx-auto px-6 py-8">
                 <!-- Stats Row (4 tiles) -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="grid grid-cols-3 gap-4 mb-6">
                     <StatTile :value="stats?.total_questions || 0" label="Questions" color="primary" />
                     <StatTile :value="stats?.answered_questions || 0" label="Answered" color="warning" />
                     <StatTile :value="stats?.total_points || 0" label="Max Possible" color="neutral" />
-                    <StatTile :value="stats?.total_members || 0" label="Members" color="info" />
                 </div>
 
-                <!-- Grading Locked Notice -->
+                <!-- Grading Not Available Notice -->
                 <div v-if="group.grading_source === 'captain' && !group.is_locked" class="mb-6 bg-warning/10 border border-warning/30 rounded-lg p-4 flex items-center gap-3">
                     <Icon name="clock" class="text-warning" size="lg" />
                     <div>
                         <p class="font-semibold text-body">Grading Not Available Yet</p>
                         <p class="text-sm text-muted">You can set correct answers after the entry cutoff has passed. Members can still submit their picks until then.</p>
+                    </div>
+                </div>
+
+                <!-- Grading Available Notice -->
+                <div v-if="group.grading_source === 'captain' && group.is_locked" class="mb-6 bg-info/10 border border-info/30 rounded-lg p-4 flex items-center gap-3">
+                    <Icon name="circle-info" class="text-info" size="lg" />
+                    <div>
+                        <p class="font-semibold text-body">Ready to Grade</p>
+                        <p class="text-sm text-muted">Click on the correct answer for each question to set it. Scores will be calculated automatically.</p>
                     </div>
                 </div>
 

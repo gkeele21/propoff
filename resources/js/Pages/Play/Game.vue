@@ -164,7 +164,7 @@ const showToastMessage = (message) => {
         </template>
 
         <!-- Main Content -->
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
             <!-- Captain Submitting For Banner -->
             <div v-if="submittingFor" class="bg-info/10 border border-info/30 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
                 <div class="flex items-center gap-3">

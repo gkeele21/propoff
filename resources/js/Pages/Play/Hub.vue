@@ -72,7 +72,7 @@ const entryButtonConfig = computed(() => {
         if (isLocked) {
             // Still allow viewing results if they have any answers
             if (entry.answered_count > 0) {
-                return { label: 'View Answers', icon: 'eye', disabled: false, route: 'play.game', variant: 'accent' };
+                return { label: 'View My Answers', icon: 'eye', disabled: false, route: 'play.game', variant: 'accent' };
             }
             return { label: "You didn't submit", icon: null, disabled: true, route: null, variant: 'primary' };
         }
@@ -81,7 +81,7 @@ const entryButtonConfig = computed(() => {
 
     if (entry.status === 'submitted') {
         if (isLocked) {
-            return { label: 'View Answers', icon: 'eye', disabled: false, route: 'play.game', variant: 'accent' };
+            return { label: 'View My Answers', icon: 'eye', disabled: false, route: 'play.game', variant: 'accent' };
         }
         // Before locked, they can still view/edit their picks
         return { label: 'View Picks', icon: 'eye', disabled: false, route: 'play.game', variant: 'secondary' };
@@ -131,14 +131,12 @@ const toggleLock = () => {
             <PageHeader :title="group.name">
                 <template v-if="isCaptain || isAdminOrManager" #titleSuffix>
                     <Badge v-if="isCaptain" variant="warning-soft">Captain</Badge>
-                    <template v-if="isAdminOrManager">
-                        <Badge :variant="group.grading_source === 'captain' ? 'primary-soft' : 'info-soft'">
-                            {{ group.grading_source === 'captain' ? 'Captain Graded' : 'Admin Graded' }}
-                        </Badge>
-                        <Link :href="route('groups.edit', group.id)" class="text-primary hover:text-primary-hover text-sm font-medium">
-                            Edit
-                        </Link>
-                    </template>
+                    <Badge :variant="group.grading_source === 'captain' ? 'primary-soft' : 'info-soft'">
+                        {{ group.grading_source === 'captain' ? 'Captain Graded' : 'Admin Graded' }}
+                    </Badge>
+                    <Link :href="route('groups.edit', group.id)" class="text-primary hover:text-primary-hover text-sm font-medium">
+                        Edit
+                    </Link>
                 </template>
                 <template #metadata>
                     <div class="flex items-center gap-2 flex-wrap">
@@ -166,7 +164,7 @@ const toggleLock = () => {
         </template>
 
         <!-- Main Content -->
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
             <!-- Stats Row (4 tiles) -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <StatTile
@@ -175,7 +173,12 @@ const toggleLock = () => {
                     color="primary"
                     :href="isCaptain ? route('groups.questions', group.id) : null"
                 />
-                <StatTile :value="stats.graded_questions" label="Answered" color="warning" />
+                <StatTile
+                    :value="stats.graded_questions"
+                    label="Answered"
+                    color="warning"
+                    :href="isCaptain ? route('groups.questions', group.id) : null"
+                />
                 <StatTile :value="stats.total_points" label="Max Possible" color="neutral" />
                 <StatTile
                     :value="stats.total_members"
@@ -284,7 +287,7 @@ const toggleLock = () => {
                                     @click="toggleLock"
                                 >
                                     <Icon :name="gameStatus?.is_locked ? 'lock-open' : 'lock'" class="sm:mr-1" size="sm" />
-                                    <span class="hidden sm:inline">{{ gameStatus?.is_locked ? 'Unlock' : 'Lock' }}</span>
+                                    <span class="hidden sm:inline">{{ gameStatus?.is_locked ? 'Unlock' : 'Lock Now' }}</span>
                                 </Button>
                             </div>
                         </div>

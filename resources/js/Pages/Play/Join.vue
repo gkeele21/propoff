@@ -41,6 +41,9 @@ const flashVerifyEntry = computed(() => page.props.flash?.verifyEntry || props.v
 // Form for name step
 const nameForm = useForm({
     name: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
 });
 
 // Form for verify step
@@ -104,14 +107,52 @@ const formatDate = (dateString) => {
                     </p>
                 </div>
 
-                <form @submit.prevent="submitName">
+                <form @submit.prevent="submitName" class="space-y-4">
                     <TextField
                         v-model="nameForm.name"
                         label="What's your name?"
                         placeholder="Enter your name"
                         :error="nameForm.errors.name"
                         autofocus
+                        required
                     />
+
+                    <!-- Optional account creation -->
+                    <div class="pt-4 border-t border-border">
+                        <p class="text-sm text-muted mb-4">
+                            Want to create an account? Add your email and password to login easily next time.
+                        </p>
+
+                        <div class="space-y-4">
+                            <TextField
+                                v-model="nameForm.email"
+                                type="email"
+                                label="Email (Optional)"
+                                placeholder="your.email@example.com"
+                                :error="nameForm.errors.email"
+                            />
+
+                            <template v-if="nameForm.email">
+                                <TextField
+                                    v-model="nameForm.password"
+                                    type="password"
+                                    label="Password (Optional)"
+                                    placeholder="Create a password"
+                                    :error="nameForm.errors.password"
+                                    hint="At least 8 characters"
+                                />
+
+                                <TextField
+                                    v-if="nameForm.password"
+                                    v-model="nameForm.password_confirmation"
+                                    type="password"
+                                    label="Confirm Password"
+                                    placeholder="Confirm your password"
+                                    :error="nameForm.errors.password_confirmation"
+                                />
+                            </template>
+                        </div>
+                    </div>
 
                     <Button
                         type="submit"

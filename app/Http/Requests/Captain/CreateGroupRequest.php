@@ -25,12 +25,14 @@ class CreateGroupRequest extends FormRequest
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'grading_source' => 'required|in:captain,admin',
+            'entry_cutoff' => 'nullable|date',
         ];
 
         // If user is not authenticated (guest), require captain name
         if (!$this->user()) {
             $rules['captain_name'] = 'required|string|max:255';
             $rules['captain_email'] = 'nullable|email|max:255';
+            $rules['captain_password'] = 'nullable|string|min:8|confirmed';
         }
 
         return $rules;
@@ -49,6 +51,8 @@ class CreateGroupRequest extends FormRequest
             'grading_source.required' => 'Please select a grading source.',
             'grading_source.in' => 'Invalid grading source selected.',
             'captain_email.email' => 'Please provide a valid email address.',
+            'captain_password.min' => 'Password must be at least 8 characters.',
+            'captain_password.confirmed' => 'Password confirmation does not match.',
         ];
     }
 }

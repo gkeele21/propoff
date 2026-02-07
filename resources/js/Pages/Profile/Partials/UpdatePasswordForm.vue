@@ -72,7 +72,7 @@ const updatePassword = () => {
             />
 
             <div class="flex items-center gap-4">
-                <Button variant="primary" :disabled="form.processing">Save</Button>
+                <Button type="submit" variant="primary" :disabled="form.processing">Save</Button>
 
                 <Transition
                     enter-active-class="transition ease-in-out"

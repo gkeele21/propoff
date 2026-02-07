@@ -51,11 +51,29 @@ const joinGroup = () => {
 
         <!-- Content Container -->
         <div class="relative min-h-screen">
-            <!-- Navigation - Always show Log in button -->
-            <div v-if="canLogin" class="fixed top-0 right-0 p-6 text-end z-10">
-                <Link :href="route('login')">
-                    <Button variant="primary" size="md">Log in</Button>
-                </Link>
+            <!-- Navigation - CTA buttons and Log in -->
+            <div class="fixed top-0 right-0 p-4 sm:p-6 z-10 flex items-center gap-3">
+                <template v-if="recognizedUser">
+                    <Link :href="route('home')">
+                        <Button variant="primary" size="md">Continue as {{ recognizedUser.name }}</Button>
+                    </Link>
+                    <Link
+                        :href="route('guest.forget')"
+                        method="post"
+                        as="button"
+                        class="text-sm text-muted hover:text-body transition-colors hidden sm:inline"
+                    >
+                        Not you?
+                    </Link>
+                </template>
+                <template v-else>
+                    <Link :href="route('register')">
+                        <Button variant="accent" size="md">Get Started Free</Button>
+                    </Link>
+                    <Link v-if="canLogin" :href="route('login')">
+                        <Button variant="primary" size="md">Log in</Button>
+                    </Link>
+                </template>
             </div>
 
             <div class="max-w-7xl mx-auto p-6 lg:p-8 pt-20">
@@ -117,7 +135,7 @@ const joinGroup = () => {
                 <!-- Join Group with Code -->
                 <div class="mt-16 max-w-2xl mx-auto bg-surface-elevated border border-border rounded-xl p-8 text-center">
                     <h2 class="text-2xl font-bold text-body mb-2">
-                        {{ recognizedUser ? 'Join a Different Group?' : 'Have a Group Code?' }}
+                        Have a Group Code?
                     </h2>
                     <p class="text-muted mb-4">Enter your code below to join</p>
 
@@ -147,27 +165,8 @@ const joinGroup = () => {
                     </form>
                 </div>
 
-                <!-- Call to Action -->
-                <div class="flex flex-col items-center mt-12 pb-8">
-                    <template v-if="recognizedUser">
-                        <Link :href="route('home')">
-                            <Button variant="primary" size="lg">Continue as {{ recognizedUser.name }}</Button>
-                        </Link>
-                        <Link
-                            :href="route('guest.forget')"
-                            method="post"
-                            as="button"
-                            class="mt-3 text-sm text-muted hover:text-body transition-colors"
-                        >
-                            Not {{ recognizedUser.name }}? Start fresh
-                        </Link>
-                    </template>
-                    <template v-else>
-                        <Link :href="route('register')">
-                            <Button variant="accent" size="lg">Get Started Free</Button>
-                        </Link>
-                    </template>
-                </div>
+                <!-- Bottom spacing -->
+                <div class="pb-8"></div>
             </div>
         </div>
 

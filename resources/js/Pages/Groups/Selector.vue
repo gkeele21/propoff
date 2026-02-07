@@ -30,7 +30,7 @@ const formatDate = (dateString) => {
         </template>
 
         <!-- Main Content -->
-        <div class="max-w-4xl mx-auto px-6 py-8">
+        <div class="max-w-7xl mx-auto px-6 py-8">
             <Card>
                 <div class="divide-y divide-border -m-5">
                     <Link

@@ -5,6 +5,7 @@ import Button from '@/Components/Base/Button.vue';
 import TextField from '@/Components/Form/TextField.vue';
 import TextArea from '@/Components/Form/TextArea.vue';
 import Radio from '@/Components/Form/Radio.vue';
+import DatePicker from '@/Components/Form/DatePicker.vue';
 import Card from '@/Components/Base/Card.vue';
 import Badge from '@/Components/Base/Badge.vue';
 import Icon from '@/Components/Base/Icon.vue';
@@ -29,8 +30,11 @@ const form = useForm({
     name: '',
     description: '',
     grading_source: 'captain',
+    entry_cutoff: '',
     captain_name: '',
     captain_email: '',
+    captain_password: '',
+    captain_password_confirmation: '',
 });
 
 const submit = () => {
@@ -106,21 +110,44 @@ const submit = () => {
                                             id="captain_email"
                                             v-model="form.captain_email"
                                             type="email"
-                                            label="Your Email (Optional - Recommended)"
+                                            label="Your Email (Optional)"
                                             :error="form.errors.captain_email"
-                                            placeholder="your.email@example.com (optional)"
+                                            placeholder="your.email@example.com"
                                         />
+
+                                        <!-- Password fields - shown when email is provided -->
+                                        <template v-if="form.captain_email">
+                                            <TextField
+                                                id="captain_password"
+                                                v-model="form.captain_password"
+                                                type="password"
+                                                label="Password (Optional)"
+                                                :error="form.errors.captain_password"
+                                                placeholder="Create a password"
+                                                hint="Add a password to login easily next time"
+                                            />
+
+                                            <TextField
+                                                v-if="form.captain_password"
+                                                id="captain_password_confirmation"
+                                                v-model="form.captain_password_confirmation"
+                                                type="password"
+                                                label="Confirm Password"
+                                                :error="form.errors.captain_password_confirmation"
+                                                placeholder="Confirm your password"
+                                            />
+                                        </template>
 
                                         <div class="p-4 bg-primary/10 border border-primary/30 rounded-lg">
                                             <p class="text-sm text-primary font-medium mb-2 flex items-center gap-2">
-                                                <Icon name="envelope" size="sm" />
-                                                Why provide an email?
+                                                <Icon name="circle-info" size="sm" />
+                                                Why create an account?
                                             </p>
                                             <ul class="text-sm text-primary/80 space-y-1 ml-6 list-disc">
+                                                <li>Login easily with your email and password</li>
                                                 <li>Track your captain history across multiple events</li>
                                                 <li>View all your past entries and groups in one place</li>
-                                                <li>If you've been a captain before, use the same email to see your history</li>
-                                                <li>Skip it if this is a one-time event and you don't need history</li>
+                                                <li>Skip it if this is a one-time event</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -152,6 +179,15 @@ const submit = () => {
                                             :error="form.errors.description"
                                             :rows="3"
                                             placeholder="Enter a description for your group"
+                                        />
+
+                                        <DatePicker
+                                            v-model="form.entry_cutoff"
+                                            type="datetime"
+                                            label="Entry Cutoff (Optional)"
+                                            :error="form.errors.entry_cutoff"
+                                            placeholder="MM/DD/YYYY HH:MM AM/PM"
+                                            hint="Set a deadline for when members can no longer submit entries. You can skip this for now and manually lock entries later from your group hub."
                                         />
                                     </div>
                                 </div>

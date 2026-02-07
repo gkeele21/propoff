@@ -15,8 +15,8 @@ defineProps({
 const user = usePage().props.auth.user;
 
 const form = useForm({
-    name: user.name,
-    email: user.email,
+    name: user.name || '',
+    email: user.email || '',
 });
 </script>
 
@@ -74,7 +74,7 @@ const form = useForm({
             </div>
 
             <div class="flex items-center gap-4">
-                <Button variant="primary" :disabled="form.processing">Save</Button>
+                <Button type="submit" variant="primary" :disabled="form.processing">Save</Button>
 
                 <Transition
                     enter-active-class="transition ease-in-out"

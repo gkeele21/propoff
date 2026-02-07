@@ -144,7 +144,7 @@ const formatDate = (dateString) => {
                         icon="user-plus"
                         @click="showAddGuestModal = true"
                     >
-                        Add User
+                        Add Group Member
                     </Button>
                 </template>
             </PageHeader>
