@@ -93,7 +93,7 @@ const formatDate = (dateString) => {
     <GuestLayout>
         <div class="max-w-md mx-auto">
             <!-- Step 1: Name Input -->
-            <div v-if="currentStep === 'name'" class="bg-surface border border-border rounded-2xl p-8">
+            <div v-if="currentStep === 'name'" class="bg-surface border border-border rounded-2xl p-5 sm:p-8">
                 <h1 class="text-2xl font-bold text-body mb-2">Enter {{ group.name }}</h1>
                 <p class="text-muted mb-6">Enter your name to continue</p>
 
@@ -132,7 +132,7 @@ const formatDate = (dateString) => {
             </div>
 
             <!-- Step 2: Verify -->
-            <div v-else-if="currentStep === 'verify'" class="bg-surface border border-border rounded-2xl p-8">
+            <div v-else-if="currentStep === 'verify'" class="bg-surface border border-border rounded-2xl p-5 sm:p-8">
                 <h1 class="text-2xl font-bold text-body mb-2">Is this you?</h1>
                 <p class="text-muted mb-6">
                     We found an existing entry for "{{ flashVerifyEntry?.name }}"
@@ -145,7 +145,7 @@ const formatDate = (dateString) => {
                     </div>
                 </div>
 
-                <div class="flex gap-3">
+                <div class="flex flex-col sm:flex-row gap-3">
                     <Button
                         variant="primary"
                         class="flex-1"
@@ -159,7 +159,7 @@ const formatDate = (dateString) => {
                         class="flex-1"
                         @click="chooseNewName"
                     >
-                        No, choose different name
+                        No, different name
                     </Button>
                 </div>
             </div>

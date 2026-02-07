@@ -145,26 +145,24 @@ const toggleLock = () => {
                 </template>
                 <template v-if="isCaptain" #actions>
                     <Link :href="route('groups.questions', group.id)">
-                        <Button variant="primary" size="sm">
-                            <Icon name="list-check" class="mr-2" size="sm" />
-                            Questions
+                        <Button variant="primary" size="sm" icon="list-check">
+                            <span class="hidden sm:inline">Questions</span>
                         </Button>
                     </Link>
                     <Link :href="route('groups.members.index', group.id)">
-                        <Button variant="secondary" size="sm">
-                            <Icon name="users" class="mr-2" size="sm" />
-                            Members
+                        <Button variant="secondary" size="sm" icon="users">
+                            <span class="hidden sm:inline">Members</span>
                         </Button>
                     </Link>
                     <Button variant="accent" size="sm" icon="share-nodes" @click="router.visit(route('groups.invitation', group.id))">
-                        Join Info
+                        <span class="hidden sm:inline">Join Info</span>
                     </Button>
                 </template>
             </PageHeader>
         </template>
 
         <!-- Main Content -->
-        <div class="max-w-4xl mx-auto px-6 py-8">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
             <!-- Stats Row (4 tiles) -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <StatTile :value="stats.total_questions" label="Questions" color="primary" />
@@ -210,8 +208,8 @@ const toggleLock = () => {
 
                         <!-- Score and Rank (if submitted) -->
                         <template v-if="myEntry?.status === 'submitted'">
-                            <div class="text-2xl font-bold text-success mb-1">{{ myEntry.score }} points</div>
-                            <div v-if="myEntry.rank" class="text-muted mb-4">
+                            <div class="text-xl sm:text-2xl font-bold text-success mb-1">{{ myEntry.score }} <span class="hidden sm:inline">points</span><span class="sm:hidden">pts</span></div>
+                            <div v-if="myEntry.rank" class="text-muted text-sm sm:text-base mb-4">
                                 {{ getOrdinal(myEntry.rank) }} of {{ myEntry.total_participants }}
                             </div>
                         </template>
@@ -248,18 +246,18 @@ const toggleLock = () => {
 
                     <div class="space-y-3">
                         <!-- Event Start -->
-                        <div class="flex justify-between items-center py-2 border-b border-border">
-                            <span class="text-muted">Event Start</span>
-                            <span class="font-semibold text-body">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-border gap-1">
+                            <span class="text-muted text-sm sm:text-base">Event Start</span>
+                            <span class="font-semibold text-body text-sm sm:text-base">
                                 {{ gameStatus?.event_start ? formatDateTime(gameStatus.event_start) : 'Not set' }}
                             </span>
                         </div>
                         <!-- Entry Cutoff with Lock/Unlock for captains -->
-                        <div class="flex justify-between items-center py-2 border-b border-border">
-                            <span class="text-muted">Entry Cutoff</span>
-                            <div class="flex items-center gap-3">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-border gap-2">
+                            <span class="text-muted text-sm sm:text-base">Entry Cutoff</span>
+                            <div class="flex items-center gap-2 sm:gap-3">
                                 <span
-                                    class="font-semibold"
+                                    class="font-semibold text-sm sm:text-base"
                                     :class="gameStatus?.is_locked ? 'text-danger' : 'text-body'"
                                 >
                                     {{ gameStatus?.close_time ? formatDateTime(gameStatus.close_time) : 'Not set' }}
@@ -271,8 +269,8 @@ const toggleLock = () => {
                                     :loading="isLocking"
                                     @click="toggleLock"
                                 >
-                                    <Icon :name="gameStatus?.is_locked ? 'lock-open' : 'lock'" class="mr-1" size="sm" />
-                                    {{ gameStatus?.is_locked ? 'Unlock' : 'Lock' }}
+                                    <Icon :name="gameStatus?.is_locked ? 'lock-open' : 'lock'" class="sm:mr-1" size="sm" />
+                                    <span class="hidden sm:inline">{{ gameStatus?.is_locked ? 'Unlock' : 'Lock' }}</span>
                                 </Button>
                             </div>
                         </div>
@@ -299,28 +297,28 @@ const toggleLock = () => {
                         class="flex items-center py-3 border-b border-border last:border-b-0"
                         :class="{ 'bg-surface-elevated -mx-5 px-5 rounded-lg': entry.user_id === leaderboard.currentUserId }"
                     >
-                        <div class="min-w-[36px] h-7 px-2 rounded-md flex items-center justify-center font-bold text-sm bg-surface-inset text-body mr-3">
+                        <div class="w-10 sm:w-12 h-7 px-1.5 sm:px-2 rounded-md flex items-center justify-center font-bold text-xs sm:text-sm bg-surface-inset text-body mr-2 sm:mr-3 flex-shrink-0">
                             {{ getOrdinal(entry.rank) }}
                         </div>
-                        <div class="flex-1">
+                        <div class="flex-1 min-w-0 truncate">
                             {{ entry.name }}
-                            <Badge v-if="entry.user_id === leaderboard.currentUserId" variant="primary-soft" size="sm" class="ml-2">You</Badge>
+                            <Badge v-if="entry.user_id === leaderboard.currentUserId" variant="primary-soft" size="sm" class="ml-1 sm:ml-2">You</Badge>
                         </div>
-                        <div class="font-semibold">{{ entry.score }} points</div>
+                        <div class="font-semibold text-sm sm:text-base flex-shrink-0 ml-2">{{ entry.score }} <span class="hidden sm:inline">points</span><span class="sm:hidden">pts</span></div>
                     </div>
 
                     <!-- User's row if not in top 5 -->
                     <template v-if="leaderboard.userRow">
                         <div class="py-2 text-center text-muted text-sm">...</div>
                         <div class="flex items-center py-3 bg-surface-elevated -mx-5 px-5 rounded-lg">
-                            <div class="min-w-[36px] h-7 px-2 rounded-md flex items-center justify-center font-bold text-sm bg-surface-inset text-body mr-3">
+                            <div class="w-10 sm:w-12 h-7 px-1.5 sm:px-2 rounded-md flex items-center justify-center font-bold text-xs sm:text-sm bg-surface-inset text-body mr-2 sm:mr-3 flex-shrink-0">
                                 {{ getOrdinal(leaderboard.userRow.rank) }}
                             </div>
-                            <div class="flex-1">
+                            <div class="flex-1 min-w-0 truncate">
                                 {{ leaderboard.userRow.name }}
-                                <Badge variant="primary-soft" size="sm" class="ml-2">You</Badge>
+                                <Badge variant="primary-soft" size="sm" class="ml-1 sm:ml-2">You</Badge>
                             </div>
-                            <div class="font-semibold">{{ leaderboard.userRow.score }} points</div>
+                            <div class="font-semibold text-sm sm:text-base flex-shrink-0 ml-2">{{ leaderboard.userRow.score }} <span class="hidden sm:inline">points</span><span class="sm:hidden">pts</span></div>
                         </div>
                     </template>
 

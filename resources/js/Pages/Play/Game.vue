@@ -164,9 +164,9 @@ const showToastMessage = (message) => {
         </template>
 
         <!-- Main Content -->
-        <div class="max-w-4xl mx-auto px-6 py-8">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
             <!-- Captain Submitting For Banner -->
-            <div v-if="submittingFor" class="bg-info/10 border border-info/30 rounded-lg p-4 mb-6">
+            <div v-if="submittingFor" class="bg-info/10 border border-info/30 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
                 <div class="flex items-center gap-3">
                     <Icon name="user-pen" class="text-info" size="lg" />
                     <div>
@@ -179,7 +179,7 @@ const showToastMessage = (message) => {
             </div>
 
             <!-- Locked Banner (only show if not graded yet) -->
-            <div v-if="group.is_locked && !hasGradedQuestions" class="bg-warning/10 border border-warning/30 rounded-lg p-4 mb-6">
+            <div v-if="group.is_locked && !hasGradedQuestions" class="bg-warning/10 border border-warning/30 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
                 <div class="flex items-center gap-3">
                     <Icon name="lock" class="text-warning" size="lg" />
                     <div>
@@ -192,14 +192,14 @@ const showToastMessage = (message) => {
             </div>
 
             <!-- Results Summary (shown when locked and graded) -->
-            <div v-if="group.is_locked && hasGradedQuestions" class="bg-surface-elevated rounded-xl p-8 text-center mb-6">
-                <div v-if="rankDisplay" class="text-5xl font-bold text-success mb-2">{{ rankDisplay }}</div>
-                <div v-else class="text-5xl font-bold text-body mb-2">Results</div>
-                <div class="text-2xl text-body">{{ entry.total_score }} points</div>
+            <div v-if="group.is_locked && hasGradedQuestions" class="bg-surface-elevated rounded-xl p-6 sm:p-8 text-center mb-4 sm:mb-6">
+                <div v-if="rankDisplay" class="text-3xl sm:text-5xl font-bold text-success mb-2">{{ rankDisplay }}</div>
+                <div v-else class="text-3xl sm:text-5xl font-bold text-body mb-2">Results</div>
+                <div class="text-xl sm:text-2xl text-body">{{ entry.total_score }} <span class="hidden sm:inline">points</span><span class="sm:hidden">pts</span></div>
             </div>
 
             <!-- Intro Card -->
-            <Card v-if="event" class="mb-6" border-color="warning">
+            <Card v-if="event" class="mb-4 sm:mb-6" border-color="warning">
                 <div>
                     <h2 class="text-xl font-bold text-body mb-2">{{ event.name }}</h2>
                     <p v-if="event.description" class="text-muted mb-4">{{ event.description }}</p>
@@ -208,9 +208,9 @@ const showToastMessage = (message) => {
             </Card>
 
             <!-- Questions Section -->
-            <Card :header-padding="false" header-bg-class="bg-surface-header">
+            <Card :header-padding="false" :body-padding="false" header-bg-class="bg-surface-header">
                 <template #header>
-                    <div class="p-6">
+                    <div class="p-4 sm:p-6">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 <h2 class="text-xl font-bold text-body">Questions</h2>
@@ -221,11 +221,11 @@ const showToastMessage = (message) => {
                 </template>
 
                 <!-- Questions List -->
-                <div class="space-y-4 p-6">
+                <div class="space-y-3 sm:space-y-4 p-4 sm:p-6">
                     <div
                         v-for="(question, index) in questions"
                         :key="question.id"
-                        class="bg-surface-elevated border border-border rounded-lg p-6"
+                        class="bg-surface-elevated border border-border rounded-lg p-4 sm:p-6"
                     >
                         <QuestionCard
                             :model-value="selectedAnswers[question.id]"

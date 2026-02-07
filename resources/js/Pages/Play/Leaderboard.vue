@@ -48,15 +48,15 @@ const breadcrumbs = computed(() => [
         </template>
 
         <!-- Main Content -->
-        <div class="max-w-4xl mx-auto px-6 py-8">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
             <Card>
                 <div class="-m-5">
                     <!-- Column Headers -->
-                    <div class="flex items-center py-3 px-5 bg-surface-header border-b border-border text-xs font-medium text-subtle uppercase tracking-wider">
-                        <div class="min-w-[52px]">Rank</div>
-                        <div class="flex-1">Player</div>
-                        <div class="w-24 text-right">Points</div>
-                        <div class="w-24 text-right">Max</div>
+                    <div class="flex items-center py-3 px-4 sm:px-5 bg-surface-header border-b border-border text-xs font-medium text-subtle uppercase tracking-wider">
+                        <div class="w-12 sm:w-14">Rank</div>
+                        <div class="flex-1 min-w-0">Player</div>
+                        <div class="w-16 sm:w-24 text-right">Points</div>
+                        <div class="hidden sm:block w-24 text-right">Max</div>
                     </div>
 
                     <!-- Leaderboard Rows -->
@@ -64,18 +64,18 @@ const breadcrumbs = computed(() => [
                         <div
                             v-for="entry in leaderboard.data"
                             :key="entry.id"
-                            class="flex items-center py-3 px-5"
+                            class="flex items-center py-3 px-4 sm:px-5"
                             :class="{ 'bg-surface-elevated': entry.user_id === userRow?.user_id }"
                         >
-                            <div class="min-w-[48px] font-bold text-xl text-primary mr-4">
+                            <div class="w-12 sm:w-14 font-bold text-lg sm:text-xl text-primary">
                                 {{ getOrdinal(entry.rank) }}
                             </div>
-                            <div class="flex-1">
+                            <div class="flex-1 min-w-0 truncate">
                                 {{ entry.user?.name }}
-                                <Badge v-if="entry.user_id === userRow?.user_id" variant="primary-soft" size="sm" class="ml-2">You</Badge>
+                                <Badge v-if="entry.user_id === userRow?.user_id" variant="primary-soft" size="sm" class="ml-1 sm:ml-2">You</Badge>
                             </div>
-                            <div class="w-24 text-right font-semibold text-body">{{ entry.total_score }}</div>
-                            <div class="w-24 text-right text-muted">{{ entry.possible_points }}</div>
+                            <div class="w-16 sm:w-24 text-right font-semibold text-body">{{ entry.total_score }}</div>
+                            <div class="hidden sm:block w-24 text-right text-muted">{{ entry.possible_points }}</div>
                         </div>
                     </div>
 

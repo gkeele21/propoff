@@ -1,30 +1,36 @@
 <template>
     <div class="space-y-3">
         <!-- Question Header -->
-        <div v-if="showHeader" class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2">
-                <!-- Drag Handle -->
-                <div v-if="showDragHandle" class="flex-shrink-0 cursor-move text-muted hover:text-body" title="Drag to reorder">
-                    <Icon name="grip-vertical" size="lg" />
+        <div v-if="showHeader" class="mb-4">
+            <!-- Mobile: Stack layout, Desktop: Inline -->
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                <!-- Question text section -->
+                <div class="flex items-start gap-2 min-w-0">
+                    <!-- Drag Handle -->
+                    <div v-if="showDragHandle" class="flex-shrink-0 cursor-move text-muted hover:text-body mt-0.5" title="Drag to reorder">
+                        <Icon name="grip-vertical" size="lg" />
+                    </div>
+                    <span v-if="questionNumber" class="text-lg font-bold text-body flex-shrink-0">
+                        {{ questionNumber }}.
+                    </span>
+                    <p class="text-lg font-semibold text-body">{{ question }}</p>
                 </div>
-                <span v-if="questionNumber" class="text-lg font-bold text-body">
-                    {{ questionNumber }}.
-                </span>
-                <p class="text-lg font-semibold text-body">{{ question }}</p>
-                <!-- Question Type Badge -->
-                <Badge v-if="questionType" :variant="questionTypeBadgeVariant" size="sm">
-                    {{ questionType.replace('_', ' ') }}
-                </Badge>
-                <!-- Voided Badge -->
-                <Badge v-if="isVoid" variant="danger" size="sm">Voided</Badge>
-                <!-- Custom Badge -->
-                <Badge v-if="isCustom" variant="warning-soft" size="sm">Custom</Badge>
-                <span v-if="points" class="text-sm text-muted flex-shrink-0">
-                    ({{ points }} {{ points === 1 ? 'pt' : 'pts' }})
-                </span>
-            </div>
-            <div class="flex items-center gap-2 flex-shrink-0">
-                <slot name="headerActions"></slot>
+
+                <!-- Metadata row: badges, points, actions -->
+                <div class="flex items-center gap-2 flex-wrap sm:flex-shrink-0">
+                    <!-- Question Type Badge -->
+                    <Badge v-if="questionType" :variant="questionTypeBadgeVariant" size="sm">
+                        {{ questionType.replace('_', ' ') }}
+                    </Badge>
+                    <!-- Voided Badge -->
+                    <Badge v-if="isVoid" variant="danger" size="sm">Voided</Badge>
+                    <!-- Custom Badge -->
+                    <Badge v-if="isCustom" variant="warning-soft" size="sm">Custom</Badge>
+                    <span v-if="points" class="text-sm text-muted">
+                        ({{ points }} {{ points === 1 ? 'pt' : 'pts' }})
+                    </span>
+                    <slot name="headerActions"></slot>
+                </div>
             </div>
         </div>
 
@@ -34,7 +40,7 @@
                 v-for="(option, index) in normalizedOptions"
                 :key="index"
                 :for="`${inputName}-${index}`"
-                class="flex items-center justify-between p-4 border-2 rounded-lg transition-all"
+                class="flex items-center justify-between p-3 sm:p-4 border-2 rounded-lg transition-all"
                 :class="[
                     getOptionClasses(option),
                     disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer',
@@ -52,7 +58,7 @@
                     @change="$emit('update:modelValue', option.value)"
                     class="sr-only"
                 />
-                <div class="flex items-center flex-1 gap-3">
+                <div class="flex items-center flex-1 gap-2 sm:gap-3 flex-wrap">
                     <!-- Result Icon (results mode only, when showResultIcons is true) -->
                     <div v-if="showResults && showResultIcons" class="w-5 flex-shrink-0">
                         <Icon
@@ -106,8 +112,8 @@
                     </span>
 
                     <!-- Bonus Points -->
-                    <span v-if="option.points && option.points > 0" class="text-xs font-semibold text-warning bg-warning/15 px-2 py-1 rounded">
-                        +{{ option.points }} bonus {{ option.points === 1 ? 'point' : 'points' }}
+                    <span v-if="option.points && option.points > 0" class="text-xs font-semibold text-warning bg-warning/15 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded whitespace-nowrap flex-shrink-0">
+                        +{{ option.points }} <span class="hidden sm:inline">bonus</span> {{ option.points === 1 ? 'pt' : 'pts' }}
                     </span>
                 </div>
             </label>

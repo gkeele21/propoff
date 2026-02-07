@@ -17,10 +17,10 @@
             </nav>
 
             <!-- Title Section with Actions -->
-            <div class="flex justify-between items-center">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4">
                 <!-- Left side: Title and optional subtitle/metadata -->
                 <div class="flex-1 min-w-0">
-                    <h1 class="font-bold text-xl text-body leading-tight flex items-center gap-2">
+                    <h1 class="font-bold text-xl text-body leading-tight flex items-center flex-wrap gap-2">
                         {{ title }}
                         <slot name="titleSuffix" />
                     </h1>
@@ -37,7 +37,7 @@
                 </div>
 
                 <!-- Right side: Action buttons -->
-                <div v-if="$slots.actions" class="flex items-center gap-3 ml-4 flex-shrink-0">
+                <div v-if="$slots.actions" class="flex items-center gap-2 sm:gap-3 flex-shrink-0 flex-wrap">
                     <slot name="actions" />
                 </div>
             </div>

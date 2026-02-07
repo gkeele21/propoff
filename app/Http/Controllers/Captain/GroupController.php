@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Captain;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Captain\CreateGroupRequest;
-use App\Mail\CaptainWelcome;
 use App\Models\CaptainInvitation;
 use App\Models\Event;
 use App\Models\EventInvitation;
@@ -13,7 +12,6 @@ use App\Models\GroupQuestion;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -193,10 +191,8 @@ class GroupController extends Controller
             session()->flash('magic_link', $magicLink);
             session()->flash('show_magic_link', true);
 
-            // Send email with magic link if email was provided
-            if ($user->email) {
-                Mail::to($user->email)->send(new CaptainWelcome($user, $group, $magicLink));
-            }
+            // TODO: Future - allow user to set password and create full account
+            // Email is captured for future login but no welcome email sent for now
 
             return Inertia::location(route('home'));
         }
