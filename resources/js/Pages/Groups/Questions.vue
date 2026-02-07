@@ -288,7 +288,7 @@ const showToastMessage = (message) => {
                 ]"
             >
                 <template #actions>
-                    <Link :href="route('play.game', { code: group.code })">
+                    <Link v-if="group.is_locked" :href="route('play.game', { code: group.code })">
                         <Button variant="accent" size="sm" icon="eye">
                             View Answers
                         </Button>

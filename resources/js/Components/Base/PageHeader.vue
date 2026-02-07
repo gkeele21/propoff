@@ -1,6 +1,6 @@
 <template>
     <div class="bg-surface border-b border-border shadow-sm sticky top-16 z-40">
-        <div class="py-3 px-4 sm:px-6 lg:px-8">
+        <div class="py-2 sm:py-3 px-4 sm:px-6 lg:px-8">
             <!-- Breadcrumb (compact, above title) -->
             <nav v-if="crumbs && crumbs.length > 0" class="flex items-center gap-1 text-xs text-muted mb-1">
                 <template v-for="(crumb, index) in crumbs" :key="index">
@@ -17,10 +17,10 @@
             </nav>
 
             <!-- Title Section with Actions -->
-            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-4">
                 <!-- Left side: Title and optional subtitle/metadata -->
                 <div class="flex-1 min-w-0">
-                    <h1 class="font-bold text-xl text-body leading-tight flex items-center flex-wrap gap-2">
+                    <h1 class="font-bold text-lg sm:text-xl text-body leading-tight flex items-center flex-wrap gap-1.5 sm:gap-2">
                         {{ title }}
                         <slot name="titleSuffix" />
                     </h1>
@@ -37,7 +37,7 @@
                 </div>
 
                 <!-- Right side: Action buttons -->
-                <div v-if="$slots.actions" class="flex items-center gap-2 sm:gap-3 flex-shrink-0 flex-wrap">
+                <div v-if="$slots.actions" class="flex items-center gap-1.5 sm:gap-3 flex-shrink-0 flex-wrap">
                     <slot name="actions" />
                 </div>
             </div>

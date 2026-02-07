@@ -33,7 +33,7 @@ const breadcrumbs = computed(() => [
     <AuthenticatedLayout :group="group">
         <template #header>
             <PageHeader title="Leaderboard" :subtitle="group.event?.name" :crumbs="breadcrumbs">
-                <template #actions>
+                <template v-if="group.is_locked" #actions>
                     <Link :href="route('play.game', { code: group.code })">
                         <Button
                             variant="accent"

@@ -80,10 +80,14 @@ const entryButtonConfig = computed(() => {
     }
 
     if (entry.status === 'submitted') {
-        return { label: 'View Answers', icon: 'eye', disabled: false, route: 'play.game', variant: 'accent' };
+        if (isLocked) {
+            return { label: 'View Answers', icon: 'eye', disabled: false, route: 'play.game', variant: 'accent' };
+        }
+        // Before locked, they can still view/edit their picks
+        return { label: 'View Picks', icon: 'eye', disabled: false, route: 'play.game', variant: 'secondary' };
     }
 
-    return { label: 'View Answers', icon: 'eye', disabled: false, route: 'play.game', variant: 'accent' };
+    return { label: 'View Picks', icon: 'eye', disabled: false, route: 'play.game', variant: 'secondary' };
 });
 
 // Copy join code to clipboard
@@ -146,16 +150,16 @@ const toggleLock = () => {
                 <template v-if="isCaptain" #actions>
                     <Link :href="route('groups.questions', group.id)">
                         <Button variant="primary" size="sm" icon="list-check">
-                            <span class="hidden sm:inline">Questions</span>
+                            Questions
                         </Button>
                     </Link>
                     <Link :href="route('groups.members.index', group.id)">
                         <Button variant="secondary" size="sm" icon="users">
-                            <span class="hidden sm:inline">Members</span>
+                            Members
                         </Button>
                     </Link>
                     <Button variant="accent" size="sm" icon="share-nodes" @click="router.visit(route('groups.invitation', group.id))">
-                        <span class="hidden sm:inline">Join Info</span>
+                        Invite
                     </Button>
                 </template>
             </PageHeader>
@@ -165,10 +169,20 @@ const toggleLock = () => {
         <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
             <!-- Stats Row (4 tiles) -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <StatTile :value="stats.total_questions" label="Questions" color="primary" />
+                <StatTile
+                    :value="stats.total_questions"
+                    label="Questions"
+                    color="primary"
+                    :href="isCaptain ? route('groups.questions', group.id) : null"
+                />
                 <StatTile :value="stats.graded_questions" label="Answered" color="warning" />
                 <StatTile :value="stats.total_points" label="Max Possible" color="neutral" />
-                <StatTile :value="stats.total_members" label="Members" color="info" />
+                <StatTile
+                    :value="stats.total_members"
+                    label="Members"
+                    color="info"
+                    :href="isCaptain ? route('groups.members.index', group.id) : null"
+                />
             </div>
 
             <!-- Two Column Layout -->
@@ -297,7 +311,7 @@ const toggleLock = () => {
                         class="flex items-center py-3 border-b border-border last:border-b-0"
                         :class="{ 'bg-surface-elevated -mx-5 px-5 rounded-lg': entry.user_id === leaderboard.currentUserId }"
                     >
-                        <div class="w-10 sm:w-12 h-7 px-1.5 sm:px-2 rounded-md flex items-center justify-center font-bold text-xs sm:text-sm bg-surface-inset text-body mr-2 sm:mr-3 flex-shrink-0">
+                        <div class="w-10 sm:w-12 font-bold text-base sm:text-lg text-primary mr-2 sm:mr-3 flex-shrink-0">
                             {{ getOrdinal(entry.rank) }}
                         </div>
                         <div class="flex-1 min-w-0 truncate">
@@ -311,7 +325,7 @@ const toggleLock = () => {
                     <template v-if="leaderboard.userRow">
                         <div class="py-2 text-center text-muted text-sm">...</div>
                         <div class="flex items-center py-3 bg-surface-elevated -mx-5 px-5 rounded-lg">
-                            <div class="w-10 sm:w-12 h-7 px-1.5 sm:px-2 rounded-md flex items-center justify-center font-bold text-xs sm:text-sm bg-surface-inset text-body mr-2 sm:mr-3 flex-shrink-0">
+                            <div class="w-10 sm:w-12 font-bold text-base sm:text-lg text-primary mr-2 sm:mr-3 flex-shrink-0">
                                 {{ getOrdinal(leaderboard.userRow.rank) }}
                             </div>
                             <div class="flex-1 min-w-0 truncate">

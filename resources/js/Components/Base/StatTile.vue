@@ -1,18 +1,25 @@
 <template>
-    <div
-        class="bg-surface-inset border border-border border-t-4 rounded-lg p-5 text-center"
-        :class="borderClasses[color]"
+    <component
+        :is="href ? Link : 'div'"
+        :href="href"
+        class="bg-surface-inset border border-border border-t-4 rounded-lg p-4 sm:p-5 text-center block"
+        :class="[
+            borderClasses[color],
+            href ? 'hover:bg-surface-overlay hover:border-border-strong transition-colors cursor-pointer' : ''
+        ]"
     >
-        <div class="text-3xl font-bold mb-1" :class="textClasses[color]">
+        <div class="text-2xl sm:text-3xl font-bold mb-1" :class="textClasses[color]">
             {{ value }}
         </div>
         <div class="text-xs text-muted uppercase tracking-wider">
             {{ label }}
         </div>
-    </div>
+    </component>
 </template>
 
 <script setup>
+import { Link } from '@inertiajs/vue3';
+
 defineProps({
     value: {
         type: [String, Number],
@@ -26,6 +33,10 @@ defineProps({
         type: String,
         default: 'primary',
         validator: (value) => ['primary', 'success', 'warning', 'danger', 'info', 'neutral'].includes(value),
+    },
+    href: {
+        type: String,
+        default: null,
     },
 });
 
