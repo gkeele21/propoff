@@ -120,6 +120,7 @@ class GroupController extends Controller
         $data = [
             'isMember' => $group->users->contains(auth()->id()) || ($isCaptain && $group->members->contains(auth()->id())),
             'isCaptain' => $isCaptain,
+            'isManager' => auth()->user()->isManager(),
         ];
 
         // For captains, provide detailed stats and member data

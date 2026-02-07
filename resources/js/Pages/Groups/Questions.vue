@@ -23,6 +23,7 @@ const props = defineProps({
     },
     isMember: Boolean,
     isCaptain: Boolean,
+    isManager: Boolean,
     recentEntries: Array,
 });
 
@@ -412,8 +413,8 @@ const showToastMessage = (message) => {
 
                             <!-- Save Answer Section (captain-graded only, requires locked group) -->
                             <div v-if="group.grading_source === 'captain' && group.is_locked && hasSelectedAnswer(question.id)" class="flex items-center justify-between gap-4 mt-4">
-                                    <!-- Sync to Admin Checkbox (only for event-linked questions) -->
-                                    <div v-if="question.event_question_id">
+                                    <!-- Sync to Admin Checkbox (only for managers with event-linked questions) -->
+                                    <div v-if="isManager && question.event_question_id">
                                         <Checkbox
                                             v-model="syncToAdmin[question.id]"
                                             label="Also set for admin grading"
