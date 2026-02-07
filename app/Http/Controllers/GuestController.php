@@ -6,6 +6,7 @@ use App\Models\EventInvitation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -51,6 +52,7 @@ class GuestController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
         $invitation = EventInvitation::where('token', $token)
@@ -61,12 +63,14 @@ class GuestController extends Controller
             return back()->withErrors(['token' => 'This invitation is no longer valid.']);
         }
 
-        // Create guest user
-        $guestToken = Str::random(32);
+        // Only generate guest token if no password (for magic link login)
+        $password = $request->password;
+        $guestToken = $password ? null : Str::random(32);
+
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->email, // Store email for Phase 2
-            'password' => null,
+            'email' => $request->email,
+            'password' => $password ? Hash::make($password) : null,
             'role' => 'guest',
             'guest_token' => $guestToken,
         ]);
@@ -83,19 +87,22 @@ class GuestController extends Controller
         // Auto-login
         Auth::login($user);
 
-        // Generate magic link for guest user
-        $magicLink = route('guest.login', ['guestToken' => $guestToken]);
-
-        // Send email with magic link if email provided
-        // TODO: Uncomment when ready to send emails
-        // if ($request->email) {
-        //     Mail::to($request->email)->send(new GuestWelcome($user, $invitation->event, $magicLink));
-        // }
-
-        // Redirect to play hub with magic link
+        // Redirect to play hub
         session()->flash('success', 'Welcome! You can now play the event.');
-        session()->flash('magic_link', $magicLink);
-        session()->flash('show_magic_link', true);
+
+        // Only show magic link if no password was set (guest token exists)
+        if ($guestToken) {
+            $magicLink = route('guest.login', ['guestToken' => $guestToken]);
+            session()->flash('magic_link', $magicLink);
+            session()->flash('show_magic_link', true);
+
+            // Send email with magic link if email provided
+            // TODO: Uncomment when ready to send emails
+            // if ($request->email) {
+            //     Mail::to($request->email)->send(new GuestWelcome($user, $invitation->event, $magicLink));
+            // }
+        }
+
         return \Inertia\Inertia::location(route('play.hub', ['code' => $invitation->group->code]));
     }
 

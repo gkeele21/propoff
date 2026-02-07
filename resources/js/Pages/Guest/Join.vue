@@ -46,9 +46,9 @@
                     </p>
                 </div>
 
-                <div class="mb-6">
+                <div class="mb-4">
                     <label for="email" class="block text-sm font-medium text-body mb-2">
-                        Email (Optional - for future features)
+                        Email (Optional)
                     </label>
                     <input
                         id="email"
@@ -57,13 +57,50 @@
                         class="w-full px-4 py-3 bg-surface-elevated border border-border text-body placeholder-muted rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                         placeholder="your.email@example.com"
                     />
-                    <p class="mt-1 text-xs text-muted">
-                        Optional: We'll send you a link to view your results later (coming soon)
-                    </p>
                     <p v-if="form.errors.email" class="mt-1 text-sm text-danger">
                         {{ form.errors.email }}
                     </p>
                 </div>
+
+                <!-- Password fields (show when email is entered) -->
+                <template v-if="form.email">
+                    <div class="mb-4">
+                        <label for="password" class="block text-sm font-medium text-body mb-2">
+                            Password (Optional)
+                        </label>
+                        <input
+                            id="password"
+                            v-model="form.password"
+                            type="password"
+                            class="w-full px-4 py-3 bg-surface-elevated border border-border text-body placeholder-muted rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="Create a password"
+                        />
+                        <p class="mt-1 text-xs text-muted">
+                            At least 8 characters. Create a password to login easily next time.
+                        </p>
+                        <p v-if="form.errors.password" class="mt-1 text-sm text-danger">
+                            {{ form.errors.password }}
+                        </p>
+                    </div>
+
+                    <div v-if="form.password" class="mb-6">
+                        <label for="password_confirmation" class="block text-sm font-medium text-body mb-2">
+                            Confirm Password
+                        </label>
+                        <input
+                            id="password_confirmation"
+                            v-model="form.password_confirmation"
+                            type="password"
+                            class="w-full px-4 py-3 bg-surface-elevated border border-border text-body placeholder-muted rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="Confirm your password"
+                        />
+                        <p v-if="form.errors.password_confirmation" class="mt-1 text-sm text-danger">
+                            {{ form.errors.password_confirmation }}
+                        </p>
+                    </div>
+                </template>
+
+                <div v-if="!form.email" class="mb-6"></div>
 
                 <button
                     type="submit"
@@ -94,6 +131,8 @@ const props = defineProps({
 const form = useForm({
     name: '',
     email: '',
+    password: '',
+    password_confirmation: '',
 });
 
 const formatDate = (dateString) => {
