@@ -33,6 +33,11 @@ const props = defineProps({
         type: [String, Number],
         default: null,
     },
+    // Next order for new questions (event context)
+    nextOrder: {
+        type: Number,
+        default: 1,
+    },
 });
 
 const emit = defineEmits(['close', 'success', 'delete']);
@@ -107,10 +112,25 @@ const getUpdateRoute = () => {
 
 // Form submission
 const submit = () => {
-    // Transform data for group context (needs question_type)
-    const transformedData = props.context === 'group'
-        ? { ...form.data(), question_type: 'multiple_choice', is_custom: true }
-        : form.data();
+    // Transform data based on context and action
+    let transformedData;
+    if (props.context === 'group') {
+        transformedData = { ...form.data(), question_type: 'multiple_choice', is_custom: true };
+    } else if (isEditing.value) {
+        // Event context update needs question_type and display_order
+        transformedData = {
+            ...form.data(),
+            question_type: props.question?.question_type || 'multiple_choice',
+            display_order: props.question?.display_order,
+        };
+    } else {
+        // Event context create needs question_type and order
+        transformedData = {
+            ...form.data(),
+            question_type: 'multiple_choice',
+            order: props.nextOrder,
+        };
+    }
 
     if (isEditing.value) {
         // Update existing question
@@ -153,7 +173,7 @@ const handleClose = () => {
             <!-- Modal Header -->
             <div class="mb-6">
                 <h2 class="text-xl font-bold text-body">
-                    {{ isEditing ? 'Edit Question' : 'Add Custom Question' }}
+                    {{ isEditing ? 'Edit Question' : 'Add Question' }}
                 </h2>
             </div>
 

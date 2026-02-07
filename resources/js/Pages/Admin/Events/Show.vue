@@ -384,7 +384,7 @@ const submitCreateGroup = () => {
                                 </Button>
                                 <Button variant="primary" size="sm" @click="openAddModal">
                                     <Icon name="plus" class="mr-2" size="sm" />
-                                    Add Custom Question
+                                    Add Question
                                 </Button>
                             </div>
                         </div>
@@ -474,13 +474,13 @@ const submitCreateGroup = () => {
                     <div v-if="questions.length === 0" class="text-center py-12 text-muted">
                         <Icon name="circle-question" size="3x" class="mb-4 text-gray-light" />
                         <p class="text-lg mb-2">No questions yet</p>
-                        <p class="text-sm mb-4">Get started by adding a custom question or importing from a template</p>
+                        <p class="text-sm mb-4">Get started by adding a question or importing from a template</p>
                         <div class="flex justify-center gap-2">
                             <Button variant="secondary" @click="navigateToImport">
                                 Import from Template
                             </Button>
                             <Button variant="primary" @click="openAddModal">
-                                Add Custom Question
+                                Add Question
                             </Button>
                         </div>
                     </div>
@@ -493,6 +493,7 @@ const submitCreateGroup = () => {
             :show="showAddEditModal"
             :question="editingQuestion"
             :event-id="event.id"
+            :next-order="questions.length + 1"
             @close="closeModal"
             @success="showToastMessage('Question saved successfully')"
             @delete="handleDeleteFromModal"

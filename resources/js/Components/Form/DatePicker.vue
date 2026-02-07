@@ -5,7 +5,7 @@
         <VueDatePicker
             :id="inputId"
             v-model="internalValue"
-            :enable-time-picker="enableTime"
+            :enable-time-picker="showTimePicker"
             :time-picker="timeOnly"
             :month-picker="monthOnly"
             :time-config="{ is24: false }"
@@ -42,6 +42,7 @@ import FormLabel from '@/Components/Form/FormLabel.vue';
 const props = defineProps({
     modelValue: { type: [String, Date, Object], default: '' },
     type: { type: String, default: 'date' }, // 'date', 'datetime', 'time', 'month'
+    enableTime: { type: Boolean, default: false }, // Shorthand for type="datetime"
     label: { type: String, default: '' },
     placeholder: { type: String, default: '' },
     format: { type: String, default: '' },
@@ -59,14 +60,15 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue']);
 
-// Normalize type (handle datetime-local as alias for datetime)
+// Normalize type (handle datetime-local as alias for datetime, or enableTime prop)
 const normalizedType = computed(() => {
+    if (props.enableTime) return 'datetime';
     if (props.type === 'datetime-local') return 'datetime';
     return props.type;
 });
 
 // Computed props based on type
-const enableTime = computed(() => normalizedType.value === 'datetime');
+const showTimePicker = computed(() => normalizedType.value === 'datetime');
 const timeOnly = computed(() => normalizedType.value === 'time');
 const monthOnly = computed(() => normalizedType.value === 'month');
 
