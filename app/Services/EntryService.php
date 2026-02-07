@@ -134,8 +134,8 @@ class EntryService
                     'points_earned' => 0,
                     'is_correct' => false,
                 ]);
-                // Still count towards possible points
-                $possiblePoints += $this->calculateMaxPointsForQuestion($groupQuestion);
+                // Still count towards possible points using USER'S selected answer
+                $possiblePoints += $this->calculatePointsForAnswer($groupQuestion, $userAnswer->answer_text);
                 continue;
             }
 
@@ -160,13 +160,14 @@ class EntryService
                 $totalScore += $pointsEarned;
             }
 
-            // Calculate possible points (max achievable for this question)
+            // Calculate possible points based on USER'S SELECTED answer
+            // This personalizes max possible per user based on their picks
             if ($pointsAwarded !== null) {
                 // Use custom points if set
                 $questionMaxPoints = $pointsAwarded;
             } else {
-                // Use base + bonus of the CORRECT answer (not max bonus)
-                $questionMaxPoints = $this->calculatePointsForAnswer($groupQuestion, $correctAnswer);
+                // Use base + bonus of the USER'S answer (personalized max possible)
+                $questionMaxPoints = $this->calculatePointsForAnswer($groupQuestion, $userAnswer->answer_text);
             }
             $possiblePoints += $questionMaxPoints;
 

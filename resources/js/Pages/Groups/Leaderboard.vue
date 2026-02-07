@@ -128,7 +128,7 @@
 
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { TrophyIcon } from '@heroicons/vue/24/outline';
 import { computed } from 'vue';
 import PageHeader from '@/Components/Base/PageHeader.vue';
@@ -151,8 +151,11 @@ const highestPercentage = computed(() => {
 
 const totalPossiblePoints = computed(() => {
     if (props.leaderboard.data.length === 0) return 0;
-    // All entries should have the same possible points for the same group/event
-    return props.leaderboard.data[0].possible_points;
+    // Note: Each user may have different possible_points based on their picks
+    // Display the highest for reference, or current user's if logged in
+    const currentUserId = usePage().props.auth?.user?.id;
+    const currentUserEntry = props.leaderboard.data.find(e => e.user_id === currentUserId);
+    return currentUserEntry?.possible_points || Math.max(...props.leaderboard.data.map(e => e.possible_points));
 });
 
 const formatDate = (dateString) => {
