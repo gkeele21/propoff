@@ -2,33 +2,34 @@
     <div class="space-y-3">
         <!-- Question Header -->
         <div v-if="showHeader" class="mb-4">
-            <!-- Mobile: Stack layout, Desktop: Inline -->
-            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-                <!-- Question text section -->
-                <div class="flex items-start gap-2 min-w-0">
-                    <!-- Drag Handle -->
-                    <div v-if="showDragHandle" class="flex-shrink-0 cursor-move text-muted hover:text-body mt-0.5" title="Drag to reorder">
-                        <Icon name="grip-vertical" size="lg" />
+            <!-- Mobile: Stack layout, Desktop: Inline with actions on right -->
+            <div class="flex flex-col sm:flex-row sm:items-start gap-2">
+                <!-- Question text + inline metadata -->
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-start gap-2">
+                        <!-- Drag Handle -->
+                        <div v-if="showDragHandle" class="flex-shrink-0 cursor-move text-muted hover:text-body mt-0.5" title="Drag to reorder">
+                            <Icon name="grip-vertical" size="lg" />
+                        </div>
+                        <span v-if="questionNumber" class="text-lg font-bold text-body flex-shrink-0">
+                            {{ questionNumber }}.
+                        </span>
+                        <p class="text-lg font-semibold text-body">
+                            {{ question }}
+                            <!-- Base points inline with question text -->
+                            <span v-if="points" class="text-sm font-normal text-muted ml-1">({{ points }} {{ points === 1 ? 'pt' : 'pts' }})</span>
+                            <!-- Badges inline after points -->
+                            <Badge v-if="questionType" :variant="questionTypeBadgeVariant" size="sm" class="ml-2 align-middle">
+                                {{ questionType.replace('_', ' ') }}
+                            </Badge>
+                            <Badge v-if="isVoid" variant="danger" size="sm" class="ml-1 align-middle">Voided</Badge>
+                            <Badge v-if="isCustom" variant="warning-soft" size="sm" class="ml-1 align-middle">Custom</Badge>
+                        </p>
                     </div>
-                    <span v-if="questionNumber" class="text-lg font-bold text-body flex-shrink-0">
-                        {{ questionNumber }}.
-                    </span>
-                    <p class="text-lg font-semibold text-body">{{ question }}</p>
                 </div>
 
-                <!-- Metadata row: badges, points, actions -->
-                <div class="flex items-center gap-2 flex-wrap sm:flex-shrink-0">
-                    <!-- Question Type Badge -->
-                    <Badge v-if="questionType" :variant="questionTypeBadgeVariant" size="sm">
-                        {{ questionType.replace('_', ' ') }}
-                    </Badge>
-                    <!-- Voided Badge -->
-                    <Badge v-if="isVoid" variant="danger" size="sm">Voided</Badge>
-                    <!-- Custom Badge -->
-                    <Badge v-if="isCustom" variant="warning-soft" size="sm">Custom</Badge>
-                    <span v-if="points" class="text-sm text-muted">
-                        ({{ points }} {{ points === 1 ? 'pt' : 'pts' }})
-                    </span>
+                <!-- Actions (edit button, etc.) - stays on right -->
+                <div v-if="$slots.headerActions" class="flex items-center gap-2 flex-shrink-0">
                     <slot name="headerActions"></slot>
                 </div>
             </div>
