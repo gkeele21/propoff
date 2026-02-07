@@ -12,34 +12,17 @@ use Inertia\Inertia;
 class GroupController extends Controller
 {
     /**
-     * Display a listing of groups.
+     * Display the join group page.
      */
     public function index()
     {
-        $userGroups = auth()->user()->groups()
-            ->withCount('users')
-            ->latest()
-            ->get();
-
-        $publicGroups = Group::where('is_public', true)
-            ->whereDoesntHave('users', function ($query) {
-                $query->where('user_id', auth()->id());
-            })
-            ->withCount('users')
-            ->latest()
-            ->limit(20)
-            ->get();
-
-        return Inertia::render('Groups/Index', [
-            'userGroups' => $userGroups,
-            'publicGroups' => $publicGroups,
-        ]);
+        return Inertia::render('Groups/Index');
     }
 
     /**
      * Show the form for creating a new group.
      */
-    public function create()
+    public function create(Request $request)
     {
         $events = \App\Models\Event::where('status', 'open')
             ->orWhere('status', 'draft')
@@ -48,6 +31,7 @@ class GroupController extends Controller
 
         return Inertia::render('Groups/Create', [
             'events' => $events,
+            'selectedEventId' => $request->query('event_id'),
         ]);
     }
 
@@ -150,6 +134,7 @@ class GroupController extends Controller
                     $answer = $question->groupQuestionAnswer;
                     return [
                         'id' => $question->id,
+                        'event_question_id' => $question->event_question_id,
                         'question_text' => $question->question_text,
                         'question_type' => $question->question_type,
                         'options' => $question->options,
@@ -295,108 +280,6 @@ class GroupController extends Controller
     }
 
     /**
-     * Join a group using its code.
-     */
-    public function join(Request $request)
-    {
-        $validated = $request->validate([
-            'code' => 'required|string|exists:groups,code',
-            'name' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255',
-        ]);
-
-        $group = Group::where('code', $validated['code'])->firstOrFail();
-
-        // Track if we created a new guest user
-        $createdGuestUser = false;
-
-        // If user is not authenticated, we need to create a guest user
-        if (!$request->user()) {
-            $createdGuestUser = true;
-            // If name is not provided, redirect to a join page where they can enter it
-            if (!$request->has('name')) {
-                return redirect()->route('groups.join.form', ['code' => $validated['code']]);
-            }
-
-            // Check if user with this email already exists (returning user)
-            $user = null;
-            if ($request->email) {
-                $user = User::where('email', $request->email)->first();
-
-                if ($user && $request->name !== $user->name) {
-                    $user->update(['name' => $request->name]);
-                }
-            }
-
-            // Create new guest user if not found
-            if (!$user) {
-                $guestToken = \Illuminate\Support\Str::random(32);
-                $user = User::create([
-                    'name' => $request->name,
-                    'email' => $request->email,
-                    'password' => null,
-                    'role' => 'guest',
-                    'guest_token' => $guestToken,
-                ]);
-            }
-
-            // Auto-login the guest user
-            Auth::login($user);
-        } else {
-            $user = $request->user();
-        }
-
-        // Check if user is already a member
-        if ($group->users->contains($user->id)) {
-            return redirect()->route('groups.questions', $group)
-                ->with('info', 'You are already a member of this group.');
-        }
-
-        // Add user to group
-        $group->users()->attach($user->id, [
-            'joined_at' => now(),
-            'is_captain' => false,
-        ]);
-
-        // If this was a guest user (we auto-logged them in), use Inertia::location for full page reload
-        if ($createdGuestUser) {
-            $magicLink = route('guest.login', ['guestToken' => $user->guest_token]);
-            session()->flash('success', 'Successfully joined ' . $group->name . '! You can now submit your entry.');
-            session()->flash('magic_link', $magicLink);
-            session()->flash('show_magic_link', true);
-            return \Inertia\Inertia::location(route('home'));
-        }
-
-        return redirect()->route('home')
-            ->with('success', 'Successfully joined ' . $group->name . '!');
-    }
-
-    /**
-     * Show the join group form (for guests entering via code).
-     */
-    public function showJoinForm(Request $request)
-    {
-        $code = $request->query('code');
-
-        $group = Group::where('code', $code)
-            ->with('event')
-            ->firstOrFail();
-
-        return \Inertia\Inertia::render('Groups/Join', [
-            'group' => [
-                'id' => $group->id,
-                'name' => $group->name,
-                'code' => $group->code,
-                'event' => [
-                    'id' => $group->event->id,
-                    'name' => $group->event->name,
-                    'event_date' => $group->event->event_date,
-                ],
-            ],
-        ]);
-    }
-
-    /**
      * Leave a group.
      */
     public function leave(Group $group)
@@ -435,6 +318,18 @@ class GroupController extends Controller
         }
 
         return back()->with('success', $message);
+    }
+
+    /**
+     * Generate a unique 8-character group code.
+     */
+    private function generateUniqueCode(): string
+    {
+        do {
+            $code = strtoupper(Str::random(8));
+        } while (Group::where('code', $code)->exists());
+
+        return $code;
     }
 
     /**

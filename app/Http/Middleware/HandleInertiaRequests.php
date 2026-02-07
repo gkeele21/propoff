@@ -40,6 +40,9 @@ class HandleInertiaRequests extends Middleware
                 'info' => $request->session()->get('info'),
                 'magic_link' => $request->session()->get('magic_link'),
                 'show_magic_link' => $request->session()->get('show_magic_link'),
+                // Play Hub join flow
+                'step' => $request->session()->get('step'),
+                'verifyEntry' => $request->session()->get('verifyEntry'),
             ],
         ];
     }

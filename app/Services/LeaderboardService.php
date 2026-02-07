@@ -81,9 +81,9 @@ class LeaderboardService
      */
     public function recalculateEventLeaderboards(Event $event): void
     {
-        // Get all completed entries for the event
+        // Get all entries with at least one answer
         $entries = $event->entries()
-            ->where('is_complete', true)
+            ->whereHas('userAnswers')
             ->with('userAnswers')
             ->get();
 
@@ -114,9 +114,9 @@ class LeaderboardService
      */
     protected function createGlobalLeaderboard(Event $event): void
     {
-        // Get all users who participated in the event
+        // Get all users who have answered at least one question
         $userIds = $event->entries()
-            ->where('is_complete', true)
+            ->whereHas('userAnswers')
             ->distinct()
             ->pluck('user_id');
 
@@ -124,7 +124,7 @@ class LeaderboardService
             // Get all entries for this user across all groups
             $userEntries = $event->entries()
                 ->where('user_id', $userId)
-                ->where('is_complete', true)
+                ->whereHas('userAnswers')
                 ->get();
 
             // Aggregate scores
@@ -265,10 +265,10 @@ class LeaderboardService
      */
     public function updateLeaderboard(Event $event, Group $group): void
     {
-        // Get all completed entries for this group
+        // Get all entries with at least one answer for this group
         $entries = $event->entries()
             ->where('group_id', $group->id)
-            ->where('is_complete', true)
+            ->whereHas('userAnswers')
             ->with('userAnswers')
             ->get();
 

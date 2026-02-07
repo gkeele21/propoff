@@ -6,24 +6,41 @@ import { ref, computed } from 'vue';
 import Button from '@/Components/Base/Button.vue';
 import Badge from '@/Components/Base/Badge.vue';
 import Icon from '@/Components/Base/Icon.vue';
+import TextField from '@/Components/Form/TextField.vue';
+import Select from '@/Components/Form/Select.vue';
+import { debounce } from 'lodash';
 
 const props = defineProps({
     events: Object,
     filters: Object,
 });
 
-const search = ref(props.filters.search || '');
-const statusFilter = ref(props.filters.status || 'all');
+const form = ref({
+    search: props.filters.search || '',
+    status: props.filters.status || '',
+});
+
+const statusOptions = [
+    { value: 'draft', label: 'Draft' },
+    { value: 'open', label: 'Open' },
+    { value: 'locked', label: 'Locked' },
+    { value: 'completed', label: 'Completed' },
+];
 
 const filterEvents = () => {
     router.get(route('admin.events.index'), {
-        search: search.value,
-        status: statusFilter.value,
+        search: form.value.search || undefined,
+        status: form.value.status || undefined,
     }, {
         preserveState: true,
+        preserveScroll: true,
         replace: true,
     });
 };
+
+const debouncedFilter = debounce(() => {
+    filterEvents();
+}, 300);
 
 const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -69,35 +86,21 @@ const getStatusVariant = (status) => {
                     <div class="p-6">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div class="col-span-2">
-                                <label class="block text-sm font-medium text-body mb-2">
-                                    <Icon name="magnifying-glass" size="sm" class="mr-1" />
-                                    Search
-                                </label>
-                                <input
-                                    v-model="search"
-                                    @input="filterEvents"
-                                    type="text"
+                                <TextField
+                                    v-model="form.search"
                                     placeholder="Search events..."
-                                    class="w-full bg-surface-elevated border-border text-body placeholder-subtle rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
+                                    icon-left="magnifying-glass"
+                                    @input="debouncedFilter"
                                 />
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-body mb-2">
-                                    <Icon name="filter" size="sm" class="mr-1" />
-                                    Status
-                                </label>
-                                <select
-                                    v-model="statusFilter"
-                                    @change="filterEvents"
-                                    class="w-full bg-surface-elevated border-border text-body rounded-md shadow-sm focus:border-primary focus:ring-primary/50"
-                                >
-                                    <option value="all">All Statuses</option>
-                                    <option value="draft">Draft</option>
-                                    <option value="open">Open</option>
-                                    <option value="locked">Locked</option>
-                                    <option value="completed">Completed</option>
-                                </select>
-                            </div>
+                            <Select
+                                v-model="form.status"
+                                :options="statusOptions"
+                                placeholder="All Statuses"
+                                allow-empty
+                                empty-label="All Statuses"
+                                @change="filterEvents"
+                            />
                         </div>
                     </div>
                 </div>

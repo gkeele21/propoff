@@ -195,12 +195,16 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    selectedEventId: {
+        type: [Number, String],
+        default: null,
+    },
 });
 
 const form = useForm({
     name: '',
     description: '',
-    event_id: '',
+    event_id: props.selectedEventId || '',
     grading_source: 'captain',
     entry_cutoff: '',
     is_public: false,

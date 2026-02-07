@@ -28,11 +28,35 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
+    $activeGroup = null;
+    $recognizedUser = null;
+
+    if (auth()->check()) {
+        $user = auth()->user();
+        $recognizedUser = [
+            'name' => $user->name,
+            'is_guest' => $user->isGuest(),
+        ];
+
+        $smartRouting = app(\App\Services\SmartRoutingService::class);
+        $activeGroups = $smartRouting->getActiveGroups($user);
+        if ($activeGroups->isNotEmpty()) {
+            $group = $activeGroups->first();
+            $activeGroup = [
+                'name' => $group->name,
+                'code' => $group->code,
+                'event_name' => $group->event->name ?? null,
+            ];
+        }
+    }
+
     return Inertia::render('Index', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
+        'activeGroup' => $activeGroup,
+        'recognizedUser' => $recognizedUser,
     ]);
 });
 
@@ -47,6 +71,14 @@ Route::post('/join/{token}', [GuestController::class, 'register'])->name('guest.
 Route::get('/my-results/{guestToken}', [GuestController::class, 'results'])->name('guest.results');
 Route::get('/guest/{guestToken}', [GuestController::class, 'login'])->name('guest.login');
 
+// Start fresh - clear guest cookie and logout
+Route::post('/guest/forget', function () {
+    if (auth()->check() && auth()->user()->isGuest()) {
+        auth()->logout();
+    }
+    return redirect('/')->withoutCookie('propoff_guest');
+})->name('guest.forget');
+
 // Play routes (public - guest-accessible via cookie or join flow)
 Route::prefix('play/{code}')->group(function () {
     Route::get('/', [\App\Http\Controllers\PlayController::class, 'hub'])->name('play.hub');
@@ -54,14 +86,8 @@ Route::prefix('play/{code}')->group(function () {
     Route::post('/join', [\App\Http\Controllers\PlayController::class, 'processJoin'])->name('play.join.process');
     Route::get('/game', [\App\Http\Controllers\PlayController::class, 'questions'])->name('play.game');
     Route::post('/save', [\App\Http\Controllers\PlayController::class, 'saveAnswers'])->name('play.save');
-    Route::post('/submit', [\App\Http\Controllers\PlayController::class, 'submit'])->name('play.submit');
-    Route::get('/results', [\App\Http\Controllers\PlayController::class, 'results'])->name('play.results');
     Route::get('/leaderboard', [\App\Http\Controllers\PlayController::class, 'leaderboard'])->name('play.leaderboard');
 });
-
-// Public join group routes (for homepage join code)
-Route::get('/groups/join', [GroupController::class, 'showJoinForm'])->name('groups.join.form');
-Route::post('/groups/join', [GroupController::class, 'join'])->name('groups.join');
 
 // Legacy route - redirects to smart routing
 Route::get('/my-home', fn () => redirect()->route('home'))->middleware(['auth', 'verified'])->name('dashboard');

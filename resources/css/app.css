@@ -114,6 +114,14 @@
             0 0 15px rgb(var(--color-primary) / 0.3);
     }
 
+    /* Checked glow variant for info/blue color */
+    .checked-glow-info {
+        box-shadow:
+            0 0 0 1px rgb(var(--color-text)),
+            0 0 0 3px rgb(var(--color-info)),
+            0 0 15px rgb(var(--color-info) / 0.3);
+    }
+
     /* Focus glow for small controls (checkbox, toggle) - smaller version */
     .focus-glow-sm:focus {
         box-shadow:
@@ -128,6 +136,15 @@
             0 0 0 1px rgb(var(--color-text)),
             0 0 0 3px rgb(var(--color-primary)),
             0 0 15px rgb(var(--color-primary) / 0.3) !important;
+        border-color: transparent !important;
+    }
+
+    /* Focus-within glow variant for info/blue color */
+    .focus-within-glow-info:focus-within {
+        box-shadow:
+            0 0 0 1px rgb(var(--color-text)),
+            0 0 0 3px rgb(var(--color-info)),
+            0 0 15px rgb(var(--color-info) / 0.3) !important;
         border-color: transparent !important;
     }
 }

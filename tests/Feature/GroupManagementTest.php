@@ -131,7 +131,7 @@ class GroupManagementTest extends TestCase
     }
 
     /** @test */
-    public function user_can_join_group_with_code()
+    public function authenticated_user_auto_joins_group_via_play_hub()
     {
         $user = User::factory()->create();
         $event = Event::factory()->create();
@@ -140,18 +140,17 @@ class GroupManagementTest extends TestCase
             'code' => 'ABC123',
         ]);
 
-        $response = $this->actingAs($user)->post(route('groups.join'), [
-            'code' => 'ABC123',
-        ]);
+        // Visiting join form auto-adds authenticated users
+        $response = $this->actingAs($user)->get(route('play.join', ['code' => 'ABC123']));
 
-        $response->assertRedirect(route('dashboard'));
+        $response->assertRedirect(route('play.hub', ['code' => 'ABC123']));
         $response->assertSessionHas('success');
 
         $this->assertTrue($group->fresh()->users->contains($user->id));
     }
 
     /** @test */
-    public function user_cannot_join_same_group_twice()
+    public function authenticated_user_already_member_goes_to_hub()
     {
         $user = User::factory()->create();
         $event = Event::factory()->create();
@@ -160,20 +159,17 @@ class GroupManagementTest extends TestCase
             'code' => 'ABC123',
         ]);
 
-        // Join first time
+        // Already a member
         $group->users()->attach($user->id, ['joined_at' => now()]);
 
-        // Try to join again
-        $response = $this->actingAs($user)->post(route('groups.join'), [
-            'code' => 'ABC123',
-        ]);
+        // Visiting join form redirects to hub
+        $response = $this->actingAs($user)->get(route('play.join', ['code' => 'ABC123']));
 
-        $response->assertRedirect(route('groups.questions', $group));
-        $response->assertSessionHas('info');
+        $response->assertRedirect(route('play.hub', ['code' => 'ABC123']));
     }
 
     /** @test */
-    public function join_form_shows_correctly()
+    public function guest_join_form_shows_correctly()
     {
         $event = Event::factory()->create();
         $group = Group::factory()->create([
@@ -181,11 +177,11 @@ class GroupManagementTest extends TestCase
             'code' => 'ABC123',
         ]);
 
-        $response = $this->get(route('groups.join', ['code' => 'ABC123']));
+        $response = $this->get(route('play.join', ['code' => 'ABC123']));
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
-            ->component('Groups/Join')
+            ->component('Play/Join')
             ->has('group')
         );
     }
@@ -401,15 +397,14 @@ class GroupManagementTest extends TestCase
     }
 
     /** @test */
-    public function join_validates_group_code()
+    public function play_hub_with_invalid_code_returns_404()
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post(route('groups.join'), [
-            'code' => 'INVALID',
-        ]);
+        // Trying to join with an invalid code returns 404
+        $response = $this->actingAs($user)->get(route('play.join', ['code' => 'INVALID']));
 
-        $response->assertSessionHasErrors('code');
+        $response->assertStatus(404);
     }
 
     /** @test */
@@ -455,7 +450,7 @@ class GroupManagementTest extends TestCase
     }
 
     /** @test */
-    public function guest_can_join_group_with_code()
+    public function guest_can_join_group_via_play_hub()
     {
         $event = Event::factory()->create();
         $group = Group::factory()->create([
@@ -463,16 +458,16 @@ class GroupManagementTest extends TestCase
             'code' => 'ABC123',
         ]);
 
-        $response = $this->post(route('groups.join'), [
-            'code' => 'ABC123',
+        // Guest submits their name via Play Hub join flow
+        $response = $this->post(route('play.join.process', ['code' => 'ABC123']), [
             'name' => 'Guest User',
-            'email' => 'guest@example.com',
         ]);
 
-        $response->assertRedirect(route('dashboard'));
+        // Should redirect to the Play Hub
+        $response->assertRedirect(route('play.hub', ['code' => 'ABC123']));
 
         // Guest user should be created
-        $user = User::where('email', 'guest@example.com')->first();
+        $user = User::where('name', 'Guest User')->first();
         $this->assertNotNull($user);
         $this->assertEquals('guest', $user->role);
 

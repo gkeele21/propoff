@@ -1,12 +1,44 @@
 <template>
-    <Head :title="`Join Info - ${group.name}`" />
+    <Head :title="`Group Invitation - ${group.name}`" />
 
     <AuthenticatedLayout>
         <template #header>
             <PageHeader
-                title="Join Info"
-                :crumbs="[{ label: 'Home', href: route('play.hub', { code: group.code }) }]"
-            />
+                title="Group Invitation"
+                subtitle="Share the join code, invitation link, or QR code to invite members to your group."
+                :crumbs="[
+                    { label: 'Home', href: route('play.hub', { code: group.code }) },
+                    { label: 'Join Info' }
+                ]"
+            >
+                <template #actions>
+                    <Button
+                        :variant="invitation.is_active ? 'danger' : 'success'"
+                        size="sm"
+                        :loading="toggleForm.processing"
+                        @click="toggleInvitation"
+                    >
+                        <Icon :name="invitation.is_active ? 'link-slash' : 'link'" class="mr-2" size="sm" />
+                        {{ invitation.is_active ? 'Deactivate' : 'Activate' }}
+                    </Button>
+                    <Button
+                        variant="accent"
+                        size="sm"
+                        @click="showRegenerateModal = true"
+                    >
+                        <Icon name="arrows-rotate" class="mr-2" size="sm" />
+                        Regenerate
+                    </Button>
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        @click="showSettingsModal = true"
+                    >
+                        <Icon name="gear" class="mr-2" size="sm" />
+                        Settings
+                    </Button>
+                </template>
+            </PageHeader>
         </template>
 
         <div class="py-12">
@@ -30,9 +62,6 @@
                             </p>
                         </div>
                     </div>
-                    <p class="text-sm text-muted mt-4 pt-4 border-t border-border">
-                        Share the join code, the invitation link below, or let members scan the QR code to join your group.
-                    </p>
                 </div>
 
                 <!-- Invitation Link Section -->
@@ -74,56 +103,18 @@
                     </div>
 
                     <!-- QR Code -->
-                    <div class="text-center py-6 border-t border-b border-border my-6">
+                    <div class="text-center py-6 border-t border-border pt-6">
                         <p class="text-sm text-muted mb-4">Scan QR Code to Join</p>
                         <div class="inline-block bg-white p-4 rounded-lg shadow-sm">
                             <div ref="qrcode" class="w-64 h-64"></div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Stats -->
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div class="bg-primary/10 rounded-lg p-4">
-                            <div class="text-2xl font-bold text-primary">{{ invitation.times_used }}</div>
-                            <div class="text-sm text-primary">Times Used</div>
-                        </div>
-                        <div class="bg-warning/10 rounded-lg p-4">
-                            <div class="text-2xl font-bold text-warning">
-                                {{ invitation.max_uses || '∞' }}
-                            </div>
-                            <div class="text-sm text-warning">Max Uses</div>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="flex flex-wrap gap-3">
-                        <button
-                            @click="toggleInvitation"
-                            :disabled="toggleForm.processing"
-                            :class="[
-                                'inline-flex items-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs uppercase tracking-widest transition',
-                                invitation.is_active
-                                    ? 'bg-danger text-white hover:bg-danger/80'
-                                    : 'bg-success text-white hover:bg-success'
-                            ]"
-                        >
-                            {{ invitation.is_active ? 'Deactivate' : 'Activate' }}
-                        </button>
-                        <button
-                            @click="showRegenerateModal = true"
-                            class="inline-flex items-center px-4 py-2 bg-warning border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-warning/80"
-                        >
-                            <ArrowPathIcon class="w-4 h-4 mr-2" />
-                            Regenerate Link
-                        </button>
-                        <button
-                            @click="showSettingsModal = true"
-                            class="inline-flex items-center px-4 py-2 bg-surface-overlay border border-border rounded-md font-semibold text-xs text-body uppercase tracking-widest hover:bg-surface-elevated"
-                        >
-                            <Cog6ToothIcon class="w-4 h-4 mr-2" />
-                            Settings
-                        </button>
-                    </div>
+                <!-- Stats -->
+                <div class="grid grid-cols-2 gap-4">
+                    <StatTile :value="invitation.times_used" label="Times Used" color="primary" />
+                    <StatTile :value="invitation.max_uses || '∞'" label="Max Uses" color="warning" />
                 </div>
 
                 <!-- Warning if inactive -->
@@ -245,12 +236,13 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import {
     UserGroupIcon,
     ClipboardDocumentIcon,
-    ArrowPathIcon,
-    Cog6ToothIcon,
     ExclamationTriangleIcon,
 } from '@heroicons/vue/24/outline';
 import QRCode from 'qrcode';
 import PageHeader from '@/Components/Base/PageHeader.vue';
+import StatTile from '@/Components/Base/StatTile.vue';
+import Button from '@/Components/Base/Button.vue';
+import Icon from '@/Components/Base/Icon.vue';
 
 const props = defineProps({
     group: Object,

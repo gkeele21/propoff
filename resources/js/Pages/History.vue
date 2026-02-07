@@ -5,6 +5,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PageHeader from '@/Components/Base/PageHeader.vue';
 import Card from '@/Components/Base/Card.vue';
 import Icon from '@/Components/Base/Icon.vue';
+import Select from '@/Components/Form/Select.vue';
 
 const props = defineProps({
     stats: Object,
@@ -29,6 +30,17 @@ const formatDate = (dateString) => {
         day: 'numeric',
     });
 };
+
+// Year options for select
+const yearOptions = computed(() =>
+    props.years.map(year => ({ value: year, label: String(year) }))
+);
+
+// Selected year (converted to work with Select component)
+const selectedYear = computed({
+    get: () => props.currentYear || '',
+    set: (value) => filterByYear(value || null),
+});
 
 // Filter by year
 const filterByYear = (year) => {
@@ -57,28 +69,19 @@ const avgFromFirstDisplay = computed(() => {
 
         <!-- Main Content -->
         <div class="max-w-4xl mx-auto px-6 py-8">
-            <!-- Filter Pills -->
-            <div class="flex flex-wrap gap-2 mb-6">
-                <button
-                    @click="filterByYear(null)"
-                    class="px-4 py-2 rounded-full text-sm font-medium transition-colors"
-                    :class="currentYear === null
-                        ? 'bg-primary text-white'
-                        : 'bg-surface border border-border text-muted hover:border-primary'"
-                >
-                    All
-                </button>
-                <button
-                    v-for="year in years"
-                    :key="year"
-                    @click="filterByYear(year)"
-                    class="px-4 py-2 rounded-full text-sm font-medium transition-colors"
-                    :class="currentYear === year
-                        ? 'bg-primary text-white'
-                        : 'bg-surface border border-border text-muted hover:border-primary'"
-                >
-                    {{ year }}
-                </button>
+            <!-- Year Filter -->
+            <div class="bg-surface shadow-sm sm:rounded-lg mb-6 border border-border">
+                <div class="p-6">
+                    <div class="max-w-xs">
+                        <Select
+                            v-model="selectedYear"
+                            :options="yearOptions"
+                            placeholder="All Years"
+                            allow-empty
+                            empty-label="All Years"
+                        />
+                    </div>
+                </div>
             </div>
 
             <!-- Stats Row -->

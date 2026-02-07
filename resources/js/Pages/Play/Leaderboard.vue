@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Badge from '@/Components/Base/Badge.vue';
+import Button from '@/Components/Base/Button.vue';
 import Card from '@/Components/Base/Card.vue';
 import PageHeader from '@/Components/Base/PageHeader.vue';
 import Icon from '@/Components/Base/Icon.vue';
@@ -31,27 +32,51 @@ const breadcrumbs = computed(() => [
 
     <AuthenticatedLayout :group="group">
         <template #header>
-            <PageHeader title="Leaderboard" :subtitle="group.event?.name" :crumbs="breadcrumbs" />
+            <PageHeader title="Leaderboard" :subtitle="group.event?.name" :crumbs="breadcrumbs">
+                <template #actions>
+                    <Link :href="route('play.game', { code: group.code })">
+                        <Button
+                            variant="primary"
+                            size="sm"
+                            icon="chart-bar"
+                        >
+                            View Results
+                        </Button>
+                    </Link>
+                </template>
+            </PageHeader>
         </template>
 
         <!-- Main Content -->
         <div class="max-w-4xl mx-auto px-6 py-8">
             <Card>
-                <div class="divide-y divide-border -m-5">
-                    <div
-                        v-for="entry in leaderboard.data"
-                        :key="entry.id"
-                        class="flex items-center py-3 px-5"
-                        :class="{ 'bg-surface-elevated': entry.user_id === userRow?.user_id }"
-                    >
-                        <div class="min-w-[36px] h-7 px-2 rounded-md flex items-center justify-center font-bold text-sm bg-surface-inset text-body mr-4">
-                            {{ getOrdinal(entry.rank) }}
+                <div class="-m-5">
+                    <!-- Column Headers -->
+                    <div class="flex items-center py-3 px-5 bg-surface-header border-b border-border text-xs font-medium text-subtle uppercase tracking-wider">
+                        <div class="min-w-[52px]">Rank</div>
+                        <div class="flex-1">Player</div>
+                        <div class="w-24 text-right">Points</div>
+                        <div class="w-24 text-right">Max</div>
+                    </div>
+
+                    <!-- Leaderboard Rows -->
+                    <div class="divide-y divide-border">
+                        <div
+                            v-for="entry in leaderboard.data"
+                            :key="entry.id"
+                            class="flex items-center py-3 px-5"
+                            :class="{ 'bg-surface-elevated': entry.user_id === userRow?.user_id }"
+                        >
+                            <div class="min-w-[36px] h-7 px-2 rounded-md flex items-center justify-center font-bold text-sm bg-surface-inset text-body mr-4">
+                                {{ getOrdinal(entry.rank) }}
+                            </div>
+                            <div class="flex-1">
+                                {{ entry.user?.name }}
+                                <Badge v-if="entry.user_id === userRow?.user_id" variant="primary-soft" size="sm" class="ml-2">You</Badge>
+                            </div>
+                            <div class="w-24 text-right font-semibold text-body">{{ entry.total_score }}</div>
+                            <div class="w-24 text-right text-muted">{{ entry.possible_points }}</div>
                         </div>
-                        <div class="flex-1">
-                            {{ entry.user?.name }}
-                            <Badge v-if="entry.user_id === userRow?.user_id" variant="primary-soft" size="sm" class="ml-2">You</Badge>
-                        </div>
-                        <div class="font-semibold">{{ entry.total_score }} points</div>
                     </div>
 
                     <!-- Empty state -->

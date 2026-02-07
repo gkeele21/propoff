@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Captain;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Captain\SetAnswerRequest;
+use App\Models\EventAnswer;
 use App\Models\Group;
 use App\Models\GroupQuestion;
 use App\Models\GroupQuestionAnswer;
@@ -51,6 +52,22 @@ class GradingController extends Controller
                 'is_void' => $request->is_void ?? false,
             ]
         );
+
+        // Sync to admin grading if requested and question is linked to an event question
+        if ($request->sync_to_admin && $groupQuestion->event_question_id) {
+            EventAnswer::updateOrCreate(
+                [
+                    'event_id' => $group->event_id,
+                    'event_question_id' => $groupQuestion->event_question_id,
+                ],
+                [
+                    'correct_answer' => $request->correct_answer,
+                    'is_void' => $request->is_void ?? false,
+                    'set_at' => now(),
+                    'set_by' => auth()->id(),
+                ]
+            );
+        }
 
         // Recalculate scores for all entries in this group
         $entries = $group->entries()->where('is_complete', true)->get();

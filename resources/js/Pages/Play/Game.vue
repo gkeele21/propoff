@@ -19,6 +19,10 @@ const props = defineProps({
         type: Object,
         default: null,
     },
+    isGuest: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 // Track selected answers locally
@@ -47,6 +51,24 @@ const totalQuestions = computed(() => props.questions.length);
 
 const totalPoints = computed(() => {
     return props.questions.reduce((sum, q) => sum + (q.points || 0), 0);
+});
+
+// Check if any questions have been graded (have correct_answer set)
+const hasGradedQuestions = computed(() => {
+    return props.questions.some(q => q.correct_answer !== null);
+});
+
+// Get ordinal suffix for rank display
+const getOrdinal = (n) => {
+    const s = ['th', 'st', 'nd', 'rd'];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+};
+
+// Format rank display
+const rankDisplay = computed(() => {
+    if (!props.entry.rank) return null;
+    return getOrdinal(props.entry.rank) + ' Place';
 });
 
 const breadcrumbs = computed(() => {
@@ -133,7 +155,7 @@ const showToastMessage = (message) => {
                 </template>
                 <template #actions>
                     <Link :href="route('play.leaderboard', { code: group.code })">
-                        <Button variant="secondary" icon="trophy" size="sm">
+                        <Button variant="primary" icon="trophy" size="sm">
                             Leaderboard
                         </Button>
                     </Link>
@@ -156,16 +178,26 @@ const showToastMessage = (message) => {
                 </div>
             </div>
 
-            <!-- Already Submitted Banner -->
-            <div v-if="entry.is_complete && submittingFor" class="bg-warning/10 border border-warning/30 rounded-lg p-4 mb-6">
+            <!-- Locked Banner (only show if not graded yet) -->
+            <div v-if="group.is_locked && !hasGradedQuestions" class="bg-warning/10 border border-warning/30 rounded-lg p-4 mb-6">
                 <div class="flex items-center gap-3">
-                    <Icon name="circle-check" class="text-warning" size="lg" />
+                    <Icon name="lock" class="text-warning" size="lg" />
                     <div>
-                        <div class="font-semibold text-warning">Entry Already Submitted</div>
+                        <div class="font-semibold text-warning">Entries Locked</div>
                         <div class="text-sm text-muted">
-                            This entry has already been submitted. You can view but not modify the answers.
+                            The entry cutoff has passed. Answers can no longer be changed.
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Results Summary (shown when locked and graded) -->
+            <div v-if="group.is_locked && hasGradedQuestions" class="bg-surface-elevated rounded-xl p-8 text-center mb-6">
+                <div v-if="rankDisplay" class="text-5xl font-bold text-success mb-2">{{ rankDisplay }}</div>
+                <div v-else class="text-5xl font-bold text-body mb-2">Results</div>
+                <div class="text-2xl text-body">{{ entry.total_score }} points</div>
+                <div v-if="entry.total_participants > 0" class="text-muted mt-1">
+                    of {{ entry.total_participants }} participants
                 </div>
             </div>
 
@@ -196,18 +228,52 @@ const showToastMessage = (message) => {
                     <div
                         v-for="(question, index) in questions"
                         :key="question.id"
-                        class="bg-surface-elevated border border-border border-l-4 border-l-[#f5f3ef] rounded-lg p-6"
+                        class="bg-surface-elevated border border-border rounded-lg overflow-hidden"
                     >
-                        <QuestionCard
-                            :model-value="selectedAnswers[question.id]"
-                            @update:model-value="selectAnswer(question.id, $event)"
-                            :question="question.question_text"
-                            :options="question.options"
-                            :points="question.points"
-                            :question-number="index + 1"
-                            :show-letters="true"
-                            :disabled="entry.is_complete"
-                        />
+                        <!-- Question Header with Points Earned (shown when graded) -->
+                        <div v-if="hasGradedQuestions" class="flex justify-between items-center p-4 border-b border-border">
+                            <div class="font-semibold text-body">{{ question.question_text }}</div>
+                            <Badge
+                                v-if="question.is_void"
+                                variant="warning-soft"
+                            >
+                                Voided
+                            </Badge>
+                            <Badge
+                                v-else-if="question.is_correct"
+                                variant="success-soft"
+                            >
+                                +{{ question.points_earned }} {{ question.points_earned === 1 ? 'point' : 'points' }}
+                            </Badge>
+                            <Badge
+                                v-else-if="question.correct_answer"
+                                variant="danger-soft"
+                            >
+                                0 points
+                            </Badge>
+                            <Badge
+                                v-else
+                                variant="default"
+                            >
+                                Pending
+                            </Badge>
+                        </div>
+
+                        <div class="p-6">
+                            <QuestionCard
+                                :model-value="selectedAnswers[question.id]"
+                                @update:model-value="selectAnswer(question.id, $event)"
+                                :question="question.question_text"
+                                :options="question.options"
+                                :points="question.points"
+                                :question-number="index + 1"
+                                :show-letters="true"
+                                :show-header="!hasGradedQuestions"
+                                :disabled="group.is_locked"
+                                :correct-answer="question.correct_answer"
+                                :show-results="!!question.correct_answer && !question.is_void"
+                            />
+                        </div>
                     </div>
 
                     <!-- Empty State -->
@@ -218,6 +284,15 @@ const showToastMessage = (message) => {
                     </div>
                 </div>
             </Card>
+
+            <!-- Guest upsell (shown when locked and is guest) -->
+            <div v-if="group.is_locked && isGuest" class="mt-8 bg-surface border border-border rounded-xl p-6 text-center">
+                <div class="text-lg font-semibold text-body mb-2">Want to save your results?</div>
+                <div class="text-muted mb-4">Create an account to track your history across events.</div>
+                <Link :href="route('register')">
+                    <Button variant="primary">Create an account</Button>
+                </Link>
+            </div>
 
         </div>
 

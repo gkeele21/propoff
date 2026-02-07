@@ -128,7 +128,6 @@ const formatDate = (dateString) => {
                             <div class="col-span-2">
                                 <TextField
                                     v-model="search"
-                                    label="Search"
                                     placeholder="Search by name or email..."
                                     icon-left="magnifying-glass"
                                     @input="filterUsers"
@@ -136,7 +135,6 @@ const formatDate = (dateString) => {
                             </div>
                             <Select
                                 v-model="roleFilter"
-                                label="Role"
                                 :options="roleFilterOptions"
                                 @change="filterUsers"
                             />
@@ -203,10 +201,17 @@ const formatDate = (dateString) => {
                                         {{ user.email }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
+                                        <span
+                                            v-if="user.role === 'guest'"
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-elevated text-muted"
+                                        >
+                                            Guest
+                                        </span>
                                         <select
+                                            v-else
                                             :value="user.role"
                                             @change="updateRole(user, $event.target.value)"
-                                            class="text-sm bg-surface-inset border border-border text-body rounded-md px-2 py-1 focus:outline-none focus-glow-sm"
+                                            class="text-sm bg-surface-elevated border border-border text-body rounded-md px-2 py-1 pr-8 focus:outline-none focus:border-primary cursor-pointer"
                                         >
                                             <option value="user">User</option>
                                             <option value="admin">Admin</option>

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Button from '@/Components/Base/Button.vue';
 import Badge from '@/Components/Base/Badge.vue';
@@ -19,6 +19,9 @@ const props = defineProps({
     isCaptain: Boolean,
     isGuest: Boolean,
 });
+
+const page = usePage();
+const isAdminOrManager = computed(() => ['admin', 'manager'].includes(page.props.auth?.user?.role));
 
 // Toast state
 const showToast = ref(false);
@@ -118,8 +121,16 @@ const toggleLock = () => {
     <AuthenticatedLayout>
         <template #header>
             <PageHeader :title="group.name">
-                <template v-if="isCaptain" #titleSuffix>
-                    <Badge variant="warning-soft">Captain</Badge>
+                <template v-if="isCaptain || isAdminOrManager" #titleSuffix>
+                    <Badge v-if="isCaptain" variant="warning-soft">Captain</Badge>
+                    <template v-if="isAdminOrManager">
+                        <Badge :variant="group.grading_source === 'captain' ? 'primary-soft' : 'info-soft'">
+                            {{ group.grading_source === 'captain' ? 'Captain Graded' : 'Admin Graded' }}
+                        </Badge>
+                        <Link :href="route('groups.edit', group.id)" class="text-primary hover:text-primary-hover text-sm font-medium">
+                            Edit
+                        </Link>
+                    </template>
                 </template>
                 <template #metadata>
                     <div class="flex items-center gap-2 flex-wrap">

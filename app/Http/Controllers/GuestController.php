@@ -176,7 +176,7 @@ class GuestController extends Controller
                     'total_score' => $entry->total_score,
                     'possible_points' => $entry->possible_points,
                     'percentage' => $entry->percentage,
-                    'is_complete' => $entry->is_complete,
+                    'is_locked' => $entry->group->is_locked,
                     'submitted_at' => $entry->submitted_at,
                     'can_edit' => $user->canEditEntry($entry),
                 ];

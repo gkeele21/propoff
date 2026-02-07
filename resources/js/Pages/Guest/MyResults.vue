@@ -83,17 +83,16 @@
 
                                     <div class="flex flex-col gap-2 items-end">
                                         <Badge
-                                            :variant="entry.is_complete ? 'success-soft' : 'warning-soft'"
+                                            :variant="entry.is_locked ? 'secondary' : 'success-soft'"
                                         >
-                                            {{ entry.is_complete ? 'Complete' : 'In Progress' }}
+                                            {{ entry.is_locked ? 'Locked' : 'Open' }}
                                         </Badge>
 
                                         <Link
-                                            v-if="entry.can_edit"
-                                            :href="entry.is_complete ? route('play.results', entry.group_code) : route('play.game', entry.group_code)"
+                                            :href="entry.is_locked ? route('play.results', entry.group_code) : route('play.game', entry.group_code)"
                                         >
                                             <Button variant="primary" size="sm">
-                                                {{ entry.is_complete ? 'View' : 'Continue' }}
+                                                {{ entry.is_locked ? 'View Results' : 'Play' }}
                                             </Button>
                                         </Link>
                                     </div>

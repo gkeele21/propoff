@@ -53,18 +53,19 @@ class UserController extends Controller
         // Get user statistics
         $stats = [
             'total_entries' => $user->entries()->count(),
-            'completed_entries' => $user->entries()->where('is_complete', true)->count(),
+            'entries_with_answers' => $user->entries()->whereHas('userAnswers')->count(),
             'groups_joined' => $user->groups()->count(),
-            'average_score' => $user->entries()->where('is_complete', true)->avg('percentage') ?? 0,
-            'best_score' => $user->entries()->where('is_complete', true)->max('percentage') ?? 0,
-            'total_points' => $user->entries()->where('is_complete', true)->sum('total_score'),
+            'average_score' => $user->entries()->whereHas('userAnswers')->avg('percentage') ?? 0,
+            'best_score' => $user->entries()->whereHas('userAnswers')->max('percentage') ?? 0,
+            'total_points' => $user->entries()->whereHas('userAnswers')->sum('total_score'),
         ];
 
         // Get recent entries
         $recentEntries = $user->entries()
             ->with(['event', 'group'])
-            ->where('is_complete', true)
-            ->latest('submitted_at')
+            ->withCount('userAnswers as answered_count')
+            ->whereHas('userAnswers')
+            ->latest('updated_at')
             ->limit(10)
             ->get();
 

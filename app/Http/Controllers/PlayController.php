@@ -87,6 +87,7 @@ class PlayController extends Controller
 
     /**
      * Show the join form for guests.
+     * Authenticated users are auto-added to the group.
      */
     public function joinForm(string $code)
     {
@@ -94,14 +95,27 @@ class PlayController extends Controller
             ->with('event')
             ->firstOrFail();
 
-        // If user is already logged in and a member, redirect to hub
+        // If user is already logged in
         if (auth()->check()) {
-            $isMember = $group->users()->where('user_id', auth()->id())->exists();
+            $user = auth()->user();
+            $isMember = $group->users()->where('user_id', $user->id)->exists();
+
             if ($isMember) {
+                // Already a member - go to hub
                 return redirect()->route('play.hub', ['code' => $code]);
             }
+
+            // Not a member - auto-add them to the group
+            $group->users()->attach($user->id, [
+                'joined_at' => now(),
+                'is_captain' => false,
+            ]);
+
+            return redirect()->route('play.hub', ['code' => $code])
+                ->with('success', 'You joined ' . $group->name . '!');
         }
 
+        // Guest user - show the join form
         return Inertia::render('Play/Join', [
             'group' => [
                 'id' => $group->id,
@@ -128,36 +142,23 @@ class PlayController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'last_initial' => 'nullable|string|max:1',
             'verified' => 'nullable|boolean',
         ]);
 
         $name = trim($validated['name']);
-        $lastInitial = isset($validated['last_initial']) ? strtoupper(trim($validated['last_initial'])) : null;
 
-        // Build full name if last initial provided
-        $fullName = $lastInitial ? $name . ' ' . $lastInitial . '.' : $name;
-
-        // Check for name collision in this group
-        $existingMember = $group->users()
-            ->where('name', 'like', $name . '%')
+        // Check for exact match
+        $exactMatch = $group->users()
+            ->where('name', $name)
             ->first();
 
-        // If name exists and no last initial yet, ask for it
-        if ($existingMember && !$lastInitial) {
-            return back()->with([
-                'step' => 'initial',
-                'existingName' => $existingMember->name,
-            ]);
+        // If verified, link to existing user immediately
+        if ($exactMatch && ($validated['verified'] ?? false)) {
+            return $this->linkGuestAndProceed($exactMatch, $group, $code);
         }
 
-        // Check for exact match with full name
-        $exactMatch = $group->users()
-            ->where('name', $fullName)
-            ->first();
-
         // If exact match and not verified, show verification
-        if ($exactMatch && !($validated['verified'] ?? false)) {
+        if ($exactMatch) {
             $entry = Entry::where('user_id', $exactMatch->id)
                 ->where('group_id', $group->id)
                 ->first();
@@ -176,13 +177,8 @@ class PlayController extends Controller
             ]);
         }
 
-        // If verified, link to existing user
-        if ($exactMatch && ($validated['verified'] ?? false)) {
-            return $this->linkGuestAndProceed($exactMatch, $group, $code);
-        }
-
-        // Create new guest user and join group
-        return $this->createGuestAndJoin($fullName, $group, $code);
+        // No match - create new guest user and join group
+        return $this->createGuestAndJoin($name, $group, $code);
     }
 
     /**
@@ -224,18 +220,18 @@ class PlayController extends Controller
             ];
         }
 
-        // Check if group is locked
-        if ($group->is_locked) {
-            return redirect()->route('play.hub', ['code' => $code])
-                ->with('error', 'This game is locked. You can no longer submit answers.');
-        }
-
         // Get or create entry for target user
         $entry = Entry::where('user_id', $targetUser->id)
             ->where('group_id', $group->id)
             ->first();
 
         if (!$entry) {
+            // Don't create new entries if group is locked
+            if ($group->is_locked) {
+                return redirect()->route('play.hub', ['code' => $code])
+                    ->with('error', 'This game is locked. New entries cannot be created.');
+            }
+
             // Calculate possible points from group's active questions
             $possiblePoints = $group->groupQuestions()
                 ->where('is_active', true)
@@ -248,24 +244,49 @@ class PlayController extends Controller
                 'total_score' => 0,
                 'possible_points' => $possiblePoints,
                 'percentage' => 0,
-                'is_complete' => false,
             ]);
         }
 
-        // If entry is complete and not submitting for someone else, redirect to results
-        if ($entry->is_complete && !$submittingFor) {
-            return redirect()->route('play.results', ['code' => $code]);
-        }
+        // Get leaderboard entry for rank (for results display)
+        $leaderboardEntry = Leaderboard::where('event_id', $group->event_id)
+            ->where('group_id', $group->id)
+            ->where('user_id', $targetUser->id)
+            ->first();
 
-        // Load questions with user's answers
+        $totalParticipants = Leaderboard::where('event_id', $group->event_id)
+            ->where('group_id', $group->id)
+            ->count();
+
+        // Load questions with user's answers and results data
         $questions = $group->groupQuestions()
             ->where('is_active', true)
             ->orderBy('display_order')
             ->get()
-            ->map(function ($question) use ($entry) {
+            ->map(function ($question) use ($entry, $group) {
                 $userAnswer = $entry->userAnswers()
                     ->where('group_question_id', $question->id)
                     ->first();
+
+                // Get correct answer based on grading source (for results display)
+                $correctAnswer = null;
+                $isVoid = false;
+
+                if ($group->grading_source === 'captain') {
+                    $groupAnswer = GroupQuestionAnswer::where('group_id', $group->id)
+                        ->where('group_question_id', $question->id)
+                        ->first();
+                    $correctAnswer = $groupAnswer?->correct_answer;
+                    $isVoid = $groupAnswer?->is_void ?? false;
+                } else {
+                    // Admin grading
+                    if ($question->event_question_id) {
+                        $eventAnswer = \App\Models\EventAnswer::where('event_id', $group->event_id)
+                            ->where('event_question_id', $question->event_question_id)
+                            ->first();
+                        $correctAnswer = $eventAnswer?->correct_answer;
+                        $isVoid = $eventAnswer?->is_void ?? false;
+                    }
+                }
 
                 return [
                     'id' => $question->id,
@@ -274,6 +295,10 @@ class PlayController extends Controller
                     'options' => $question->options,
                     'points' => $question->points,
                     'user_answer' => $userAnswer?->answer_text,
+                    'correct_answer' => $correctAnswer,
+                    'is_void' => $isVoid,
+                    'points_earned' => $userAnswer?->points_earned ?? 0,
+                    'is_correct' => $userAnswer?->is_correct ?? false,
                 ];
             });
 
@@ -284,6 +309,7 @@ class PlayController extends Controller
                 'id' => $group->id,
                 'name' => $group->name,
                 'code' => $group->code,
+                'is_locked' => $group->is_locked,
             ],
             'event' => $group->event ? [
                 'id' => $group->event->id,
@@ -294,10 +320,14 @@ class PlayController extends Controller
                 'id' => $entry->id,
                 'answered_count' => $answeredCount,
                 'total_questions' => $questions->count(),
-                'is_complete' => $entry->is_complete,
+                'total_score' => $entry->total_score,
+                'possible_points' => $entry->possible_points,
+                'rank' => $leaderboardEntry?->rank,
+                'total_participants' => $totalParticipants,
             ],
             'questions' => $questions,
             'submittingFor' => $submittingFor,
+            'isGuest' => $currentUser->isGuest(),
         ]);
     }
 
@@ -339,8 +369,8 @@ class PlayController extends Controller
             ->where('group_id', $group->id)
             ->first();
 
-        if (!$entry || $entry->is_complete) {
-            return back()->with('error', 'Invalid entry state.');
+        if (!$entry) {
+            return back()->with('error', 'No entry found.');
         }
 
         $validated = $request->validate([
@@ -384,181 +414,23 @@ class PlayController extends Controller
                     ]
                 );
             }
+
+            // Update entry totals
+            $totalScore = $entry->userAnswers()->sum('points_earned');
+            $percentage = $entry->possible_points > 0
+                ? ($totalScore / $entry->possible_points) * 100
+                : 0;
+
+            $entry->update([
+                'total_score' => $totalScore,
+                'percentage' => $percentage,
+            ]);
         });
 
-        return back()->with('success', 'Answers saved!');
-    }
-
-    /**
-     * Submit/complete an entry.
-     */
-    public function submit(Request $request, string $code)
-    {
-        $group = Group::where('code', $code)->firstOrFail();
-        $currentUser = auth()->user();
-
-        if (!$currentUser) {
-            return redirect()->route('play.join', ['code' => $code]);
-        }
-
-        // Determine target user (self or someone else if captain)
-        $targetUserId = $currentUser->id;
-        $submittingForOther = false;
-
-        if ($request->has('for_user') && $request->for_user != $currentUser->id) {
-            // Check if current user is a captain of this group
-            if (!$currentUser->isCaptainOf($group->id)) {
-                abort(403, 'Only captains can submit for other users.');
-            }
-
-            // Verify target user is in this group
-            if (!$group->users()->where('user_id', $request->for_user)->exists()) {
-                abort(404, 'User is not a member of this group.');
-            }
-
-            $targetUserId = $request->for_user;
-            $submittingForOther = true;
-        }
-
-        // Check if group is locked
-        if ($group->is_locked) {
-            return redirect()->route('play.hub', ['code' => $code])
-                ->with('error', 'This game is locked. You can no longer submit answers.');
-        }
-
-        $entry = Entry::where('user_id', $targetUserId)
-            ->where('group_id', $group->id)
-            ->first();
-
-        if (!$entry) {
-            return redirect()->route('play.game', ['code' => $code]);
-        }
-
-        if ($entry->is_complete) {
-            if ($submittingForOther) {
-                return redirect()->route('groups.members.index', ['group' => $group->id])
-                    ->with('info', 'This entry has already been submitted.');
-            }
-            return redirect()->route('play.results', ['code' => $code]);
-        }
-
-        // Calculate total score
-        $totalScore = $entry->userAnswers()->sum('points_earned');
-        $percentage = $entry->possible_points > 0
-            ? ($totalScore / $entry->possible_points) * 100
-            : 0;
-
-        $entry->update([
-            'total_score' => $totalScore,
-            'percentage' => $percentage,
-            'is_complete' => true,
-            'submitted_at' => now(),
-        ]);
-
         // Update leaderboard
-        $this->updateLeaderboard($entry);
+        $this->updateLeaderboard($entry->fresh());
 
-        // Redirect appropriately based on who submitted
-        if ($submittingForOther) {
-            return redirect()->route('groups.members.index', ['group' => $group->id])
-                ->with('success', 'Entry submitted successfully!');
-        }
-
-        return redirect()->route('play.results', ['code' => $code])
-            ->with('success', 'Entry submitted!');
-    }
-
-    /**
-     * Display the results page.
-     */
-    public function results(string $code)
-    {
-        $group = Group::where('code', $code)->firstOrFail();
-        $user = auth()->user();
-
-        if (!$user) {
-            return redirect()->route('play.join', ['code' => $code]);
-        }
-
-        $entry = Entry::where('user_id', $user->id)
-            ->where('group_id', $group->id)
-            ->first();
-
-        if (!$entry) {
-            return redirect()->route('play.hub', ['code' => $code]);
-        }
-
-        // Get leaderboard entry for rank
-        $leaderboardEntry = Leaderboard::where('event_id', $group->event_id)
-            ->where('group_id', $group->id)
-            ->where('user_id', $user->id)
-            ->first();
-
-        $totalParticipants = Leaderboard::where('event_id', $group->event_id)
-            ->where('group_id', $group->id)
-            ->count();
-
-        // Load questions with correct answers and user answers
-        $questions = $group->groupQuestions()
-            ->where('is_active', true)
-            ->orderBy('display_order')
-            ->get()
-            ->map(function ($question) use ($entry, $group) {
-                $userAnswer = $entry->userAnswers()
-                    ->where('group_question_id', $question->id)
-                    ->first();
-
-                // Get correct answer based on grading source
-                $correctAnswer = null;
-                $isVoid = false;
-
-                if ($group->grading_source === 'captain') {
-                    $groupAnswer = GroupQuestionAnswer::where('group_id', $group->id)
-                        ->where('group_question_id', $question->id)
-                        ->first();
-                    $correctAnswer = $groupAnswer?->correct_answer;
-                    $isVoid = $groupAnswer?->is_void ?? false;
-                } else {
-                    // Admin grading
-                    if ($question->event_question_id) {
-                        $eventAnswer = \App\Models\EventAnswer::where('event_id', $group->event_id)
-                            ->where('event_question_id', $question->event_question_id)
-                            ->first();
-                        $correctAnswer = $eventAnswer?->correct_answer;
-                        $isVoid = $eventAnswer?->is_void ?? false;
-                    }
-                }
-
-                return [
-                    'id' => $question->id,
-                    'question_text' => $question->question_text,
-                    'options' => $question->options,
-                    'points' => $question->points,
-                    'correct_answer' => $correctAnswer,
-                    'is_void' => $isVoid,
-                    'user_answer' => $userAnswer?->answer_text,
-                    'points_earned' => $userAnswer?->points_earned ?? 0,
-                    'is_correct' => $userAnswer?->is_correct ?? false,
-                ];
-            });
-
-        return Inertia::render('Play/Results', [
-            'group' => [
-                'id' => $group->id,
-                'name' => $group->name,
-                'code' => $group->code,
-            ],
-            'entry' => [
-                'id' => $entry->id,
-                'total_score' => $entry->total_score,
-                'possible_points' => $entry->possible_points,
-                'is_complete' => $entry->is_complete,
-                'rank' => $leaderboardEntry?->rank,
-                'total_participants' => $totalParticipants,
-            ],
-            'questions' => $questions,
-            'isGuest' => $user->isGuest(),
-        ]);
+        return back()->with('success', 'Answers saved!');
     }
 
     /**
@@ -590,8 +462,32 @@ class PlayController extends Controller
                 $userRow = [
                     'rank' => $userLeaderboard->rank,
                     'name' => $user->name,
-                    'score' => $userLeaderboard->total_score,
+                    'total_score' => $userLeaderboard->total_score,
+                    'possible_points' => $userLeaderboard->possible_points,
+                    'user_id' => $user->id,
                 ];
+            } else {
+                // Fall back to Entry if not on leaderboard yet
+                $entry = Entry::where('event_id', $group->event_id)
+                    ->where('group_id', $group->id)
+                    ->where('user_id', $user->id)
+                    ->first();
+
+                if ($entry) {
+                    // Calculate approximate rank based on score
+                    $rank = Leaderboard::where('event_id', $group->event_id)
+                        ->where('group_id', $group->id)
+                        ->where('total_score', '>', $entry->total_score)
+                        ->count() + 1;
+
+                    $userRow = [
+                        'rank' => $rank,
+                        'name' => $user->name,
+                        'total_score' => $entry->total_score,
+                        'possible_points' => $entry->possible_points,
+                        'user_id' => $user->id,
+                    ];
+                }
             }
         }
 

@@ -1,10 +1,7 @@
 <script setup>
-import { ref } from 'vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import Logo from '@/Components/Domain/Logo.vue';
 import Button from '@/Components/Base/Button.vue';
-import Icon from '@/Components/Base/Icon.vue';
-import Modal from '@/Components/Base/Modal.vue';
 
 defineProps({
     canLogin: {
@@ -21,18 +18,24 @@ defineProps({
         type: String,
         required: true,
     },
+    activeGroup: {
+        type: Object,
+        default: null,
+    },
+    recognizedUser: {
+        type: Object,
+        default: null,
+    },
 });
-
-const showUserModal = ref(false);
 
 const joinGroupForm = useForm({
     code: '',
 });
 
 const joinGroup = () => {
-    joinGroupForm.post(route('groups.join'), {
-        preserveScroll: true,
-    });
+    if (joinGroupForm.code) {
+        router.visit(route('play.hub', { code: joinGroupForm.code.toUpperCase() }));
+    }
 };
 </script>
 
@@ -48,22 +51,11 @@ const joinGroup = () => {
 
         <!-- Content Container -->
         <div class="relative min-h-screen">
-            <!-- Navigation -->
+            <!-- Navigation - Always show Log in button -->
             <div v-if="canLogin" class="fixed top-0 right-0 p-6 text-end z-10">
-                <button
-                    v-if="$page.props.auth.user"
-                    @click="showUserModal = true"
-                    type="button"
-                    class="inline-flex items-center gap-2 h-9 px-3 text-sm font-medium text-body hover:text-primary focus:outline-none transition duration-150"
-                >
-                    <Icon name="user" size="sm" />
-                    {{ $page.props.auth.user.name }}
-                </button>
-                <template v-else>
-                    <Link :href="route('login')">
-                        <Button variant="primary" size="md">Log in</Button>
-                    </Link>
-                </template>
+                <Link :href="route('login')">
+                    <Button variant="primary" size="md">Log in</Button>
+                </Link>
             </div>
 
             <div class="max-w-7xl mx-auto p-6 lg:p-8 pt-20">
@@ -124,7 +116,9 @@ const joinGroup = () => {
 
                 <!-- Join Group with Code -->
                 <div class="mt-16 max-w-2xl mx-auto bg-surface-elevated border border-border rounded-xl p-8 text-center">
-                    <h2 class="text-2xl font-bold text-body mb-2">Have a Group Code?</h2>
+                    <h2 class="text-2xl font-bold text-body mb-2">
+                        {{ recognizedUser ? 'Join a Different Group?' : 'Have a Group Code?' }}
+                    </h2>
                     <p class="text-muted mb-4">Enter your code below to join</p>
 
                     <form @submit.prevent="joinGroup" class="flex flex-col sm:flex-row gap-4">
@@ -148,52 +142,35 @@ const joinGroup = () => {
                             :loading="joinGroupForm.processing"
                             :disabled="!joinGroupForm.code"
                         >
-                            Join
+                            Go
                         </Button>
                     </form>
                 </div>
 
                 <!-- Call to Action -->
-                <div class="flex justify-center mt-12 pb-8">
-                    <Link v-if="!$page.props.auth.user" :href="route('register')">
-                        <Button variant="accent" size="lg">Get Started Free</Button>
-                    </Link>
-                    <Link v-else :href="route('home')">
-                        <Button variant="primary" size="lg">Continue</Button>
-                    </Link>
+                <div class="flex flex-col items-center mt-12 pb-8">
+                    <template v-if="recognizedUser">
+                        <Link :href="route('home')">
+                            <Button variant="primary" size="lg">Continue as {{ recognizedUser.name }}</Button>
+                        </Link>
+                        <Link
+                            :href="route('guest.forget')"
+                            method="post"
+                            as="button"
+                            class="mt-3 text-sm text-muted hover:text-body transition-colors"
+                        >
+                            Not {{ recognizedUser.name }}? Start fresh
+                        </Link>
+                    </template>
+                    <template v-else>
+                        <Link :href="route('register')">
+                            <Button variant="accent" size="lg">Get Started Free</Button>
+                        </Link>
+                    </template>
                 </div>
             </div>
         </div>
 
-        <!-- User Modal -->
-        <Modal :show="showUserModal" @close="showUserModal = false" max-width="sm">
-            <div class="p-6">
-                <div class="text-center mb-6">
-                    <div class="w-16 h-16 bg-surface-inset rounded-full flex items-center justify-center mx-auto mb-3">
-                        <Icon name="user" size="2x" class="text-muted" />
-                    </div>
-                    <div class="text-lg font-semibold text-body">{{ $page.props.auth.user?.name }}</div>
-                    <div class="text-sm text-muted">{{ $page.props.auth.user?.email }}</div>
-                </div>
-                <div class="space-y-3">
-                    <Link :href="route('profile.edit')" class="block">
-                        <Button variant="secondary" class="w-full" icon="user">
-                            Profile
-                        </Button>
-                    </Link>
-                    <Link
-                        :href="route('logout')"
-                        method="post"
-                        as="button"
-                        class="w-full"
-                    >
-                        <Button variant="danger" class="w-full" icon="right-from-bracket">
-                            Log Out
-                        </Button>
-                    </Link>
-                </div>
-            </div>
-        </Modal>
     </div>
 </template>
 

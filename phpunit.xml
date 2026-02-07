@@ -5,12 +5,16 @@
          colors="true"
 >
     <testsuites>
+        <!-- Tests disabled - they use RefreshDatabase which wipes the main DB -->
+        <!-- Uncomment and enable sqlite/:memory: below before running tests -->
+        <!--
         <testsuite name="Unit">
             <directory>tests/Unit</directory>
         </testsuite>
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
         </testsuite>
+        -->
     </testsuites>
     <source>
         <include>

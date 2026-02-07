@@ -25,6 +25,7 @@ class SetAnswerRequest extends FormRequest
             'correct_answer' => 'required|string',
             'points_awarded' => 'nullable|integer|min:0',
             'is_void' => 'nullable|boolean',
+            'sync_to_admin' => 'nullable|boolean',
         ];
     }
 

@@ -94,17 +94,18 @@ class GroupController extends Controller
         $stats = [
             'total_members' => $group->users()->count(),
             'total_entries' => $group->entries()->count(),
-            'completed_entries' => $group->entries()->where('is_complete', true)->count(),
-            'average_score' => $group->entries()->where('is_complete', true)->avg('percentage') ?? 0,
-            'best_score' => $group->entries()->where('is_complete', true)->max('percentage') ?? 0,
+            'entries_with_answers' => $group->entries()->whereHas('userAnswers')->count(),
+            'average_score' => $group->entries()->whereHas('userAnswers')->avg('percentage') ?? 0,
+            'best_score' => $group->entries()->whereHas('userAnswers')->max('percentage') ?? 0,
             'total_events_played' => $group->entries()->distinct('event_id')->count('event_id'),
         ];
 
         // Get recent entries
         $recentEntries = $group->entries()
             ->with(['event', 'user'])
-            ->where('is_complete', true)
-            ->latest('submitted_at')
+            ->withCount('userAnswers as answered_count')
+            ->whereHas('userAnswers')
+            ->latest('updated_at')
             ->limit(10)
             ->get();
 

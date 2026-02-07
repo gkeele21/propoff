@@ -8,7 +8,7 @@
                 </div>
 
                 <!-- Desktop Navigation Links -->
-                <div class="hidden sm:flex items-center space-x-8">
+                <div class="hidden sm:flex items-center space-x-8 h-full">
                     <template v-for="item in visibleItems" :key="item.route">
                         <Link
                             :href="route(item.route)"
@@ -115,9 +115,9 @@ function isActive(item) {
     return matches.some(pattern => route().current(pattern));
 }
 
-// Desktop link classes
-const desktopActiveClass = 'inline-flex items-center px-1 pt-1 border-b-2 border-primary text-sm font-medium leading-5 text-body focus:outline-none focus:border-primary transition duration-150 ease-in-out';
-const desktopInactiveClass = 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-muted hover:text-body hover:border-primary/50 focus:outline-none focus:text-body focus:border-primary/50 transition duration-150 ease-in-out';
+// Desktop link classes - h-full + -mb-px aligns the border exactly with nav's bottom border
+const desktopActiveClass = 'inline-flex items-center h-full px-1 -mb-px border-b-2 border-primary text-sm font-medium leading-5 text-body focus:outline-none focus:border-primary transition duration-150 ease-in-out';
+const desktopInactiveClass = 'inline-flex items-center h-full px-1 -mb-px border-b-2 border-transparent text-sm font-medium leading-5 text-muted hover:text-body hover:border-primary/50 focus:outline-none focus:text-body focus:border-primary/50 transition duration-150 ease-in-out';
 
 // Mobile link classes
 const mobileActiveClass = 'block w-full ps-3 pe-4 py-2 border-l-4 border-primary text-start text-base font-medium text-body bg-surface-overlay focus:outline-none focus:text-body focus:bg-surface-overlay focus:border-primary transition duration-150 ease-in-out';

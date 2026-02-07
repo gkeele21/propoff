@@ -19,10 +19,11 @@
                 v-for="(option, index) in normalizedOptions"
                 :key="index"
                 :for="`${inputName}-${index}`"
-                class="flex items-center justify-between p-4 border-2 rounded-lg transition-all focus-within-glow"
+                class="flex items-center justify-between p-4 border-2 rounded-lg transition-all"
                 :class="[
                     getOptionClasses(option),
-                    disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
+                    disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer',
+                    getFocusGlowClass(option)
                 ]"
             >
                 <!-- Hidden Radio Input for Keyboard Navigation -->
@@ -111,7 +112,7 @@ import Icon from '@/Components/Base/Icon.vue';
 const props = defineProps({
     modelValue: { type: [String, Number], default: '' },
     question: { type: String, default: '' },
-    options: { type: Array, required: true },
+    options: { type: Array, default: null },
     points: { type: Number, default: 0 },
     questionNumber: { type: Number, default: null },
     correctAnswer: { type: [String, Number], default: null },
@@ -123,6 +124,8 @@ const props = defineProps({
     name: { type: String, default: '' },
     selectionColor: { type: String, default: 'primary' }, // 'primary' or 'info'
     showResultIcons: { type: Boolean, default: true }, // Show check/x/arrow icons in results mode
+    selectionBg: { type: Boolean, default: true }, // Show background tint on selection
+    showFocusGlow: { type: Boolean, default: true }, // Show focus-within glow on click/tab
 });
 
 defineEmits(['update:modelValue']);
@@ -136,6 +139,7 @@ const inputName = computed(() => {
 
 // Normalize options to always have { label, value, points } format
 const normalizedOptions = computed(() => {
+    if (!props.options) return [];
     return props.options.map((option, index) => {
         if (typeof option === 'string') {
             return { label: option, value: option, points: 0 };
@@ -160,25 +164,31 @@ function isCorrect(option) {
     return props.correctAnswer !== null && option.value === props.correctAnswer;
 }
 
+function getFocusGlowClass(option) {
+    if (!props.showFocusGlow) return '';
+    // When showing results and this is the correct answer, use primary (green) glow
+    if (props.showResults && isCorrect(option)) {
+        return 'focus-within-glow';
+    }
+    // Otherwise use selection color's glow
+    return props.selectionColor === 'info' ? 'focus-within-glow-info' : 'focus-within-glow';
+}
+
 function getOptionClasses(option) {
+    const bg = props.selectionBg;
+    const glow = props.selectionColor === 'info' ? 'checked-glow-info' : 'checked-glow';
+
     // Results mode styling
     if (props.showResults) {
-        // Selection takes precedence (for pending selections)
-        if (isSelected(option) && !isCorrect(option)) {
+        // Selection ALWAYS takes precedence - use selection color (blue when info)
+        if (isSelected(option)) {
             return props.selectionColor === 'info'
-                ? 'border-info bg-info/10 checked-glow'
-                : 'border-primary bg-primary/10 checked-glow';
+                ? `border-info ${bg ? 'bg-info/10' : 'bg-surface-inset'} ${glow}`
+                : `border-primary ${bg ? 'bg-primary/10' : 'bg-surface-inset'} ${glow}`;
         }
-        if (isCorrect(option) && isSelected(option)) {
-            return 'border-success bg-success/10 checked-glow';
-        }
-        if (isCorrect(option) && !isSelected(option)) {
-            return 'border-success bg-success/10';
-        }
-        if (!isCorrect(option) && isSelected(option)) {
-            return props.selectionColor === 'info'
-                ? 'border-info bg-info/10 checked-glow'
-                : 'border-danger bg-danger/10 checked-glow';
+        // Correct answer (not selected) - green outline, no glow
+        if (isCorrect(option)) {
+            return `border-success ${bg ? 'bg-success/10' : 'bg-surface-inset'}`;
         }
         return 'border-border bg-surface-inset hover:border-border-strong hover:bg-surface-overlay';
     }
@@ -186,8 +196,8 @@ function getOptionClasses(option) {
     // Normal mode styling
     if (isSelected(option)) {
         return props.selectionColor === 'info'
-            ? 'border-info bg-info/10 checked-glow'
-            : 'border-primary bg-primary/10 checked-glow';
+            ? `border-info ${bg ? 'bg-info/10' : 'bg-surface-inset'} ${glow}`
+            : `border-primary ${bg ? 'bg-primary/10' : 'bg-surface-inset'} checked-glow`;
     }
     return 'border-border bg-surface-inset hover:border-border-strong hover:bg-surface-overlay';
 }

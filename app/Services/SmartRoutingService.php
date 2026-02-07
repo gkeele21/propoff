@@ -20,7 +20,8 @@ class SmartRoutingService
         $count = $activeGroups->count();
 
         if ($count === 0) {
-            return route('home');
+            // No active groups - go to join page
+            return route('groups.index');
         }
 
         if ($count === 1) {

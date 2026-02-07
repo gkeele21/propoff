@@ -4,7 +4,6 @@ import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import Button from '@/Components/Base/Button.vue';
 import TextField from '@/Components/Form/TextField.vue';
-import Card from '@/Components/Base/Card.vue';
 import Icon from '@/Components/Base/Icon.vue';
 
 const props = defineProps({
@@ -13,17 +12,24 @@ const props = defineProps({
         type: String,
         default: 'name',
     },
-    existingNames: {
-        type: Array,
-        default: () => [],
-    },
     verifyEntry: Object,
 });
 
 const page = usePage();
 
+// Track if user rejected a verification (to show hint)
+const showNameTakenHint = ref(false);
+const rejectedName = ref('');
+
+// Local override for step (when user clicks "No, choose different name")
+const localStep = ref(null);
+
 // Get flash data for step navigation
 const currentStep = computed(() => {
+    // Local override takes priority
+    if (localStep.value) {
+        return localStep.value;
+    }
     if (page.props.flash?.step) {
         return page.props.flash.step;
     }
@@ -31,50 +37,43 @@ const currentStep = computed(() => {
 });
 
 const flashVerifyEntry = computed(() => page.props.flash?.verifyEntry || props.verifyEntry);
-const flashExistingName = computed(() => page.props.flash?.existingName);
 
 // Form for name step
 const nameForm = useForm({
     name: '',
 });
 
-// Form for initial step
-const initialForm = useForm({
-    name: '',
-    last_initial: '',
-});
-
 // Form for verify step
 const verifyForm = useForm({
     name: '',
-    last_initial: '',
     verified: false,
 });
 
 // Submit name
 const submitName = () => {
+    // Clear the hint when submitting a new name
+    if (nameForm.name !== rejectedName.value) {
+        showNameTakenHint.value = false;
+    }
+    // Clear local step override when submitting
+    localStep.value = null;
     nameForm.post(route('play.join.process', { code: props.group.code }));
-};
-
-// Submit with initial
-const submitInitial = () => {
-    initialForm.name = nameForm.name || flashExistingName.value?.split(' ')[0] || '';
-    initialForm.post(route('play.join.process', { code: props.group.code }));
 };
 
 // Verify and continue as existing user
 const verifyAndContinue = () => {
-    verifyForm.name = flashVerifyEntry.value?.name?.split(' ')[0] || '';
-    verifyForm.last_initial = flashVerifyEntry.value?.name?.split(' ')[1]?.charAt(0) || '';
+    verifyForm.name = flashVerifyEntry.value?.name || '';
     verifyForm.verified = true;
     verifyForm.post(route('play.join.process', { code: props.group.code }));
 };
 
-// Create new user (reject verification)
-const createNew = () => {
-    // Go back to initial step to choose different initial
-    nameForm.name = flashVerifyEntry.value?.name?.split(' ')[0] || '';
-    nameForm.post(route('play.join.process', { code: props.group.code }));
+// Reject verification - go back to name input with hint
+const chooseNewName = () => {
+    rejectedName.value = flashVerifyEntry.value?.name || '';
+    showNameTakenHint.value = true;
+    nameForm.name = '';
+    // Use local override to go back to name step
+    localStep.value = 'name';
 };
 
 // Format date helper
@@ -89,20 +88,27 @@ const formatDate = (dateString) => {
 </script>
 
 <template>
-    <Head :title="`Join ${group.name}`" />
+    <Head :title="`Enter ${group.name}`" />
 
     <GuestLayout>
         <div class="max-w-md mx-auto">
             <!-- Step 1: Name Input -->
             <div v-if="currentStep === 'name'" class="bg-surface border border-border rounded-2xl p-8">
-                <h1 class="text-2xl font-bold text-body mb-2">Join {{ group.name }}</h1>
-                <p class="text-muted mb-6">Enter your name to join the game</p>
+                <h1 class="text-2xl font-bold text-body mb-2">Enter {{ group.name }}</h1>
+                <p class="text-muted mb-6">Enter your name to continue</p>
+
+                <!-- Hint when name was taken -->
+                <div v-if="showNameTakenHint" class="mb-4 p-3 bg-warning/10 border border-warning/30 rounded-lg">
+                    <p class="text-sm text-warning">
+                        "{{ rejectedName }}" is already taken. Please choose a different name or add your last initial (e.g., "{{ rejectedName.split(' ')[0] }} T.").
+                    </p>
+                </div>
 
                 <form @submit.prevent="submitName">
                     <TextField
                         v-model="nameForm.name"
                         label="What's your name?"
-                        placeholder="Enter your first name"
+                        placeholder="Enter your name"
                         :error="nameForm.errors.name"
                         autofocus
                     />
@@ -125,44 +131,7 @@ const formatDate = (dateString) => {
                 </div>
             </div>
 
-            <!-- Step 2: Last Initial -->
-            <div v-else-if="currentStep === 'initial'" class="bg-surface border border-border rounded-2xl p-8">
-                <h1 class="text-2xl font-bold text-body mb-2">One more thing...</h1>
-                <p class="text-muted mb-6">
-                    There's already a "{{ flashExistingName?.split(' ')[0] || nameForm.name }}" in this group.
-                    What's your last initial?
-                </p>
-
-                <form @submit.prevent="submitInitial">
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-body mb-2">Last initial</label>
-                        <input
-                            v-model="initialForm.last_initial"
-                            type="text"
-                            maxlength="1"
-                            class="w-20 h-14 text-center text-2xl font-bold bg-surface-inset border border-border rounded-lg text-body focus:border-primary focus:ring-primary uppercase"
-                            autofocus
-                        />
-                        <p class="text-sm text-muted mt-2">
-                            You'll appear as "{{ flashExistingName?.split(' ')[0] || nameForm.name }} {{ initialForm.last_initial?.toUpperCase() || '?' }}."
-                        </p>
-                    </div>
-
-                    <Button
-                        type="submit"
-                        variant="primary"
-                        size="lg"
-                        class="w-full"
-                        :loading="initialForm.processing"
-                        :disabled="!initialForm.last_initial"
-                    >
-                        Continue
-                        <Icon name="arrow-right" class="ml-2" size="sm" />
-                    </Button>
-                </form>
-            </div>
-
-            <!-- Step 3: Verify -->
+            <!-- Step 2: Verify -->
             <div v-else-if="currentStep === 'verify'" class="bg-surface border border-border rounded-2xl p-8">
                 <h1 class="text-2xl font-bold text-body mb-2">Is this you?</h1>
                 <p class="text-muted mb-6">
@@ -188,9 +157,9 @@ const formatDate = (dateString) => {
                     <Button
                         variant="outline"
                         class="flex-1"
-                        @click="createNew"
+                        @click="chooseNewName"
                     >
-                        No, create new
+                        No, choose different name
                     </Button>
                 </div>
             </div>

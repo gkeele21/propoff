@@ -60,14 +60,34 @@
                                         {{ template.category }}
                                     </span>
                                 </div>
-                                <Badge
-                                    :variant="template.question_type === 'multiple_choice' ? 'info-soft' :
-                                              template.question_type === 'yes_no' ? 'success-soft' :
-                                              template.question_type === 'numeric' ? 'warning-soft' : 'default'"
-                                    size="sm"
-                                >
-                                    {{ template.question_type?.replace('_', ' ') }}
-                                </Badge>
+                                <div class="flex items-center gap-2">
+                                    <Badge
+                                        :variant="template.question_type === 'multiple_choice' ? 'info-soft' :
+                                                  template.question_type === 'yes_no' ? 'success-soft' :
+                                                  template.question_type === 'numeric' ? 'warning-soft' : 'default'"
+                                        size="sm"
+                                    >
+                                        {{ template.question_type?.replace('_', ' ') }}
+                                    </Badge>
+                                    <div @click.prevent.stop>
+                                        <Dropdown align="right" width="48">
+                                            <template #trigger>
+                                                <button class="p-1 text-warning hover:text-warning/80 transition-colors">
+                                                    <Icon name="ellipsis-vertical" />
+                                                </button>
+                                            </template>
+                                            <template #content>
+                                                <button
+                                                    @click="duplicateTemplate(template.id)"
+                                                    class="w-full px-4 py-2 text-left text-sm text-body hover:bg-surface-overlay flex items-center gap-2"
+                                                >
+                                                    <Icon name="copy" size="sm" class="text-warning" />
+                                                    Duplicate
+                                                </button>
+                                            </template>
+                                        </Dropdown>
+                                    </div>
+                                </div>
                             </div>
 
                             <p class="text-sm text-muted mb-4 line-clamp-2">{{ template.question_text }}</p>
@@ -101,11 +121,6 @@
                                 </div>
                             </div>
 
-                            <div class="flex items-center justify-end pt-4 border-t border-border">
-                                <button @click.prevent="duplicateTemplate(template.id)" class="text-warning hover:text-warning/80 text-sm font-medium">
-                                    Duplicate
-                                </button>
-                            </div>
                         </div>
                     </Link>
                 </div>
@@ -140,6 +155,7 @@ import Badge from '@/Components/Base/Badge.vue';
 import Icon from '@/Components/Base/Icon.vue';
 import TextField from '@/Components/Form/TextField.vue';
 import Select from '@/Components/Form/Select.vue';
+import Dropdown from '@/Components/Form/Dropdown.vue';
 import Pagination from '@/Components/Base/Pagination.vue';
 import { ref, computed, watch } from 'vue';
 import { debounce } from 'lodash';

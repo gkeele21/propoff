@@ -133,8 +133,8 @@
                                             <span class="font-semibold">{{ entry.total_score }}</span> / {{ entry.possible_points }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <Badge :variant="entry.is_complete ? 'success-soft' : 'warning-soft'" size="sm">
-                                                {{ entry.is_complete ? 'Complete' : 'In Progress' }}
+                                            <Badge :variant="entry.answered_count > 0 ? 'success-soft' : 'warning-soft'" size="sm">
+                                                {{ entry.answered_count > 0 ? `${entry.answered_count} answers` : 'No answers' }}
                                             </Badge>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">

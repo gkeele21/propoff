@@ -12,6 +12,7 @@ import QuestionModal from '@/Components/Domain/QuestionModal.vue';
 import Confirm from '@/Components/Feedback/Confirm.vue';
 import Toast from '@/Components/Feedback/Toast.vue';
 import StatTile from '@/Components/Base/StatTile.vue';
+import Checkbox from '@/Components/Form/Checkbox.vue';
 
 const props = defineProps({
     group: Object,
@@ -27,6 +28,7 @@ const props = defineProps({
 
 // State for answer selection and toast
 const selectedAnswers = ref({});
+const syncToAdmin = ref({}); // Track sync checkbox per question
 const toastMessage = ref('');
 const showToast = ref(false);
 const draggedQuestion = ref(null);
@@ -91,8 +93,12 @@ const formatDate = (dateString) => {
 };
 
 // Answer selection handlers
-const selectAnswer = (questionId, answerValue) => {
+const selectAnswer = (questionId, answerValue, question) => {
     selectedAnswers.value[questionId] = answerValue;
+    // Initialize sync checkbox - default checked if question has event_question_id
+    if (syncToAdmin.value[questionId] === undefined) {
+        syncToAdmin.value[questionId] = !!question.event_question_id;
+    }
 };
 
 const hasSelectedAnswer = (questionId) => {
@@ -103,13 +109,21 @@ const saveAnswer = (question) => {
     const answer = selectedAnswers.value[question.id];
     if (!answer) return;
 
+    const willSync = syncToAdmin.value[question.id] ?? false;
+
     router.post(
         route('groups.grading.setAnswer', [props.group.id, question.id]),
-        { correct_answer: answer },
+        {
+            correct_answer: answer,
+            sync_to_admin: willSync,
+        },
         {
             onSuccess: () => {
                 delete selectedAnswers.value[question.id];
-                showToastMessage('Answer saved and scores calculated');
+                delete syncToAdmin.value[question.id];
+                showToastMessage(
+                    willSync ? 'Answer saved for group and admin' : 'Answer saved and scores calculated'
+                );
             },
             onError: () => {
                 showToastMessage('Error saving answer');
@@ -282,9 +296,18 @@ const getTypeBadgeVariant = (type) => {
                 ]"
             >
                 <template #actions>
+                    <Link :href="route('play.game', { code: group.code })">
+                        <Button variant="accent" size="sm" icon="chart-bar">
+                            View Results
+                        </Button>
+                    </Link>
+                    <Link :href="route('play.leaderboard', { code: group.code })">
+                        <Button variant="primary" size="sm" icon="trophy">
+                            Leaderboard
+                        </Button>
+                    </Link>
                     <Link :href="route('groups.members.index', group.id)">
-                        <Button variant="secondary" size="sm">
-                            <Icon name="users" class="mr-2" size="sm" />
+                        <Button variant="secondary" size="sm" icon="users">
                             Members
                         </Button>
                     </Link>
@@ -391,7 +414,7 @@ const getTypeBadgeVariant = (type) => {
                             <div class="mb-4">
                                 <QuestionCard
                                     :model-value="selectedAnswers[question.id]"
-                                    @update:model-value="selectAnswer(question.id, $event)"
+                                    @update:model-value="selectAnswer(question.id, $event, question)"
                                     :question="question.question_text"
                                     :options="question.options"
                                     :points="question.points"
@@ -399,12 +422,24 @@ const getTypeBadgeVariant = (type) => {
                                     :show-results="!!question.correct_answer"
                                     :show-header="false"
                                     :disabled="group.grading_source !== 'captain'"
+                                    selection-color="info"
+                                    :selection-bg="false"
+                                    :show-focus-glow="false"
+                                    :show-result-icons="false"
                                 />
                             </div>
 
-                                <!-- Save Answer Button (captain-graded only) -->
-                                <div v-if="group.grading_source === 'captain' && hasSelectedAnswer(question.id)" class="flex justify-end">
-                                    <Button variant="primary" @click="saveAnswer(question)">
+                                <!-- Save Answer Section (captain-graded only) -->
+                                <div v-if="group.grading_source === 'captain' && hasSelectedAnswer(question.id)" class="flex items-center justify-between gap-4">
+                                    <!-- Sync to Admin Checkbox (only for event-linked questions) -->
+                                    <div v-if="question.event_question_id">
+                                        <Checkbox
+                                            v-model="syncToAdmin[question.id]"
+                                            label="Also set for admin grading"
+                                        />
+                                    </div>
+                                    <div v-else></div>
+                                    <Button variant="secondary" @click="saveAnswer(question)">
                                         Save Answer
                                     </Button>
                                 </div>
