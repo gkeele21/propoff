@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Captain;
 
 use App\Http\Controllers\Controller;
 use App\Models\Group;
+use App\Models\Leaderboard;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -108,6 +109,11 @@ class MemberController extends Controller
 
         // Delete any entries this user has in this group
         $entriesDeleted = $group->entries()->where('user_id', $user->id)->delete();
+
+        // Delete leaderboard entry
+        Leaderboard::where('group_id', $group->id)
+            ->where('user_id', $user->id)
+            ->delete();
 
         // Remove from group
         $group->members()->detach($user->id);
