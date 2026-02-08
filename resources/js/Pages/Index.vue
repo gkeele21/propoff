@@ -61,7 +61,7 @@ const joinGroup = () => {
                         :href="route('guest.forget')"
                         method="post"
                         as="button"
-                        class="text-sm text-muted hover:text-body transition-colors hidden sm:inline"
+                        class="text-sm text-muted hover:text-body transition-colors"
                     >
                         Not you?
                     </Link>
