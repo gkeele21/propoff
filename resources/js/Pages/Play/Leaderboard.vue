@@ -55,6 +55,7 @@ const breadcrumbs = computed(() => [
                     <div class="flex items-center py-3 px-4 sm:px-5 bg-surface-header border-b border-border text-xs font-medium text-subtle uppercase tracking-wider">
                         <div class="w-12 sm:w-14">Rank</div>
                         <div class="flex-1 min-w-0">Player</div>
+                        <div v-if="!group.is_locked" class="w-16 sm:w-20 text-right">Answers</div>
                         <div class="w-16 sm:w-24 text-right">Points</div>
                         <div class="hidden sm:block w-24 text-right">Max</div>
                     </div>
@@ -74,6 +75,7 @@ const breadcrumbs = computed(() => [
                                 {{ entry.user?.name }}
                                 <Badge v-if="entry.user_id === userRow?.user_id" variant="primary-soft" size="sm" class="ml-1 sm:ml-2">You</Badge>
                             </div>
+                            <div v-if="!group.is_locked" class="w-16 sm:w-20 text-right text-muted">{{ entry.answered_count }}</div>
                             <div class="w-16 sm:w-24 text-right font-semibold text-body">{{ entry.total_score }}</div>
                             <div class="hidden sm:block w-24 text-right text-muted">{{ entry.possible_points }}</div>
                         </div>

@@ -751,30 +751,45 @@ class PlayController extends Controller
     /**
      * Recalculate ranks for all users in a group.
      * Handles ties: entries with the same score get the same rank.
+     * Members who haven't answered any questions are all tied for 1st place.
      */
     protected function recalculateRanks(int $eventId, int $groupId): void
     {
-        $leaderboards = Leaderboard::where('event_id', $eventId)
+        // Get members who have answered at least one question, ordered by score
+        $activeLeaderboards = Leaderboard::where('event_id', $eventId)
             ->where('group_id', $groupId)
+            ->where('answered_count', '>', 0)
             ->orderBy('total_score', 'desc')
             ->orderBy('percentage', 'desc')
             ->orderBy('answered_count', 'desc')
             ->get();
 
+        // Get members who haven't answered any questions (all tied for 1st)
+        $inactiveLeaderboards = Leaderboard::where('event_id', $eventId)
+            ->where('group_id', $groupId)
+            ->where('answered_count', 0)
+            ->get();
+
+        // All inactive members get rank 1
+        foreach ($inactiveLeaderboards as $leaderboard) {
+            $leaderboard->update(['rank' => 1]);
+        }
+
+        // Active members get ranked starting after the inactive members
         $currentRank = 1;
         $previousScore = null;
         $previousPercentage = null;
         $previousAnsweredCount = null;
 
-        foreach ($leaderboards as $index => $leaderboard) {
+        foreach ($activeLeaderboards as $index => $leaderboard) {
             // Check if this entry ties with the previous one
             if ($previousScore === $leaderboard->total_score
                 && $previousPercentage === $leaderboard->percentage
                 && $previousAnsweredCount === $leaderboard->answered_count) {
                 // Same rank as previous (tie)
             } else {
-                // New rank = position in list (1-indexed)
-                $currentRank = $index + 1;
+                // Rank = position among active members + count of inactive members
+                $currentRank = $index + 1 + $inactiveLeaderboards->count();
             }
 
             $leaderboard->update(['rank' => $currentRank]);
