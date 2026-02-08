@@ -73,22 +73,16 @@ class GradingController extends Controller
                 ]
             );
 
-            // Recalculate scores for all groups using admin grading
+            // Recalculate scores for all groups using admin grading (batch)
             $adminGroups = $group->event->groups()->where('grading_source', 'admin')->get();
             foreach ($adminGroups as $adminGroup) {
-                $adminEntries = $adminGroup->entries()->get();
-                foreach ($adminEntries as $entry) {
-                    $this->entryService->calculateScore($entry);
-                }
+                $this->entryService->batchGradeGroup($adminGroup);
                 $this->leaderboardService->updateLeaderboard($group->event, $adminGroup);
             }
         }
 
-        // Recalculate scores for all entries in this group
-        $entries = $group->entries()->get();
-        foreach ($entries as $entry) {
-            $this->entryService->calculateScore($entry);
-        }
+        // Batch recalculate scores for all entries in this group
+        $this->entryService->batchGradeGroup($group);
 
         // Update leaderboard
         $this->leaderboardService->updateLeaderboard($group->event, $group);
@@ -126,11 +120,8 @@ class GradingController extends Controller
 
         $answer->update(['is_void' => !$answer->is_void]);
 
-        // Recalculate scores
-        $entries = $group->entries()->get();
-        foreach ($entries as $entry) {
-            $this->entryService->calculateScore($entry);
-        }
+        // Batch recalculate scores
+        $this->entryService->batchGradeGroup($group);
 
         // Update leaderboard
         $this->leaderboardService->updateLeaderboard($group->event, $group);

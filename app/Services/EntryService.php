@@ -386,4 +386,104 @@ class EntryService
 
         return $possiblePoints;
     }
+
+    /**
+     * Batch grade all entries for a group efficiently.
+     * Pre-fetches all data to avoid N+1 queries.
+     */
+    public function batchGradeGroup(Group $group): void
+    {
+        // Pre-fetch all group questions
+        $groupQuestions = $group->groupQuestions()
+            ->where('is_active', true)
+            ->get()
+            ->keyBy('id');
+
+        // Pre-fetch all correct answers for this group (captain grading)
+        $groupAnswers = [];
+        if ($group->grading_source === 'captain') {
+            $groupAnswers = GroupQuestionAnswer::where('group_id', $group->id)
+                ->get()
+                ->keyBy('group_question_id');
+        } else {
+            // Admin grading - pre-fetch event answers
+            $eventQuestionIds = $groupQuestions->pluck('event_question_id')->filter()->toArray();
+            if (!empty($eventQuestionIds)) {
+                $eventAnswers = EventAnswer::where('event_id', $group->event_id)
+                    ->whereIn('event_question_id', $eventQuestionIds)
+                    ->get()
+                    ->keyBy('event_question_id');
+
+                // Map to group question IDs
+                foreach ($groupQuestions as $gq) {
+                    if ($gq->event_question_id && isset($eventAnswers[$gq->event_question_id])) {
+                        $groupAnswers[$gq->id] = $eventAnswers[$gq->event_question_id];
+                    }
+                }
+            }
+        }
+
+        // Get all entries with their user answers
+        $entries = $group->entries()
+            ->with(['userAnswers'])
+            ->get();
+
+        // Process each entry
+        foreach ($entries as $entry) {
+            $totalScore = 0;
+            $possiblePoints = 0;
+            $userAnswerUpdates = [];
+
+            foreach ($entry->userAnswers as $userAnswer) {
+                $groupQuestion = $groupQuestions->get($userAnswer->group_question_id);
+                if (!$groupQuestion) {
+                    continue;
+                }
+
+                // Get correct answer from pre-fetched data
+                $answer = $groupAnswers[$userAnswer->group_question_id] ?? null;
+                $correctAnswer = $answer?->correct_answer ?? null;
+                $isVoid = $answer?->is_void ?? false;
+                $pointsAwarded = $answer?->points_awarded ?? null;
+
+                // Skip if voided
+                if ($isVoid) {
+                    $userAnswerUpdates[$userAnswer->id] = ['points_earned' => 0, 'is_correct' => false];
+                    continue;
+                }
+
+                // Skip if no answer set yet
+                if (!$correctAnswer) {
+                    $userAnswerUpdates[$userAnswer->id] = ['points_earned' => 0, 'is_correct' => false];
+                    $possiblePoints += $this->calculatePointsForAnswer($groupQuestion, $userAnswer->answer_text);
+                    continue;
+                }
+
+                // Check if correct
+                $isCorrect = $this->compareAnswers($userAnswer->answer_text, $correctAnswer, $groupQuestion->question_type);
+
+                if ($isCorrect) {
+                    $pointsEarned = $pointsAwarded ?? $this->calculatePointsForAnswer($groupQuestion, $userAnswer->answer_text);
+                    $totalScore += $pointsEarned;
+                    $possiblePoints += $pointsEarned;
+                    $userAnswerUpdates[$userAnswer->id] = ['points_earned' => $pointsEarned, 'is_correct' => true];
+                } else {
+                    $userAnswerUpdates[$userAnswer->id] = ['points_earned' => 0, 'is_correct' => false];
+                }
+            }
+
+            // Batch update user answers
+            foreach ($userAnswerUpdates as $answerId => $data) {
+                UserAnswer::where('id', $answerId)->update($data);
+            }
+
+            // Update entry totals
+            $percentage = $possiblePoints > 0 ? round(($totalScore / $possiblePoints) * 100, 2) : 0;
+            $entry->update([
+                'total_score' => $totalScore,
+                'possible_points' => $possiblePoints,
+                'percentage' => $percentage,
+            ]);
+        }
+    }
 }

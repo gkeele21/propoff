@@ -186,12 +186,14 @@ class GradingController extends Controller
      */
     public function calculateScores(Event $event)
     {
-        $entries = $event->entries()->get();
+        // Batch grade by group for efficiency
+        $groups = $event->groups()->get();
         $gradedCount = 0;
 
-        foreach ($entries as $entry) {
-            $this->entryService->gradeEntry($entry);
-            $gradedCount++;
+        foreach ($groups as $group) {
+            $entryCount = $group->entries()->count();
+            $this->entryService->batchGradeGroup($group);
+            $gradedCount += $entryCount;
         }
 
         // Update leaderboards
