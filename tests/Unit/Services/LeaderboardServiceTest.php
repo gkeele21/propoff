@@ -253,7 +253,7 @@ class LeaderboardServiceTest extends TestCase
     }
 
     /** @test */
-    public function it_breaks_ties_by_answered_count_when_percentage_and_score_equal()
+    public function it_ties_users_with_same_score_regardless_of_answered_count()
     {
         $event = Event::factory()->create();
         $group = Group::factory()->create(['event_id' => $event->id]);
@@ -261,7 +261,7 @@ class LeaderboardServiceTest extends TestCase
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
 
-        // Same percentage and total score but different answered_count
+        // Same total score but different answered_count - should still tie
         Leaderboard::create([
             'event_id' => $event->id,
             'group_id' => $group->id,
@@ -286,9 +286,9 @@ class LeaderboardServiceTest extends TestCase
 
         $this->leaderboardService->updateRanks($event->id, $group->id);
 
-        // User1 should rank higher (answered more questions)
+        // Both should be tied for rank 1 (same total score)
         $this->assertEquals(1, Leaderboard::where('user_id', $user1->id)->first()->rank);
-        $this->assertEquals(2, Leaderboard::where('user_id', $user2->id)->first()->rank);
+        $this->assertEquals(1, Leaderboard::where('user_id', $user2->id)->first()->rank);
     }
 
     /** @test */

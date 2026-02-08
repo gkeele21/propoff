@@ -33,6 +33,7 @@ class LeaderboardService
 
     /**
      * Update ranks for a specific event and group leaderboard.
+     * Rank is based ONLY on total points.
      */
     public function updateRanks(int $eventId, ?int $groupId = null): void
     {
@@ -43,22 +44,15 @@ class LeaderboardService
             $query->whereNull('group_id');
         }
 
-        // Order by total_score DESC, then percentage DESC, then answered_count DESC
-        $entries = $query->orderByDesc('total_score')
-            ->orderByDesc('percentage')
-            ->orderByDesc('answered_count')
-            ->get();
+        // Order by total_score DESC only
+        $entries = $query->orderByDesc('total_score')->get();
 
         $currentRank = 1;
         $previousScore = null;
-        $previousPercentage = null;
-        $previousCount = null;
 
         foreach ($entries as $index => $entry) {
-            // Check if this entry ties with the previous one
-            if ($previousScore === $entry->total_score
-                && $previousPercentage === $entry->percentage
-                && $previousCount === $entry->answered_count) {
+            // Check if this entry ties with the previous one (same score = same rank)
+            if ($previousScore !== null && $previousScore === $entry->total_score) {
                 // Same rank as previous (tie)
             } else {
                 // New rank = position in list (1-indexed)
@@ -66,10 +60,7 @@ class LeaderboardService
             }
 
             $entry->update(['rank' => $currentRank]);
-
             $previousScore = $entry->total_score;
-            $previousPercentage = $entry->percentage;
-            $previousCount = $entry->answered_count;
         }
     }
 

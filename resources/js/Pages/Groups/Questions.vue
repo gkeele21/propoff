@@ -30,6 +30,7 @@ const props = defineProps({
 // State for answer selection and toast
 const selectedAnswers = ref({});
 const syncToAdmin = ref({}); // Track sync checkbox per question
+const savingQuestionId = ref(null); // Track which question is being saved
 const toastMessage = ref('');
 const showToast = ref(false);
 const draggedQuestion = ref(null);
@@ -108,8 +109,9 @@ const hasSelectedAnswer = (questionId) => {
 
 const saveAnswer = (question) => {
     const answer = selectedAnswers.value[question.id];
-    if (!answer) return;
+    if (!answer || savingQuestionId.value === question.id) return;
 
+    savingQuestionId.value = question.id;
     const willSync = syncToAdmin.value[question.id] ?? false;
 
     router.post(
@@ -128,6 +130,9 @@ const saveAnswer = (question) => {
             },
             onError: () => {
                 showToastMessage('Error saving answer');
+            },
+            onFinish: () => {
+                savingQuestionId.value = null;
             },
         }
     );
@@ -415,7 +420,7 @@ const showToastMessage = (message) => {
                             </QuestionCard>
 
                             <!-- Save Answer Section (captain-graded only, requires locked group) -->
-                            <div v-if="group.grading_source === 'captain' && group.is_locked && hasSelectedAnswer(question.id)" class="flex items-center justify-between gap-4 mt-4">
+                            <div v-if="group.grading_source === 'captain' && group.is_locked && hasSelectedAnswer(question.id) && savingQuestionId !== question.id" class="flex items-center justify-between gap-4 mt-4">
                                     <!-- Sync to Admin Checkbox (only for managers with event-linked questions) -->
                                     <div v-if="isManager && question.event_question_id">
                                         <Checkbox

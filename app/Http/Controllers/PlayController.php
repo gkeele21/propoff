@@ -734,16 +734,10 @@ class PlayController extends Controller
     {
         $answeredCount = $entry->userAnswers()->count();
 
-        // Calculate rank
+        // Calculate rank based only on total points
         $rank = Leaderboard::where('event_id', $entry->event_id)
             ->where('group_id', $entry->group_id)
-            ->where(function ($query) use ($entry) {
-                $query->where('total_score', '>', $entry->total_score)
-                    ->orWhere(function ($q) use ($entry) {
-                        $q->where('total_score', '=', $entry->total_score)
-                            ->where('percentage', '>', $entry->percentage);
-                    });
-            })
+            ->where('total_score', '>', $entry->total_score)
             ->count() + 1;
 
         Leaderboard::updateOrCreate(
@@ -767,53 +761,31 @@ class PlayController extends Controller
 
     /**
      * Recalculate ranks for all users in a group.
-     * Handles ties: entries with the same score get the same rank.
-     * Members who haven't answered any questions are all tied for 1st place.
+     * Handles ties: entries with the same total_score get the same rank.
+     * Rank is based ONLY on total points.
      */
     protected function recalculateRanks(int $eventId, int $groupId): void
     {
-        // Get members who have answered at least one question, ordered by score
-        $activeLeaderboards = Leaderboard::where('event_id', $eventId)
+        // Get all leaderboard entries ordered by total score only
+        $leaderboards = Leaderboard::where('event_id', $eventId)
             ->where('group_id', $groupId)
-            ->where('answered_count', '>', 0)
             ->orderBy('total_score', 'desc')
-            ->orderBy('percentage', 'desc')
-            ->orderBy('answered_count', 'desc')
             ->get();
 
-        // Get members who haven't answered any questions (all tied for 1st)
-        $inactiveLeaderboards = Leaderboard::where('event_id', $eventId)
-            ->where('group_id', $groupId)
-            ->where('answered_count', 0)
-            ->get();
-
-        // All inactive members get rank 1
-        foreach ($inactiveLeaderboards as $leaderboard) {
-            $leaderboard->update(['rank' => 1]);
-        }
-
-        // Active members get ranked starting after the inactive members
         $currentRank = 1;
         $previousScore = null;
-        $previousPercentage = null;
-        $previousAnsweredCount = null;
 
-        foreach ($activeLeaderboards as $index => $leaderboard) {
-            // Check if this entry ties with the previous one
-            if ($previousScore === $leaderboard->total_score
-                && $previousPercentage === $leaderboard->percentage
-                && $previousAnsweredCount === $leaderboard->answered_count) {
+        foreach ($leaderboards as $index => $leaderboard) {
+            // Check if this entry ties with the previous one (same score = same rank)
+            if ($previousScore !== null && $previousScore === $leaderboard->total_score) {
                 // Same rank as previous (tie)
             } else {
-                // Rank = position among active members + count of inactive members
-                $currentRank = $index + 1 + $inactiveLeaderboards->count();
+                // New rank = position + 1
+                $currentRank = $index + 1;
             }
 
             $leaderboard->update(['rank' => $currentRank]);
-
             $previousScore = $leaderboard->total_score;
-            $previousPercentage = $leaderboard->percentage;
-            $previousAnsweredCount = $leaderboard->answered_count;
         }
     }
 }
