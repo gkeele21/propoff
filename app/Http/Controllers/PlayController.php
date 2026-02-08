@@ -275,6 +275,9 @@ class PlayController extends Controller
                 'possible_points' => $possiblePoints,
                 'percentage' => 0,
             ]);
+
+            // Create leaderboard entry immediately so new members appear on leaderboard
+            $this->updateLeaderboard($entry);
         }
 
         // Get leaderboard entry for rank (for results display)
@@ -747,6 +750,7 @@ class PlayController extends Controller
 
     /**
      * Recalculate ranks for all users in a group.
+     * Handles ties: entries with the same score get the same rank.
      */
     protected function recalculateRanks(int $eventId, int $groupId): void
     {
@@ -754,12 +758,30 @@ class PlayController extends Controller
             ->where('group_id', $groupId)
             ->orderBy('total_score', 'desc')
             ->orderBy('percentage', 'desc')
+            ->orderBy('answered_count', 'desc')
             ->get();
 
         $currentRank = 1;
-        foreach ($leaderboards as $leaderboard) {
+        $previousScore = null;
+        $previousPercentage = null;
+        $previousAnsweredCount = null;
+
+        foreach ($leaderboards as $index => $leaderboard) {
+            // Check if this entry ties with the previous one
+            if ($previousScore === $leaderboard->total_score
+                && $previousPercentage === $leaderboard->percentage
+                && $previousAnsweredCount === $leaderboard->answered_count) {
+                // Same rank as previous (tie)
+            } else {
+                // New rank = position in list (1-indexed)
+                $currentRank = $index + 1;
+            }
+
             $leaderboard->update(['rank' => $currentRank]);
-            $currentRank++;
+
+            $previousScore = $leaderboard->total_score;
+            $previousPercentage = $leaderboard->percentage;
+            $previousAnsweredCount = $leaderboard->answered_count;
         }
     }
 }

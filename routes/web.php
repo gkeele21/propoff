@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EventQuestionController;
-use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
@@ -108,9 +107,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // Leaderboard routes (group-specific only)
-    Route::get('/groups/{group}/leaderboard', [LeaderboardController::class, 'group'])->name('groups.leaderboard');
 
     // Group routes
     Route::resource('groups', GroupController::class)->except(['show']);

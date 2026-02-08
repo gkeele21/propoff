@@ -175,7 +175,7 @@ const toggleLock = () => {
                 />
                 <StatTile
                     :value="stats.graded_questions"
-                    label="Answered"
+                    label="Scored"
                     color="warning"
                     :href="isCaptain ? route('groups.questions', group.id) : null"
                 />
@@ -301,7 +301,7 @@ const toggleLock = () => {
                     <div class="flex justify-between items-center w-full">
                         <span class="font-semibold">Leaderboard</span>
                         <Link :href="route('play.leaderboard', { code: group.code })">
-                            <Button variant="ghost" size="sm">View Full</Button>
+                            <Button variant="ghost" size="sm">Full View</Button>
                         </Link>
                     </div>
                 </template>

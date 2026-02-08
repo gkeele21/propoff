@@ -43,35 +43,32 @@ class LeaderboardService
             $query->whereNull('group_id');
         }
 
-        // Order by percentage DESC, then total_score DESC, then answered_count DESC
-        $entries = $query->orderByDesc('percentage')
-            ->orderByDesc('total_score')
+        // Order by total_score DESC, then percentage DESC, then answered_count DESC
+        $entries = $query->orderByDesc('total_score')
+            ->orderByDesc('percentage')
             ->orderByDesc('answered_count')
             ->get();
 
-        $rank = 1;
-        $previousPercentage = null;
+        $currentRank = 1;
         $previousScore = null;
+        $previousPercentage = null;
         $previousCount = null;
-        $sameRankCount = 0;
 
         foreach ($entries as $index => $entry) {
-            // Check if this entry has the same score as previous (tie)
-            if ($previousPercentage === $entry->percentage
-                && $previousScore === $entry->total_score
+            // Check if this entry ties with the previous one
+            if ($previousScore === $entry->total_score
+                && $previousPercentage === $entry->percentage
                 && $previousCount === $entry->answered_count) {
-                // Same rank as previous
-                $sameRankCount++;
+                // Same rank as previous (tie)
             } else {
-                // Different rank
-                $rank = $index + 1;
-                $sameRankCount = 0;
+                // New rank = position in list (1-indexed)
+                $currentRank = $index + 1;
             }
 
-            $entry->update(['rank' => $rank]);
+            $entry->update(['rank' => $currentRank]);
 
-            $previousPercentage = $entry->percentage;
             $previousScore = $entry->total_score;
+            $previousPercentage = $entry->percentage;
             $previousCount = $entry->answered_count;
         }
     }

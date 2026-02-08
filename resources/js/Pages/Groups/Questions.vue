@@ -308,7 +308,7 @@ const showToastMessage = (message) => {
                 <!-- Stats Row (4 tiles) -->
                 <div class="grid grid-cols-3 gap-4 mb-6">
                     <StatTile :value="stats?.total_questions || 0" label="Questions" color="primary" />
-                    <StatTile :value="stats?.answered_questions || 0" label="Answered" color="warning" />
+                    <StatTile :value="stats?.answered_questions || 0" label="Scored" color="warning" />
                     <StatTile :value="stats?.total_points || 0" label="Max Possible" color="neutral" />
                 </div>
 

@@ -354,7 +354,7 @@ const submitCreateGroup = () => {
             <!-- Stats Row -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <StatTile :value="questions.length" label="Questions" color="primary" />
-                <StatTile :value="stats.graded_count || 0" label="Answered" color="warning" />
+                <StatTile :value="stats.graded_count || 0" label="Scored" color="warning" />
                 <StatTile :value="stats.total_points || 0" label="Max Possible" color="neutral" />
                 <StatTile :value="stats.total_entries || 0" label="Entries" color="info" />
             </div>

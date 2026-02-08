@@ -49,6 +49,10 @@ const answeredCount = computed(() => {
 
 const totalQuestions = computed(() => props.questions.length);
 
+const allQuestionsAnswered = computed(() => {
+    return answeredCount.value === totalQuestions.value && totalQuestions.value > 0;
+});
+
 const totalPoints = computed(() => {
     return props.questions.reduce((sum, q) => sum + (q.points || 0), 0);
 });
@@ -140,6 +144,51 @@ const showToastMessage = (message) => {
         showToast.value = false;
     }, 3000);
 };
+
+// Handle "Done" button - save answers and go to hub
+const finishAndGoToHub = () => {
+    if (saving.value) return;
+
+    // If there are unsaved answers, save first then navigate
+    const answers = Object.entries(selectedAnswers.value)
+        .filter(([_, value]) => value !== null && value !== '')
+        .map(([questionId, answerText]) => ({
+            group_question_id: parseInt(questionId),
+            answer_text: answerText,
+        }));
+
+    if (answers.length === 0) {
+        // No answers to save, just navigate
+        router.visit(route('play.hub', { code: props.group.code }));
+        return;
+    }
+
+    saving.value = true;
+
+    const routeParams = { code: props.group.code };
+    if (props.submittingFor) {
+        routeParams.for_user = props.submittingFor.id;
+    }
+
+    router.post(
+        route('play.save', routeParams),
+        { answers, for_user: props.submittingFor?.id },
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                // Navigate to hub after successful save
+                router.visit(route('play.hub', { code: props.group.code }));
+            },
+            onError: () => {
+                showToastMessage('Error saving answers. Please try again.');
+                saving.value = false;
+            },
+            onFinish: () => {
+                // Don't reset saving here - we're navigating away
+            },
+        }
+    );
+};
 </script>
 
 <template>
@@ -154,6 +203,16 @@ const showToastMessage = (message) => {
                     </span>
                 </template>
                 <template #actions>
+                    <Button
+                        v-if="allQuestionsAnswered && !group.is_locked"
+                        variant="secondary"
+                        icon="check"
+                        size="sm"
+                        :loading="saving"
+                        @click="finishAndGoToHub"
+                    >
+                        Done
+                    </Button>
                     <Link :href="route('play.leaderboard', { code: group.code })">
                         <Button variant="primary" icon="trophy" size="sm">
                             Leaderboard
