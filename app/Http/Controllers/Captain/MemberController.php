@@ -106,11 +106,8 @@ class MemberController extends Controller
             return back()->with('error', 'Cannot remove the last captain. Promote someone else first or delete the group.');
         }
 
-        // Check if user has entries
-        $hasEntries = $group->entries()->where('user_id', $user->id)->exists();
-        if ($hasEntries) {
-            return back()->with('error', 'Cannot remove member with existing entries.');
-        }
+        // Delete any entries this user has in this group
+        $entriesDeleted = $group->entries()->where('user_id', $user->id)->delete();
 
         // Remove from group
         $group->members()->detach($user->id);

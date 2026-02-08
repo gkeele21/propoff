@@ -10,6 +10,10 @@ import Modal from '@/Components/Base/Modal.vue';
 import Confirm from '@/Components/Feedback/Confirm.vue';
 import TextField from '@/Components/Form/TextField.vue';
 import Icon from '@/Components/Base/Icon.vue';
+import Toast from '@/Components/Feedback/Toast.vue';
+import { useFlashToast } from '@/composables/useFlashToast';
+
+const { showErrorToast, showSuccessToast, errorMessage, successMessage, showFlashMessages } = useFlashToast();
 
 const props = defineProps({
     group: {
@@ -30,16 +34,18 @@ const confirmDialog = ref({
     show: false,
     title: '',
     message: '',
+    messageHtml: '',
     variant: 'default',
     icon: '',
     action: null,
 });
 
-const showConfirmDialog = (title, message, action, variant = 'default', icon = '') => {
+const showConfirmDialog = (title, message, action, variant = 'default', icon = '', messageHtml = '') => {
     confirmDialog.value = {
         show: true,
         title,
-        message,
+        message: messageHtml ? '' : message,
+        messageHtml,
         variant,
         icon,
         action,
@@ -50,7 +56,6 @@ const handleConfirm = () => {
     if (confirmDialog.value.action) {
         confirmDialog.value.action();
     }
-    confirmDialog.value.show = false;
 };
 
 const promoteToCaptain = (member) => {
@@ -58,8 +63,12 @@ const promoteToCaptain = (member) => {
         'Promote to Captain?',
         `Are you sure you want to promote ${member.name} to captain?`,
         () => {
-            router.post(route('groups.members.promote', [props.group.id, member.id]), {}, {
+            router.post(route('groups.members.promote', { group: props.group.id, user: member.id }), {}, {
                 preserveScroll: true,
+                onSuccess: (page) => {
+                    confirmDialog.value.show = false;
+                    showFlashMessages(page.props);
+                },
             });
         },
         'info',
@@ -72,8 +81,12 @@ const demoteFromCaptain = (member) => {
         'Demote Captain?',
         `Are you sure you want to demote ${member.name} to a regular member?`,
         () => {
-            router.post(route('groups.members.demote', [props.group.id, member.id]), {}, {
+            router.post(route('groups.members.demote', { group: props.group.id, user: member.id }), {}, {
                 preserveScroll: true,
+                onSuccess: (page) => {
+                    confirmDialog.value.show = false;
+                    showFlashMessages(page.props);
+                },
             });
         },
         'warning',
@@ -82,16 +95,30 @@ const demoteFromCaptain = (member) => {
 };
 
 const removeMember = (member) => {
+    const hasAnswers = member.entries_count > 0;
+    const title = hasAnswers ? 'Remove Member & Delete Answers?' : 'Remove Member?';
+    const messageHtml = hasAnswers
+        ? `Are you sure you want to remove ${member.name} from the group?<br><br>They have answered <span class="text-primary font-semibold">${member.entries_count}</span> ${member.entries_count === 1 ? 'question' : 'questions'}. This will delete all their answers and scores.`
+        : `Are you sure you want to remove ${member.name} from the group?`;
+
     showConfirmDialog(
-        'Remove Member?',
-        `Are you sure you want to remove ${member.name} from the group?`,
+        title,
+        '',
         () => {
-            router.delete(route('groups.members.remove', [props.group.id, member.id]), {
+            router.delete(route('groups.members.remove', { group: props.group.id, user: member.id }), {
                 preserveScroll: true,
+                onSuccess: (page) => {
+                    confirmDialog.value.show = false;
+                    showFlashMessages(page.props);
+                },
+                onError: () => {
+                    confirmDialog.value.show = false;
+                },
             });
         },
         'danger',
-        'user-minus'
+        'user-minus',
+        messageHtml
     );
 };
 
@@ -104,9 +131,10 @@ const addGuest = () => {
         name: guestName.value.trim(),
     }, {
         preserveScroll: true,
-        onSuccess: () => {
+        onSuccess: (page) => {
             guestName.value = '';
             showAddGuestModal.value = false;
+            showFlashMessages(page.props);
         },
     });
 };
@@ -272,13 +300,13 @@ const formatDate = (dateString) => {
                             </div>
                         </div>
                     </Card>
-                    <Card border-color="warning">
+                    <Card border-color="danger">
                         <div class="flex items-start gap-3">
-                            <Icon name="triangle-exclamation" class="text-warning mt-0.5" />
+                            <Icon name="triangle-exclamation" class="text-danger mt-0.5" />
                             <div>
-                                <h4 class="font-semibold text-body mb-1">Note</h4>
+                                <h4 class="font-semibold text-body mb-1">Warning</h4>
                                 <p class="text-sm text-muted">
-                                    You cannot remove members who have already submitted answers. You also cannot demote the last captain.
+                                    Removing a member will also delete all their entries and scores. You cannot demote the last captain.
                                 </p>
                             </div>
                         </div>
@@ -318,11 +346,28 @@ const formatDate = (dateString) => {
                     :show="confirmDialog.show"
                     :title="confirmDialog.title"
                     :message="confirmDialog.message"
+                    :message-html="confirmDialog.messageHtml"
                     :variant="confirmDialog.variant"
                     :icon="confirmDialog.icon"
                     @confirm="handleConfirm"
                     @cancel="confirmDialog.show = false"
                     @close="confirmDialog.show = false"
+                />
+
+                <!-- Flash Messages -->
+                <Toast
+                    :show="showErrorToast"
+                    :message="errorMessage"
+                    variant="error"
+                    position="top-right"
+                    @close="showErrorToast = false"
+                />
+                <Toast
+                    :show="showSuccessToast"
+                    :message="successMessage"
+                    variant="success"
+                    position="top-right"
+                    @close="showSuccessToast = false"
                 />
             </div>
         </div>

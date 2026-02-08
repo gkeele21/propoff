@@ -16,9 +16,10 @@
                     <h3 v-if="title" class="text-lg font-semibold text-body">
                         {{ title }}
                     </h3>
-                    <p v-if="message" class="mt-2 text-subtle">
+                    <p v-if="message" class="mt-2 text-subtle whitespace-pre-line">
                         {{ message }}
                     </p>
+                    <p v-else-if="messageHtml" class="mt-2 text-subtle whitespace-pre-line" v-html="messageHtml"></p>
                     <slot />
                 </div>
             </div>
@@ -53,6 +54,7 @@ const props = defineProps({
     show: { type: Boolean, default: false },
     title: { type: String, default: '' },
     message: { type: String, default: '' },
+    messageHtml: { type: String, default: '' },
     variant: { type: String, default: 'default' }, // default, danger, warning, info
     icon: { type: String, default: '' },
     confirmText: { type: String, default: 'Confirm' },
