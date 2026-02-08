@@ -72,6 +72,16 @@ class GradingController extends Controller
                     'set_by' => auth()->id(),
                 ]
             );
+
+            // Recalculate scores for all groups using admin grading
+            $adminGroups = $group->event->groups()->where('grading_source', 'admin')->get();
+            foreach ($adminGroups as $adminGroup) {
+                $adminEntries = $adminGroup->entries()->get();
+                foreach ($adminEntries as $entry) {
+                    $this->entryService->calculateScore($entry);
+                }
+                $this->leaderboardService->updateLeaderboard($group->event, $adminGroup);
+            }
         }
 
         // Recalculate scores for all entries in this group

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Entry;
+use App\Models\EventAnswer;
 use App\Models\Group;
 use App\Models\GroupQuestionAnswer;
 use App\Models\Leaderboard;
@@ -546,9 +547,23 @@ class PlayController extends Controller
     protected function getGroupStats(Group $group): array
     {
         $totalQuestions = $group->groupQuestions()->where('is_active', true)->count();
-        $gradedQuestions = $group->groupQuestionAnswers()->count();
         $totalMembers = $group->users()->count();
         $totalPoints = $group->groupQuestions()->where('is_active', true)->sum('points');
+
+        // Count graded questions based on grading source
+        if ($group->grading_source === 'captain') {
+            $gradedQuestions = $group->groupQuestionAnswers()->count();
+        } else {
+            // Admin grading: count event answers for questions linked to this group
+            $eventQuestionIds = $group->groupQuestions()
+                ->where('is_active', true)
+                ->whereNotNull('event_question_id')
+                ->pluck('event_question_id');
+
+            $gradedQuestions = EventAnswer::where('event_id', $group->event_id)
+                ->whereIn('event_question_id', $eventQuestionIds)
+                ->count();
+        }
 
         return [
             'total_questions' => $totalQuestions,
