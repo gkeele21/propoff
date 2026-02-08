@@ -9,11 +9,18 @@ use App\Models\CaptainInvitation;
 use App\Models\Event;
 use App\Models\EventInvitation;
 use App\Models\Group;
+use App\Services\EntryService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class EventController extends Controller
 {
+    protected EntryService $entryService;
+
+    public function __construct(EntryService $entryService)
+    {
+        $this->entryService = $entryService;
+    }
     /**
      * Display a listing of events.
      */
@@ -82,7 +89,6 @@ class EventController extends Controller
         $gradedCount = \App\Models\EventAnswer::where('event_id', $event->id)
             ->where('is_void', false)
             ->count();
-        $totalPoints = $event->eventQuestions()->sum('points');
 
         $stats = [
             'total_questions' => $event->event_questions_count,
@@ -93,7 +99,7 @@ class EventController extends Controller
                 ->avg('percentage') ?? 0),
             'participating_groups' => $event->groups()->count(),
             'graded_count' => $gradedCount,
-            'total_points' => $totalPoints,
+            'total_points' => $this->entryService->calculateTheoreticalMaxForEvent($event),
         ];
 
         // Get questions with all necessary data

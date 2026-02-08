@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Models\User;
+use App\Services\EntryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -11,6 +12,12 @@ use Inertia\Inertia;
 
 class GroupController extends Controller
 {
+    protected EntryService $entryService;
+
+    public function __construct(EntryService $entryService)
+    {
+        $this->entryService = $entryService;
+    }
     /**
      * Display the join group page.
      */
@@ -155,7 +162,7 @@ class GroupController extends Controller
                 'total_questions' => $questions->count(),
                 'total_entries' => $group->entries()->where('is_complete', true)->count(),
                 'answered_questions' => $group->groupQuestionAnswers()->count(),
-                'total_points' => $group->groupQuestions()->where('is_active', true)->sum('points'),
+                'total_points' => $this->entryService->calculateTheoreticalMax($group),
             ];
 
             // Format group data for captain view

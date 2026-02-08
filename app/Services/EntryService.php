@@ -21,7 +21,7 @@ class EntryService
     {
         // Calculate possible points from group's active questions
         // Before answers are set, include maximum possible bonuses
-        $possiblePoints = $this->calculateInitialPossiblePoints($group);
+        $possiblePoints = $this->calculateTheoreticalMax($group);
 
         return Entry::create([
             'event_id' => $event->id,
@@ -158,23 +158,30 @@ class EntryService
                     );
                 }
                 $totalScore += $pointsEarned;
-            }
 
-            // Calculate possible points based on USER'S SELECTED answer
-            // This personalizes max possible per user based on their picks
-            if ($pointsAwarded !== null) {
-                // Use custom points if set
-                $questionMaxPoints = $pointsAwarded;
-            } else {
-                // Use base + bonus of the USER'S answer (personalized max possible)
-                $questionMaxPoints = $this->calculatePointsForAnswer($groupQuestion, $userAnswer->answer_text);
+                // Only add to possible points if correct - wrong answers are lost points
+                $possiblePoints += $pointsEarned;
             }
-            $possiblePoints += $questionMaxPoints;
+            // If wrong, don't add to possiblePoints - those points can no longer be earned
 
             $userAnswer->update([
                 'points_earned' => $pointsEarned,
                 'is_correct' => $isCorrect,
             ]);
+        }
+
+        // Add max possible points for unanswered questions ONLY if group is not locked
+        // Once locked, unanswered questions = lost points (can't answer anymore)
+        if (!$group->is_locked) {
+            $answeredQuestionIds = $userAnswers->pluck('group_question_id')->toArray();
+            $unansweredQuestions = $group->groupQuestions()
+                ->where('is_active', true)
+                ->whereNotIn('id', $answeredQuestionIds)
+                ->get();
+
+            foreach ($unansweredQuestions as $question) {
+                $possiblePoints += $this->calculateMaxPointsForQuestion($question);
+            }
         }
 
         // Update entry totals
@@ -334,16 +341,47 @@ class EntryService
     }
 
     /**
-     * Calculate initial possible points for a group (before answers are set).
+     * Calculate theoretical max points for a group.
      * Includes base points + maximum possible bonus for each question.
+     * This is the same for everyone - the ceiling if you picked all underdogs and got them right.
      */
-    protected function calculateInitialPossiblePoints(Group $group): int
+    public function calculateTheoreticalMax(Group $group): int
     {
         $possiblePoints = 0;
         $questions = $group->groupQuestions()->active()->get();
 
         foreach ($questions as $question) {
             $possiblePoints += $this->calculateMaxPointsForQuestion($question);
+        }
+
+        return $possiblePoints;
+    }
+
+    /**
+     * Calculate theoretical max points for an event.
+     * Includes base points + maximum possible bonus for each question.
+     */
+    public function calculateTheoreticalMaxForEvent(Event $event): int
+    {
+        $possiblePoints = 0;
+        $questions = $event->eventQuestions()->get();
+
+        foreach ($questions as $question) {
+            $basePoints = $question->points;
+            $maxBonus = 0;
+
+            if ($question->question_type === 'multiple_choice' && $question->options) {
+                $options = is_string($question->options) ? json_decode($question->options, true) : $question->options;
+                if (is_array($options)) {
+                    foreach ($options as $option) {
+                        if (is_array($option) && isset($option['points'])) {
+                            $maxBonus = max($maxBonus, $option['points'] ?? 0);
+                        }
+                    }
+                }
+            }
+
+            $possiblePoints += $basePoints + $maxBonus;
         }
 
         return $possiblePoints;

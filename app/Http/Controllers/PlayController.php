@@ -9,6 +9,7 @@ use App\Models\GroupQuestionAnswer;
 use App\Models\Leaderboard;
 use App\Models\User;
 use App\Models\UserAnswer;
+use App\Services\EntryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,12 @@ use Inertia\Inertia;
 
 class PlayController extends Controller
 {
+    protected EntryService $entryService;
+
+    public function __construct(EntryService $entryService)
+    {
+        $this->entryService = $entryService;
+    }
     /**
      * Display the Play Hub for a group.
      */
@@ -263,17 +270,12 @@ class PlayController extends Controller
                     ->with('error', 'This game is locked. New entries cannot be created.');
             }
 
-            // Calculate possible points from group's active questions
-            $possiblePoints = $group->groupQuestions()
-                ->where('is_active', true)
-                ->sum('points');
-
             $entry = Entry::create([
                 'event_id' => $group->event_id,
                 'user_id' => $targetUser->id,
                 'group_id' => $group->id,
                 'total_score' => 0,
-                'possible_points' => $possiblePoints,
+                'possible_points' => $this->entryService->calculateTheoreticalMax($group),
                 'percentage' => 0,
             ]);
 
@@ -548,7 +550,7 @@ class PlayController extends Controller
     {
         $totalQuestions = $group->groupQuestions()->where('is_active', true)->count();
         $totalMembers = $group->users()->count();
-        $totalPoints = $group->groupQuestions()->where('is_active', true)->sum('points');
+        $totalPoints = $this->entryService->calculateTheoreticalMax($group);
 
         // Count graded questions based on grading source
         if ($group->grading_source === 'captain') {
