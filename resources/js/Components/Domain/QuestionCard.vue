@@ -114,7 +114,7 @@
 
                     <!-- Bonus Points -->
                     <span v-if="option.points && option.points > 0" class="text-xs font-semibold text-warning bg-warning/15 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded whitespace-nowrap flex-shrink-0">
-                        +{{ option.points }} <span class="hidden sm:inline">bonus</span> {{ option.points === 1 ? 'pt' : 'pts' }}
+                        +{{ option.points }} bonus {{ option.points === 1 ? 'pt' : 'pts' }}
                     </span>
                 </div>
             </label>
