@@ -330,7 +330,7 @@ class LeaderboardService
             $caseSql = implode(' ', $cases);
             $idsSql = implode(',', $ids);
 
-            \DB::statement("UPDATE leaderboards SET rank = CASE {$caseSql} END WHERE id IN ({$idsSql})");
+            \DB::statement("UPDATE leaderboards SET `rank` = CASE {$caseSql} END WHERE id IN ({$idsSql})");
         }
     }
 }
