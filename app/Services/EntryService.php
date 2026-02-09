@@ -428,6 +428,10 @@ class EntryService
             ->with(['userAnswers'])
             ->get();
 
+        // Collect all updates for bulk operations
+        $allUserAnswerUpdates = [];
+        $entryUpdates = [];
+
         // Process each entry
         foreach ($entries as $entry) {
             $totalScore = 0;
@@ -472,18 +476,60 @@ class EntryService
                 }
             }
 
-            // Batch update user answers
+            // Collect user answer updates for bulk operation
             foreach ($userAnswerUpdates as $answerId => $data) {
-                UserAnswer::where('id', $answerId)->update($data);
+                $allUserAnswerUpdates[] = [
+                    'id' => $answerId,
+                    'points_earned' => $data['points_earned'],
+                    'is_correct' => $data['is_correct'],
+                ];
             }
 
-            // Update entry totals
+            // Collect entry updates for bulk operation
             $percentage = $possiblePoints > 0 ? round(($totalScore / $possiblePoints) * 100, 2) : 0;
-            $entry->update([
+            $entryUpdates[] = [
+                'id' => $entry->id,
                 'total_score' => $totalScore,
                 'possible_points' => $possiblePoints,
                 'percentage' => $percentage,
-            ]);
+            ];
+        }
+
+        // Bulk update user answers using CASE statements
+        if (!empty($allUserAnswerUpdates)) {
+            $pointsCases = [];
+            $correctCases = [];
+            $ids = [];
+            foreach ($allUserAnswerUpdates as $update) {
+                $pointsCases[] = "WHEN id = {$update['id']} THEN {$update['points_earned']}";
+                $correctCases[] = "WHEN id = {$update['id']} THEN " . ($update['is_correct'] ? '1' : '0');
+                $ids[] = $update['id'];
+            }
+            $pointsCaseSql = implode(' ', $pointsCases);
+            $correctCaseSql = implode(' ', $correctCases);
+            $idsSql = implode(',', $ids);
+
+            \DB::statement("UPDATE user_answers SET points_earned = CASE {$pointsCaseSql} END, is_correct = CASE {$correctCaseSql} END WHERE id IN ({$idsSql})");
+        }
+
+        // Bulk update entries using CASE statements
+        if (!empty($entryUpdates)) {
+            $scoreCases = [];
+            $possibleCases = [];
+            $percentCases = [];
+            $ids = [];
+            foreach ($entryUpdates as $update) {
+                $scoreCases[] = "WHEN id = {$update['id']} THEN {$update['total_score']}";
+                $possibleCases[] = "WHEN id = {$update['id']} THEN {$update['possible_points']}";
+                $percentCases[] = "WHEN id = {$update['id']} THEN {$update['percentage']}";
+                $ids[] = $update['id'];
+            }
+            $scoreCaseSql = implode(' ', $scoreCases);
+            $possibleCaseSql = implode(' ', $possibleCases);
+            $percentCaseSql = implode(' ', $percentCases);
+            $idsSql = implode(',', $ids);
+
+            \DB::statement("UPDATE entries SET total_score = CASE {$scoreCaseSql} END, possible_points = CASE {$possibleCaseSql} END, percentage = CASE {$percentCaseSql} END WHERE id IN ({$idsSql})");
         }
     }
 }

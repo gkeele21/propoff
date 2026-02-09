@@ -249,26 +249,88 @@ class LeaderboardService
 
     /**
      * Update leaderboard for a specific event and group.
-     * Used when answers are updated (captain or admin grading).
+     * Uses bulk operations for efficiency.
      */
     public function updateLeaderboard(Event $event, Group $group): void
     {
-        // Get all entries with at least one answer for this group
+        // Get all entries with answer counts in a single query
         $entries = $event->entries()
             ->where('group_id', $group->id)
-            ->whereHas('userAnswers')
-            ->with('userAnswers')
+            ->withCount('userAnswers')
             ->get();
 
-        // Update leaderboard entries for all entries
-        foreach ($entries as $entry) {
-            $this->updateLeaderboardForEntry($entry);
+        if ($entries->isEmpty()) {
+            return;
         }
 
-        // Update ranks for this group
-        $this->updateRanks($event->id, $group->id);
+        // Bulk upsert leaderboard entries
+        $leaderboardData = $entries->map(function ($entry) {
+            return [
+                'event_id' => $entry->event_id,
+                'user_id' => $entry->user_id,
+                'group_id' => $entry->group_id,
+                'total_score' => $entry->total_score,
+                'possible_points' => $entry->possible_points,
+                'percentage' => $entry->percentage,
+                'answered_count' => $entry->user_answers_count,
+                'rank' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        })->toArray();
 
-        // Also update global leaderboard
-        $this->createGlobalLeaderboard($event);
+        Leaderboard::upsert(
+            $leaderboardData,
+            ['event_id', 'user_id', 'group_id'],
+            ['total_score', 'possible_points', 'percentage', 'answered_count', 'rank', 'updated_at']
+        );
+
+        // Update ranks for this group
+        $this->updateRanksBulk($event->id, $group->id);
+    }
+
+    /**
+     * Update ranks using a more efficient approach.
+     */
+    public function updateRanksBulk(int $eventId, int $groupId): void
+    {
+        // Get all leaderboard entries ordered by score
+        $entries = Leaderboard::where('event_id', $eventId)
+            ->where('group_id', $groupId)
+            ->orderByDesc('total_score')
+            ->get(['id', 'total_score']);
+
+        if ($entries->isEmpty()) {
+            return;
+        }
+
+        // Calculate ranks in memory
+        $updates = [];
+        $currentRank = 1;
+        $previousScore = null;
+
+        foreach ($entries as $index => $entry) {
+            if ($previousScore !== null && $previousScore === $entry->total_score) {
+                // Tie - same rank
+            } else {
+                $currentRank = $index + 1;
+            }
+            $updates[$entry->id] = $currentRank;
+            $previousScore = $entry->total_score;
+        }
+
+        // Bulk update ranks using CASE statement
+        if (!empty($updates)) {
+            $cases = [];
+            $ids = [];
+            foreach ($updates as $id => $rank) {
+                $cases[] = "WHEN id = {$id} THEN {$rank}";
+                $ids[] = $id;
+            }
+            $caseSql = implode(' ', $cases);
+            $idsSql = implode(',', $ids);
+
+            \DB::statement("UPDATE leaderboards SET rank = CASE {$caseSql} END WHERE id IN ({$idsSql})");
+        }
     }
 }

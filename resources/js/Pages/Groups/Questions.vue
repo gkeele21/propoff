@@ -95,11 +95,12 @@ const formatDate = (dateString) => {
 };
 
 // Answer selection handlers
-const selectAnswer = (questionId, answerValue, question) => {
+const selectAnswer = (questionId, answerValue) => {
     selectedAnswers.value[questionId] = answerValue;
-    // Initialize sync checkbox - default checked if question has event_question_id
+    // Initialize sync checkbox - default checked for managers, unchecked for others
     if (syncToAdmin.value[questionId] === undefined) {
-        syncToAdmin.value[questionId] = !!question.event_question_id;
+        const question = props.questions.find(q => q.id === questionId);
+        syncToAdmin.value[questionId] = props.isManager && !!question?.event_question_id;
     }
 };
 
@@ -122,16 +123,11 @@ const saveAnswer = (question) => {
         },
         {
             onSuccess: () => {
-                delete selectedAnswers.value[question.id];
-                delete syncToAdmin.value[question.id];
-                showToastMessage(
-                    willSync ? 'Answer saved for group and admin' : 'Answer saved and scores calculated'
-                );
+                // Redirect to hub page for faster load
+                router.visit(route('play.hub', { code: props.group.code }));
             },
             onError: () => {
                 showToastMessage('Error saving answer');
-            },
-            onFinish: () => {
                 savingQuestionId.value = null;
             },
         }
@@ -384,7 +380,7 @@ const showToastMessage = (message) => {
                             >
                             <QuestionCard
                                 :model-value="selectedAnswers[question.id]"
-                                @update:model-value="selectAnswer(question.id, $event, question)"
+                                @update:model-value="selectAnswer(question.id, $event)"
                                 :question="question.question_text"
                                 :options="question.options"
                                 :points="question.points"
