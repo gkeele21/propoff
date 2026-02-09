@@ -118,8 +118,8 @@
                     </span>
                 </div>
 
-                <!-- Pick Count (shown in results mode when we have distribution data) -->
-                <div v-if="showResults && answerDistribution && getPickCount(option.value) > 0" class="flex-shrink-0">
+                <!-- Pick Count (shown when we have distribution data - i.e. group is locked) -->
+                <div v-if="answerDistribution && getPickCount(option.value) > 0" class="flex-shrink-0">
                     <button
                         type="button"
                         :ref="el => setButtonRef(option.value, el)"
