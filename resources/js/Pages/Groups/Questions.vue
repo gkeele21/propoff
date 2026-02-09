@@ -122,9 +122,24 @@ const saveAnswer = (question) => {
             sync_to_admin: willSync,
         },
         {
+            preserveScroll: true,
             onSuccess: () => {
-                // Redirect to hub page for faster load
-                router.visit(route('play.hub', { code: props.group.code }));
+                showToastMessage('Answer saved');
+                delete selectedAnswers.value[question.id];
+                savingQuestionId.value = null;
+
+                // Scroll to the next unanswered question
+                setTimeout(() => {
+                    const currentIndex = props.questions.findIndex(q => q.id === question.id);
+                    const nextUnanswered = props.questions.find((q, i) => i > currentIndex && !q.correct_answer);
+
+                    if (nextUnanswered) {
+                        const element = document.getElementById(`question-${nextUnanswered.id}`);
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                }, 100);
             },
             onError: () => {
                 showToastMessage('Error saving answer');
