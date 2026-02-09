@@ -206,6 +206,37 @@ class QuestionTemplateController extends Controller
     }
 
     /**
+     * Reorder templates.
+     */
+    public function reorder(Request $request)
+    {
+        $validated = $request->validate([
+            'template_id' => 'required|exists:question_templates,id',
+            'new_order' => 'required|integer|min:1',
+        ]);
+
+        $template = QuestionTemplate::findOrFail($validated['template_id']);
+        $oldOrder = $template->display_order;
+        $newOrder = $validated['new_order'];
+
+        if ($oldOrder < $newOrder) {
+            // Moving down - shift up templates in between
+            QuestionTemplate::where('display_order', '>', $oldOrder)
+                ->where('display_order', '<=', $newOrder)
+                ->decrement('display_order');
+        } elseif ($oldOrder > $newOrder) {
+            // Moving up - shift down templates in between
+            QuestionTemplate::where('display_order', '>=', $newOrder)
+                ->where('display_order', '<', $oldOrder)
+                ->increment('display_order');
+        }
+
+        $template->update(['display_order' => $newOrder]);
+
+        return back()->with('success', 'Templates reordered successfully!');
+    }
+
+    /**
      * Preview template with variable substitution.
      */
     public function preview(Request $request, QuestionTemplate $template)

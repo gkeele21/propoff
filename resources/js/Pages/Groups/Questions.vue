@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Button from '@/Components/Base/Button.vue';
@@ -272,6 +272,16 @@ const showToastMessage = (message) => {
     }, 3000);
 };
 
+// Filter for unanswered questions
+const showUnansweredOnly = ref(false);
+
+const filteredQuestions = computed(() => {
+    if (!showUnansweredOnly.value) {
+        return props.questions;
+    }
+    return props.questions.filter(q => !q.correct_answer);
+});
+
 </script>
 
 <template>
@@ -338,12 +348,28 @@ const showToastMessage = (message) => {
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-3">
                                     <h2 class="text-xl font-bold text-body">Questions</h2>
-                                    <Badge variant="primary-soft" size="sm">{{ questions?.length || 0 }}</Badge>
+                                    <Badge variant="primary-soft" size="sm">{{ filteredQuestions?.length || 0 }}</Badge>
+                                    <span v-if="showUnansweredOnly && filteredQuestions.length !== questions.length" class="text-xs text-muted">
+                                        of {{ questions.length }}
+                                    </span>
                                 </div>
-                                <Button variant="primary" size="sm" @click="openAddModal">
-                                    <Icon name="plus" class="mr-2" size="sm" />
-                                    Add Question
-                                </Button>
+                                <div class="flex items-center gap-3">
+                                    <button
+                                        v-if="group.is_locked"
+                                        @click="showUnansweredOnly = !showUnansweredOnly"
+                                        class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors"
+                                        :class="showUnansweredOnly
+                                            ? 'bg-primary text-white'
+                                            : 'bg-surface-elevated text-muted hover:text-body'"
+                                    >
+                                        <Icon name="filter" size="sm" />
+                                        Unanswered
+                                    </button>
+                                    <Button variant="primary" size="sm" @click="openAddModal">
+                                        <Icon name="plus" class="mr-2" size="sm" />
+                                        Add Question
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </template>
@@ -351,7 +377,7 @@ const showToastMessage = (message) => {
                     <!-- Questions List -->
                     <div class="space-y-4 p-6">
                         <div
-                            v-for="(question, index) in questions"
+                            v-for="question in filteredQuestions"
                             :key="question.id"
                             :id="`question-${question.id}`"
                             class="relative"
@@ -384,7 +410,7 @@ const showToastMessage = (message) => {
                                 :question="question.question_text"
                                 :options="question.options"
                                 :points="question.points"
-                                :question-number="index + 1"
+                                :question-number="question.display_order"
                                 :correct-answer="question.correct_answer"
                                 :show-results="!!question.correct_answer"
                                 :show-header="true"
@@ -443,12 +469,25 @@ const showToastMessage = (message) => {
                             />
                         </div>
 
-                        <!-- Empty State -->
+                        <!-- Empty State - No questions at all -->
                         <div v-if="!questions || questions.length === 0" class="text-center py-12 text-muted">
                             <Icon name="circle-question" size="3x" class="mb-4 text-subtle" />
                             <p class="text-lg mb-2">No questions yet</p>
                             <p class="text-sm mb-4">Add questions for your group members to answer</p>
                             <Button variant="primary" @click="openAddModal">Add Question</Button>
+                        </div>
+
+                        <!-- Empty State - All questions answered (when filtering) -->
+                        <div v-else-if="filteredQuestions.length === 0 && showUnansweredOnly" class="text-center py-12 text-muted">
+                            <Icon name="circle-check" size="3x" class="mb-4 text-success" />
+                            <p class="text-lg mb-2">All questions answered</p>
+                            <p class="text-sm mb-4">You've set answers for all {{ questions.length }} questions</p>
+                            <button
+                                @click="showUnansweredOnly = false"
+                                class="text-primary hover:text-primary-hover transition-colors"
+                            >
+                                Show all questions
+                            </button>
                         </div>
                     </div>
                 </Card>

@@ -227,6 +227,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::middleware('manager')->group(function () {
         // Question Templates
         Route::resource('question-templates', QuestionTemplateController::class);
+        Route::post('/question-templates/reorder', [QuestionTemplateController::class, 'reorder'])->name('question-templates.reorder');
         Route::post('/question-templates/{template}/preview', [QuestionTemplateController::class, 'preview'])->name('question-templates.preview');
         Route::post('/question-templates/{template}/duplicate', [QuestionTemplateController::class, 'duplicate'])->name('question-templates.duplicate');
 
