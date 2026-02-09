@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Badge from '@/Components/Base/Badge.vue';
@@ -12,6 +12,59 @@ const props = defineProps({
     group: Object,
     leaderboard: Object,
     userRow: Object,
+});
+
+// Sorting state
+const sortColumn = ref('rank');
+const sortDirection = ref('asc');
+
+const toggleSort = (column) => {
+    if (sortColumn.value === column) {
+        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortColumn.value = column;
+        // Default directions: rank asc, others desc (highest first)
+        sortDirection.value = column === 'rank' ? 'asc' : 'desc';
+    }
+};
+
+const sortedLeaderboard = computed(() => {
+    const data = [...props.leaderboard.data];
+    const col = sortColumn.value;
+    const dir = sortDirection.value;
+
+    return data.sort((a, b) => {
+        let aVal, bVal;
+
+        switch (col) {
+            case 'rank':
+                aVal = a.rank;
+                bVal = b.rank;
+                break;
+            case 'player':
+                aVal = (a.user?.name || '').toLowerCase();
+                bVal = (b.user?.name || '').toLowerCase();
+                break;
+            case 'answers':
+                aVal = a.answered_count;
+                bVal = b.answered_count;
+                break;
+            case 'points':
+                aVal = a.total_score;
+                bVal = b.total_score;
+                break;
+            case 'max':
+                aVal = a.possible_points;
+                bVal = b.possible_points;
+                break;
+            default:
+                return 0;
+        }
+
+        if (aVal < bVal) return dir === 'asc' ? -1 : 1;
+        if (aVal > bVal) return dir === 'asc' ? 1 : -1;
+        return 0;
+    });
 });
 
 // Get ordinal suffix
@@ -53,17 +106,48 @@ const breadcrumbs = computed(() => [
                 <div class="-m-5">
                     <!-- Column Headers -->
                     <div class="flex items-center py-3 px-4 sm:px-5 bg-surface-header border-b border-border text-xs font-medium text-subtle uppercase tracking-wider">
-                        <div class="w-12 sm:w-14">Rank</div>
-                        <div class="flex-1 min-w-0">Player</div>
-                        <div v-if="!group.is_locked" class="w-14 sm:w-20 text-right">Answers</div>
-                        <div class="w-14 sm:w-24 text-right">Points</div>
-                        <div class="w-12 sm:w-24 text-right">Max</div>
+                        <button
+                            class="w-12 sm:w-14 flex items-center gap-1 hover:text-body transition-colors cursor-pointer"
+                            @click="toggleSort('rank')"
+                        >
+                            Rank
+                            <Icon v-if="sortColumn === 'rank'" :name="sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'" size="xs" />
+                        </button>
+                        <button
+                            class="flex-1 min-w-0 flex items-center gap-1 hover:text-body transition-colors cursor-pointer text-left"
+                            @click="toggleSort('player')"
+                        >
+                            Player
+                            <Icon v-if="sortColumn === 'player'" :name="sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'" size="xs" />
+                        </button>
+                        <button
+                            v-if="!group.is_locked"
+                            class="w-14 sm:w-20 flex items-center justify-end gap-1 hover:text-body transition-colors cursor-pointer"
+                            @click="toggleSort('answers')"
+                        >
+                            <Icon v-if="sortColumn === 'answers'" :name="sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'" size="xs" />
+                            Answers
+                        </button>
+                        <button
+                            class="w-14 sm:w-24 flex items-center justify-end gap-1 hover:text-body transition-colors cursor-pointer"
+                            @click="toggleSort('points')"
+                        >
+                            <Icon v-if="sortColumn === 'points'" :name="sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'" size="xs" />
+                            Points
+                        </button>
+                        <button
+                            class="w-12 sm:w-24 flex items-center justify-end gap-1 hover:text-body transition-colors cursor-pointer"
+                            @click="toggleSort('max')"
+                        >
+                            <Icon v-if="sortColumn === 'max'" :name="sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'" size="xs" />
+                            Max
+                        </button>
                     </div>
 
                     <!-- Leaderboard Rows -->
                     <div class="divide-y divide-border">
                         <div
-                            v-for="entry in leaderboard.data"
+                            v-for="entry in sortedLeaderboard"
                             :key="entry.id"
                             class="flex items-center py-3 px-4 sm:px-5"
                             :class="{ 'bg-surface-elevated': entry.user_id === userRow?.user_id }"
@@ -82,7 +166,7 @@ const breadcrumbs = computed(() => [
                     </div>
 
                     <!-- Empty state -->
-                    <div v-if="leaderboard.data.length === 0" class="p-8 text-center">
+                    <div v-if="sortedLeaderboard.length === 0" class="p-8 text-center">
                         <Icon name="trophy" size="3x" class="text-subtle mb-4" />
                         <p class="text-muted">No entries yet</p>
                     </div>
