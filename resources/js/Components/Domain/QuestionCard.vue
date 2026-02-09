@@ -117,6 +117,36 @@
                         +{{ option.points }} bonus {{ option.points === 1 ? 'pt' : 'pts' }}
                     </span>
                 </div>
+
+                <!-- Pick Count (shown in results mode when we have distribution data) -->
+                <div v-if="showResults && answerDistribution && getPickCount(option.value) > 0" class="flex-shrink-0">
+                    <button
+                        type="button"
+                        :ref="el => setButtonRef(option.value, el)"
+                        @click.prevent.stop="toggleDropdown(option.value)"
+                        class="text-xs text-muted hover:text-body transition-colors flex items-center gap-1"
+                    >
+                        <Icon name="users" size="xs" />
+                        {{ getPickCount(option.value) }}
+                        <Icon :name="openDropdown === option.value ? 'chevron-up' : 'chevron-down'" size="xs" />
+                    </button>
+
+                    <!-- Dropdown with user names (teleported to body to escape stacking context) -->
+                    <Teleport to="body">
+                        <div
+                            v-if="openDropdown === option.value"
+                            class="fixed z-[9999] bg-[#1f1f1f] border border-border rounded-lg shadow-xl p-3 min-w-[160px] max-h-[200px] overflow-y-auto"
+                            :style="getDropdownPosition(option.value)"
+                        >
+                            <div class="text-xs font-semibold text-muted mb-2">{{ getPickCount(option.value) }} picked this</div>
+                            <ul class="space-y-1">
+                                <li v-for="userName in getPickUsers(option.value)" :key="userName" class="text-sm text-body">
+                                    {{ userName }}
+                                </li>
+                            </ul>
+                        </div>
+                    </Teleport>
+                </div>
             </label>
         </div>
 
@@ -129,7 +159,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import Icon from '@/Components/Base/Icon.vue';
 import Badge from '@/Components/Base/Badge.vue';
 
@@ -156,6 +186,68 @@ const props = defineProps({
     questionType: { type: String, default: null }, // Question type badge (multiple_choice, yes_no, etc.)
     isVoid: { type: Boolean, default: false }, // Show voided badge
     isCustom: { type: Boolean, default: false }, // Show custom badge
+    // Answer distribution (for showing who picked what)
+    answerDistribution: { type: Object, default: null }, // { 'Option A': { count: 5, users: ['John', 'Jane', ...] }, ... }
+});
+
+// Track which option's dropdown is open
+const openDropdown = ref(null);
+
+// Store button refs for positioning
+const buttonRefs = ref({});
+
+function setButtonRef(optionValue, el) {
+    if (el) {
+        buttonRefs.value[optionValue] = el;
+    }
+}
+
+function toggleDropdown(optionValue) {
+    if (openDropdown.value === optionValue) {
+        openDropdown.value = null;
+    } else {
+        openDropdown.value = optionValue;
+    }
+}
+
+function getDropdownPosition(optionValue) {
+    const button = buttonRefs.value[optionValue];
+    if (!button) return {};
+
+    const rect = button.getBoundingClientRect();
+    return {
+        top: `${rect.bottom + 4}px`,
+        right: `${window.innerWidth - rect.right}px`,
+    };
+}
+
+function getPickCount(optionValue) {
+    if (!props.answerDistribution || !props.answerDistribution[optionValue]) {
+        return 0;
+    }
+    return props.answerDistribution[optionValue].count;
+}
+
+function getPickUsers(optionValue) {
+    if (!props.answerDistribution || !props.answerDistribution[optionValue]) {
+        return [];
+    }
+    return props.answerDistribution[optionValue].users;
+}
+
+// Close dropdown when clicking outside
+function handleClickOutside(event) {
+    if (openDropdown.value && !event.target.closest('.relative')) {
+        openDropdown.value = null;
+    }
+}
+
+onMounted(() => {
+    document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside);
 });
 
 // Question type badge variant

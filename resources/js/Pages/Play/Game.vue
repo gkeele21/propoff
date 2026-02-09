@@ -298,6 +298,7 @@ const finishAndGoToHub = () => {
                             :disabled="group.is_locked"
                             :correct-answer="question.correct_answer"
                             :show-results="!!question.correct_answer && !question.is_void"
+                            :answer-distribution="question.answer_distribution"
                         >
                             <template v-if="hasGradedQuestions" #headerActions>
                                 <Badge v-if="question.is_void" variant="warning-soft">

@@ -293,12 +293,18 @@ class PlayController extends Controller
             ->where('group_id', $group->id)
             ->count();
 
+        // Pre-fetch answer distribution if group is locked (for showing pick counts)
+        $answerDistribution = [];
+        if ($group->is_locked) {
+            $answerDistribution = $this->getAnswerDistribution($group);
+        }
+
         // Load questions with user's answers and results data
         $questions = $group->groupQuestions()
             ->where('is_active', true)
             ->orderBy('display_order')
             ->get()
-            ->map(function ($question) use ($entry, $group) {
+            ->map(function ($question) use ($entry, $group, $answerDistribution) {
                 $userAnswer = $entry->userAnswers()
                     ->where('group_question_id', $question->id)
                     ->first();
@@ -335,6 +341,7 @@ class PlayController extends Controller
                     'is_void' => $isVoid,
                     'points_earned' => $userAnswer?->points_earned ?? 0,
                     'is_correct' => $userAnswer?->is_correct ?? false,
+                    'answer_distribution' => $answerDistribution[$question->id] ?? [],
                 ];
             });
 
@@ -787,5 +794,43 @@ class PlayController extends Controller
             $leaderboard->update(['rank' => $currentRank]);
             $previousScore = $leaderboard->total_score;
         }
+    }
+
+    /**
+     * Get answer distribution for all questions in a group.
+     * Returns an array keyed by question ID, with each option's count and user names.
+     */
+    protected function getAnswerDistribution(Group $group): array
+    {
+        // Get all user answers for this group with user names
+        $answers = UserAnswer::select('user_answers.group_question_id', 'user_answers.answer_text', 'users.name as user_name')
+            ->join('entries', 'entries.id', '=', 'user_answers.entry_id')
+            ->join('users', 'users.id', '=', 'entries.user_id')
+            ->where('entries.group_id', $group->id)
+            ->whereNotNull('user_answers.answer_text')
+            ->get();
+
+        // Group by question_id -> answer_text -> list of user names
+        $distribution = [];
+        foreach ($answers as $answer) {
+            $questionId = $answer->group_question_id;
+            $answerText = $answer->answer_text;
+
+            if (!isset($distribution[$questionId])) {
+                $distribution[$questionId] = [];
+            }
+
+            if (!isset($distribution[$questionId][$answerText])) {
+                $distribution[$questionId][$answerText] = [
+                    'count' => 0,
+                    'users' => [],
+                ];
+            }
+
+            $distribution[$questionId][$answerText]['count']++;
+            $distribution[$questionId][$answerText]['users'][] = $answer->user_name;
+        }
+
+        return $distribution;
     }
 }
